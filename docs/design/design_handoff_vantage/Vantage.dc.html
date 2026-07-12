@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes vScreenIn { from { transform: translateY(12px); } to { transform: translateY(0); } }
+  @keyframes vRise { from { transform: translateY(16px); } to { transform: translateY(0); } }
+  @keyframes vPulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+  @keyframes vSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+</style>
+</helmet>
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 50% 0%, #232227 0%, #131315 55%, #0c0c0d 100%);font-family:'Hanken Grotesk',sans-serif;padding:32px 0;">
+  <div style="position:relative;width:390px;height:844px;background:#0F0F11;border-radius:46px;overflow:hidden;box-shadow:0 40px 90px -20px rgba(0,0,0,.7),0 0 0 11px #1b1b1e,0 0 0 12px #2c2c30;color:#F4F1EA;">
+
+    <!-- status bar -->
+    <div style="position:absolute;top:0;left:0;right:0;height:50px;z-index:60;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font-size:13px;font-weight:600;letter-spacing:.2px;pointer-events:none;">
+      <span>9:41</span>
+      <span style="display:flex;gap:6px;align-items:center;font-size:12px;opacity:.9;">􀙇 􀛨 􀛪</span>
+    </div>
+
+    <!-- scroll area -->
+    <div style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;">
+
+      <!-- ============ TODAY ============ -->
+      <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:vScreenIn .4s ease both;padding:58px 20px 110px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;">
+          <div>
+            <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#8C8A93;font-weight:600;">{{ dateLabel }}</div>
+            <div style="font-family:'Newsreader',serif;font-size:30px;line-height:1.05;margin-top:6px;font-weight:500;">Today in<br>{{ locationName }}</div>
+          </div>
+          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#3a3a40,#222226);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;border:1px solid rgba(255,255,255,.08);">M</div>
+        </div>
+
+        <!-- golden hour hero -->
+        <div style="position:relative;border-radius:24px;overflow:hidden;padding:22px 22px 24px;background:linear-gradient(150deg,#5a3d1e 0%,#3a2a18 45%,#211b14 100%);border:1px solid rgba(233,184,114,.22);margin-bottom:26px;">
+          <div style="position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#F2A93B 0%,rgba(242,169,59,0) 70%);opacity:.55;"></div>
+          <div style="position:relative;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#E9B872;">
+              <span style="width:7px;height:7px;border-radius:50%;background:#F2A93B;animation:vPulse 2s ease infinite;"></span>{{ heroPhase }}
+            </div>
+            <div style="font-family:'Newsreader',serif;font-size:44px;font-weight:500;letter-spacing:-1px;margin-top:10px;line-height:1;">{{ heroCountdown }}</div>
+            <div style="font-size:14px;color:#cfc6b6;margin-top:6px;">until golden hour · {{ heroWindow }}</div>
+            <div style="display:flex;gap:18px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);">
+              <div><div style="font-size:11px;color:#a99e8c;text-transform:uppercase;letter-spacing:.5px;">Sky</div><div style="font-size:15px;font-weight:600;margin-top:2px;">{{ heroSky }}</div></div>
+              <div><div style="font-size:11px;color:#a99e8c;text-transform:uppercase;letter-spacing:.5px;">Cloud</div><div style="font-size:15px;font-weight:600;margin-top:2px;">{{ heroCloud }}</div></div>
+              <div><div style="font-size:11px;color:#a99e8c;text-transform:uppercase;letter-spacing:.5px;">Temp</div><div style="font-size:15px;font-weight:600;margin-top:2px;">{{ heroTemp }}</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-family:'Newsreader',serif;font-size:22px;font-weight:500;">Best shots near you</div>
+          <div style="font-size:13px;color:#8C8A93;font-weight:600;white-space:nowrap;">{{ spotCount }} spots</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ spotsView }}" as="spot" hint-placeholder-count="4">
+            <div onClick="{{ spot.open }}" style="position:relative;border-radius:20px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.07);background:#161618;animation:vRise .5s ease both;">
+              <div style="position:relative;height:188px;background-size:cover;background-position:center;background-image:{{ spot.bg }}">
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(12,12,13,.92) 0%,rgba(12,12,13,.25) 55%,rgba(12,12,13,.45) 100%);"></div>
+                <div style="position:absolute;top:12px;left:12px;display:flex;gap:7px;">
+                  <span style="background:rgba(10,10,11,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);font-size:11px;font-weight:600;letter-spacing:.4px;padding:5px 10px;border-radius:20px;">{{ spot.type }}</span>
+                </div>
+                <div style="position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:5px;background:rgba(10,10,11,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);padding:5px 9px;border-radius:20px;">
+                  <span style="font-size:13px;font-weight:700;color:{{ spot.scoreColor }}">{{ spot.score }}</span>
+                  <span style="font-size:10px;color:#b9b6bf;text-transform:uppercase;letter-spacing:.5px;">score</span>
+                </div>
+                <div style="position:absolute;left:14px;right:14px;bottom:12px;">
+                  <div style="font-family:'Newsreader',serif;font-size:21px;font-weight:500;line-height:1.1;">{{ spot.name }}</div>
+                  <div style="font-size:13px;color:#c9c6cf;margin-top:3px;">{{ spot.tagline }}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;font-size:12.5px;">
+                <span style="display:flex;align-items:center;gap:6px;color:{{ spot.windowColor }};font-weight:600;white-space:nowrap;">{{ spot.windowIcon }} {{ spot.window }}</span>
+                <span style="display:flex;align-items:center;gap:6px;color:#9b98a2;"><span style="width:7px;height:7px;border-radius:50%;background:{{ spot.crowdColor }};"></span>{{ spot.crowd }}</span>
+                <span style="margin-left:auto;color:#9b98a2;">{{ spot.distance }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ DETAIL ============ -->
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:vScreenIn .35s ease both;padding-bottom:120px;">
+        <!-- hero -->
+        <div style="position:relative;height:340px;background-size:cover;background-position:center;background-image:{{ a_heroBg }}">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,#0F0F11 2%,rgba(15,15,17,.15) 45%,rgba(15,15,17,.55) 100%);"></div>
+          <div style="position:absolute;top:54px;left:18px;right:18px;display:flex;justify-content:space-between;">
+            <div onClick="{{ back }}" style="width:38px;height:38px;border-radius:50%;background:rgba(10,10,11,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;">‹</div>
+            <div onClick="{{ a_toggleSave }}" style="width:38px;height:38px;border-radius:50%;background:rgba(10,10,11,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;color:{{ a_savedColor }}">{{ a_savedIcon }}</div>
+          </div>
+          <div style="position:absolute;left:20px;right:20px;bottom:18px;">
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <span style="background:rgba(10,10,11,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);font-size:11px;font-weight:600;letter-spacing:.4px;padding:5px 11px;border-radius:20px;">{{ a_type }}</span>
+              <span style="background:{{ a_windowColor }};color:#15110a;font-size:11px;font-weight:700;letter-spacing:.3px;padding:5px 11px;border-radius:20px;white-space:nowrap;">{{ a_score }} score</span>
+            </div>
+            <div style="font-family:'Newsreader',serif;font-size:34px;font-weight:500;line-height:1.02;letter-spacing:-.5px;">{{ a_name }}</div>
+            <div style="font-size:14px;color:#cfccd4;margin-top:4px;">{{ a_tagline }}</div>
+          </div>
+        </div>
+
+        <div style="padding:20px;">
+          <p style="font-size:15px;line-height:1.55;color:#c4c1cb;margin:0 0 26px;">{{ a_why }}</p>
+
+          <!-- light timeline -->
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-family:'Newsreader',serif;font-size:19px;font-weight:500;">When the light works</div>
+            <div style="font-size:12px;color:#E9B872;font-weight:600;white-space:nowrap;">{{ a_window }}</div>
+          </div>
+          <div style="background:#161618;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px 16px 12px;margin-bottom:24px;">
+            <div style="display:flex;align-items:flex-end;gap:6px;height:118px;">
+              <sc-for list="{{ a_lightBars }}" as="bar" hint-placeholder-count="10">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:7px;">
+                  <div style="{{ bar.style }}"></div>
+                  <span style="font-size:9px;color:#7c7a83;">{{ bar.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#9b98a2;">
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:#E9B872;"></span>Golden</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:#7FA0CF;"></span>Blue hour</span>
+              <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:2px;background:#9DB89A;opacity:.5;"></span>Flat / day</span>
+            </div>
+          </div>
+
+          <!-- sun + crowd two-up -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+            <div style="background:#161618;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px;">
+              <div style="font-size:12px;color:#8C8A93;text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:12px;">Sun &amp; shadow</div>
+              <div style="position:relative;width:96px;height:96px;margin:0 auto;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:radial-gradient(circle at 50% 50%,#1d1d20,#141416);">
+                <span style="position:absolute;top:4px;left:50%;transform:translateX(-50%);font-size:9px;color:#7c7a83;">N</span>
+                <span style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:9px;color:#7c7a83;">S</span>
+                <span style="position:absolute;left:5px;top:50%;transform:translateY(-50%);font-size:9px;color:#7c7a83;">W</span>
+                <span style="position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:9px;color:#7c7a83;">E</span>
+                <div style="position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;{{ a_sunDialStyle }}">
+                  <div style="width:2px;height:48px;background:linear-gradient(to bottom,#F2A93B,rgba(242,169,59,0));margin-top:2px;position:relative;">
+                    <div style="position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:#F2A93B;box-shadow:0 0 12px #F2A93B;"></div>
+                  </div>
+                </div>
+                <div style="position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#56545c;transform:translate(-50%,-50%);"></div>
+              </div>
+              <div style="text-align:center;margin-top:12px;font-size:13px;font-weight:600;">{{ a_sunLabel }} · {{ a_sunEl }}</div>
+              <div style="text-align:center;font-size:11px;color:#8C8A93;margin-top:2px;">shadows fall opposite</div>
+            </div>
+            <div style="background:#161618;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:16px;">
+              <div style="font-size:12px;color:#8C8A93;text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:12px;">Crowd density</div>
+              <div style="display:flex;align-items:flex-end;gap:3px;height:78px;">
+                <sc-for list="{{ a_crowdBars }}" as="cb" hint-placeholder-count="10">
+                  <div style="flex:1;display:flex;align-items:flex-end;height:100%;"><div style="{{ cb.style }}"></div></div>
+                </sc-for>
+              </div>
+              <div style="text-align:center;margin-top:14px;font-size:13px;font-weight:600;color:{{ a_crowdColor }}">{{ a_crowd }} right now</div>
+              <div style="text-align:center;font-size:11px;color:#8C8A93;margin-top:2px;">quietest after 8 PM</div>
+            </div>
+          </div>
+
+          <!-- weather strip -->
+          <div style="display:flex;background:#161618;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px 0;margin-bottom:26px;">
+            <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.07);"><div style="font-size:11px;color:#8C8A93;text-transform:uppercase;letter-spacing:.5px;">Sky</div><div style="font-size:15px;font-weight:600;margin-top:3px;">{{ a_sky }}</div></div>
+            <div style="flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.07);"><div style="font-size:11px;color:#8C8A93;text-transform:uppercase;letter-spacing:.5px;">Cloud</div><div style="font-size:15px;font-weight:600;margin-top:3px;">{{ a_cloud }}</div></div>
+            <div style="flex:1;text-align:center;"><div style="font-size:11px;color:#8C8A93;text-transform:uppercase;letter-spacing:.5px;">Temp</div><div style="font-size:15px;font-weight:600;margin-top:3px;">{{ a_temp }}</div></div>
+          </div>
+
+          <!-- example shots -->
+          <div style="font-family:'Newsreader',serif;font-size:19px;font-weight:500;margin-bottom:6px;">What you can expect to shoot</div>
+          <div style="font-size:12.5px;color:#8C8A93;margin-bottom:14px;">Recent frames from this spot</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;">
+            <sc-for list="{{ a_gallery }}" as="g" hint-placeholder-count="3">
+              <div style="{{ g.style }}"></div>
+            </sc-for>
+          </div>
+
+          <!-- tips -->
+          <div style="font-family:'Newsreader',serif;font-size:19px;font-weight:500;margin-bottom:14px;">Field notes</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <sc-for list="{{ a_tips }}" as="tip" hint-placeholder-count="3">
+              <div style="display:flex;gap:12px;align-items:flex-start;">
+                <div style="flex:none;width:24px;height:24px;border-radius:50%;border:1px solid rgba(233,184,114,.4);color:#E9B872;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">{{ tip.n }}</div>
+                <div style="font-size:14px;line-height:1.45;color:#c4c1cb;padding-top:2px;">{{ tip.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- sticky action -->
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:58;padding:14px 18px 30px;background:linear-gradient(to top,#0F0F11 55%,rgba(15,15,17,0));display:flex;gap:10px;">
+          <div onClick="{{ a_toggleRoute }}" style="flex:1;text-align:center;padding:15px;border-radius:16px;font-size:15px;font-weight:600;cursor:pointer;background:{{ a_inRouteBg }};color:{{ a_inRouteColor }};border:{{ a_inRouteBorder }}">{{ a_inRouteLabel }}</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ROUTES ============ -->
+      <sc-if value="{{ isRoutes }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:vScreenIn .35s ease both;padding:58px 20px 110px;">
+        <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#8C8A93;font-weight:600;">Thu · May 16</div>
+        <div style="font-family:'Newsreader',serif;font-size:30px;font-weight:500;margin-top:6px;margin-bottom:18px;">Tonight's route</div>
+
+        <!-- summary -->
+        <div style="position:relative;border-radius:20px;overflow:hidden;padding:18px 20px;background:linear-gradient(135deg,#23314a,#161a26);border:1px solid rgba(127,160,207,.22);margin-bottom:26px;">
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#9FB8DE;margin-bottom:14px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#7FA0CF;"></span>Optimized for tonight's light
+          </div>
+          <div style="display:flex;gap:22px;">
+            <div><div style="font-size:11px;color:#94a3bd;text-transform:uppercase;letter-spacing:.5px;">Window</div><div style="font-size:16px;font-weight:600;margin-top:3px;white-space:nowrap;">{{ routeStart }}–{{ routeEnd }}</div></div>
+            <div><div style="font-size:11px;color:#94a3bd;text-transform:uppercase;letter-spacing:.5px;">Sunset</div><div style="font-size:16px;font-weight:600;margin-top:3px;white-space:nowrap;">{{ routeSunset }}</div></div>
+          </div>
+          <div style="font-size:12.5px;color:#9fb0c9;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);">{{ routeDistance }} · timed so you reach each spot at its best light</div>
+        </div>
+
+        <!-- timeline -->
+        <sc-if value="{{ routeHasItems }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;">
+          <sc-for list="{{ routeList }}" as="stop" hint-placeholder-count="3">
+            <div>
+              <sc-if value="{{ stop.hasDrive }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:10px;padding:8px 0 8px 17px;">
+                  <div style="width:2px;height:26px;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.22) 0 4px,transparent 4px 8px);"></div>
+                  <span style="font-size:11.5px;color:#7c7a83;">↓ {{ stop.drive }}</span>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:14px;align-items:stretch;">
+                <div style="flex:none;width:36px;display:flex;flex-direction:column;align-items:center;">
+                  <div style="width:36px;height:36px;border-radius:50%;border:1.5px solid {{ stop.windowColor }};color:{{ stop.windowColor }};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:'Newsreader',serif;">{{ stop.n }}</div>
+                </div>
+                <div style="flex:1;display:flex;gap:13px;background:#161618;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:11px;overflow:hidden;">
+                  <div style="flex:none;width:66px;height:66px;border-radius:13px;background-size:cover;background-position:center;background-image:{{ stop.bg }}"></div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+                      <div style="font-family:'Newsreader',serif;font-size:18px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ stop.name }}</div>
+                      <div style="font-size:13px;font-weight:700;color:{{ stop.windowColor }};white-space:nowrap;">{{ stop.arrival }}</div>
+                    </div>
+                    <div style="font-size:12px;color:#8C8A93;margin-top:2px;">{{ stop.type }} · {{ stop.distance }}</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px;">
+                      <span style="font-size:12px;color:{{ stop.windowColor }};font-weight:600;white-space:nowrap;">{{ stop.act }}</span>
+                      <span onClick="{{ stop.remove }}" style="font-size:16px;color:#6E6C75;cursor:pointer;padding:0 2px;">×</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+
+        <!-- add suggestions -->
+        <div style="font-size:12px;color:#8C8A93;text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin:28px 0 14px;">Add to the route</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ routeSuggestions }}" as="sug" hint-placeholder-count="3">
+            <div onClick="{{ sug.add }}" style="display:flex;gap:12px;align-items:center;background:#141416;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:9px;cursor:pointer;">
+              <div style="flex:none;width:48px;height:48px;border-radius:11px;background-size:cover;background-position:center;background-image:{{ sug.bg }}"></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ sug.name }}</div>
+                <div style="font-size:12px;color:{{ sug.windowColor }};margin-top:2px;">{{ sug.type }} · {{ sug.window }}</div>
+              </div>
+              <div style="flex:none;width:30px;height:30px;border-radius:50%;border:1px solid rgba(233,184,114,.4);color:#E9B872;display:flex;align-items:center;justify-content:center;font-size:18px;">+</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ MAP ============ -->
+      <sc-if value="{{ isMap }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:vScreenIn .35s ease both;position:relative;height:844px;overflow:hidden;background:radial-gradient(ellipse at 35% 25%,#1b1e24 0%,#0d0e11 70%);">
+        <!-- street grid -->
+        <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 1px,transparent 1px 52px),repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px 52px);"></div>
+        <!-- river -->
+        <div style="position:absolute;top:-10%;left:48%;width:120px;height:130%;transform:rotate(18deg);background:linear-gradient(90deg,rgba(60,90,130,0),rgba(60,90,130,.32),rgba(60,90,130,0));filter:blur(2px);"></div>
+        <!-- parks -->
+        <div style="position:absolute;top:30%;left:14%;width:90px;height:120px;border-radius:30px;background:rgba(70,100,70,.18);"></div>
+        <div style="position:absolute;top:58%;left:62%;width:130px;height:90px;border-radius:26px;background:rgba(70,100,70,.15);"></div>
+
+        <!-- pins -->
+        <sc-for list="{{ mapPins }}" as="pin" hint-placeholder-count="6">
+          <div onClick="{{ pin.open }}" style="{{ pin.style }}">
+            <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);background:{{ pin.color }};box-shadow:0 4px 14px rgba(0,0,0,.5),0 0 0 4px rgba(15,15,17,.6);display:flex;align-items:center;justify-content:center;">
+                <span style="transform:rotate(-45deg);font-size:12px;font-weight:700;color:#15110a;">{{ pin.score }}</span>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+
+        <!-- top overlay -->
+        <div style="position:absolute;top:54px;left:18px;right:18px;z-index:20;">
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(20,20,22,.78);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-radius:15px;padding:13px 16px;">
+            <span style="font-size:15px;opacity:.7;">⌕</span>
+            <span style="font-size:14px;color:#8C8A93;white-space:nowrap;">Search Portland, OR</span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;overflow:hidden;">
+            <span style="flex:none;background:#E9B872;color:#15110a;font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;white-space:nowrap;">☀ Golden now</span>
+            <span style="flex:none;background:rgba(20,20,22,.78);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;white-space:nowrap;">🌙 Blue hour</span>
+            <span style="flex:none;background:rgba(20,20,22,.78);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:600;padding:8px 14px;border-radius:20px;white-space:nowrap;">Low crowd</span>
+          </div>
+        </div>
+
+        <!-- bottom hint card -->
+        <div style="position:absolute;left:18px;right:18px;bottom:100px;z-index:20;background:rgba(20,20,22,.82);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:15px 17px;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#E9B872;margin-bottom:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#F2A93B;"></span>6 spots peaking tonight</div>
+          <div style="font-size:14px;color:#c4c1cb;line-height:1.5;">Tap any pin to see its light window, crowd forecast and sample shots. Pins are scored for <span style="color:#E9B872;">right now</span>.</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SAVED ============ -->
+      <sc-if value="{{ isSaved }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:vScreenIn .35s ease both;padding:58px 20px 110px;">
+        <div style="font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#8C8A93;font-weight:600;">Your collection</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px;margin-bottom:22px;">
+          <div style="font-family:'Newsreader',serif;font-size:30px;font-weight:500;">Saved spots</div>
+          <div style="font-size:14px;color:#8C8A93;font-weight:600;">{{ savedCount }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <sc-for list="{{ savedList }}" as="spot" hint-placeholder-count="2">
+            <div onClick="{{ spot.open }}" style="border-radius:18px;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,.07);background:#161618;">
+              <div style="position:relative;height:130px;background-size:cover;background-position:center;background-image:{{ spot.bg }}">
+                <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(12,12,13,.7),transparent 60%);"></div>
+                <div style="position:absolute;top:9px;right:9px;font-size:15px;color:#E07A8B;">♥</div>
+              </div>
+              <div style="padding:11px 12px 13px;">
+                <div style="font-family:'Newsreader',serif;font-size:16px;font-weight:500;line-height:1.1;">{{ spot.name }}</div>
+                <div style="font-size:11.5px;color:{{ spot.windowColor }};margin-top:5px;font-weight:600;">{{ spot.windowIcon }} {{ spot.window }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- SCREENS_ANCHOR -->
+
+    </div>
+
+    <!-- bottom nav -->
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:55;padding:10px 24px 30px;background:linear-gradient(to top,#0F0F11 60%,rgba(15,15,17,0));display:flex;justify-content:space-between;align-items:flex-end;">
+      <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="4">
+        <div onClick="{{ nav.go }}" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;flex:1;color:{{ nav.color }};">
+          <span style="font-size:20px;line-height:1;">{{ nav.icon }}</span>
+          <span style="font-size:10px;font-weight:600;letter-spacing:.3px;">{{ nav.label }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;locationName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Portland, OR&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;unitSystem&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mi&quot;,&quot;km&quot;],&quot;default&quot;:&quot;mi&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'today', activeId: null, route: ['pittock','steel','japanese'], saved: ['pittock','sauvie'] };
+
+  data() {
+    const u = (id) => `url('https://images.unsplash.com/photo-${id}?w=900&q=80&auto=format&fit=crop')`;
+    return [
+      { id:'pittock', name:'Pittock Mansion', type:'Landscape', img:'1506905925346-21bda4d32df4',
+        tagline:'Sweeping city-to-Mt.Hood overlook', score:94, scoreColor:'#E9B872',
+        window:'6:42–7:18 PM', windowType:'golden', crowd:'Moderate', crowdLevel:.55, distance:'4.2 mi',
+        sky:'Clear', cloud:'12%', temp:'61°', sunAz:288, sunLabel:'WNW', sunEl:'4°',
+        why:'East-facing terrace catches warm sidelight on the skyline while Mt. Hood glows behind it. Best 30 min before sunset.',
+        gallery:['1506905925346-21bda4d32df4','1444723121867-7a241cacace9','1470770841072-f978cf4d019e'],
+        tips:['Arrive 40 min early — the lot fills fast at golden hour','Bring a 70–200mm to compress the skyline against Mt. Hood','South corner of the terrace clears of crowds first'] },
+      { id:'steel', name:'Steel Bridge', type:'Architecture', img:'1503899036084-c55cdd92da26',
+        tagline:'Double-deck reflections on the Willamette', score:89, scoreColor:'#E9B872',
+        window:'8:30–9:05 PM', windowType:'blue', crowd:'Low', crowdLevel:.25, distance:'1.1 mi',
+        sky:'Clear', cloud:'8%', temp:'59°', sunAz:300, sunLabel:'NW', sunEl:'—',
+        why:'The blue-hour window lights the bridge against a deepening sky with mirror-calm water reflections downstream.',
+        gallery:['1503899036084-c55cdd92da26','1514565131-fce0801e5785','1449824913935-59a10b8d2000'],
+        tips:['Tripod essential — exposures run 4–8s at blue hour','Shoot from the east esplanade for the reflection','MAX trains add light trails every ~6 min'] },
+      { id:'japanese', name:'Japanese Garden', type:'Nature', img:'1441974231531-c6227db76b6e',
+        tagline:'Soft canopy light & maple detail', score:86, scoreColor:'#E9B872',
+        window:'All day · overcast', windowType:'day', crowd:'Busy', crowdLevel:.8, distance:'3.8 mi',
+        sky:'Overcast', cloud:'90%', temp:'58°', sunAz:0, sunLabel:'Diffused', sunEl:'—',
+        why:'Overcast acts as a giant softbox — ideal for saturated greens and maple macro without harsh shadows.',
+        gallery:['1441974231531-c6227db76b6e','1490750967868-88aa4486c946','1502082553048-f009c37129b9'],
+        tips:['Overcast days are the secret — no blown highlights','Go at opening (10am) to beat tour groups','Polarizer cuts leaf glare and deepens greens'] },
+      { id:'sauvie', name:'Sauvie Island', type:'Wildlife', img:'1470770841072-f978cf4d019e',
+        tagline:'Wetland birds & open-sky sunsets', score:82, scoreColor:'#E9B872',
+        window:'6:50–7:25 PM', windowType:'golden', crowd:'Low', crowdLevel:.2, distance:'12 mi',
+        sky:'Few clouds', cloud:'30%', temp:'60°', sunAz:285, sunLabel:'WNW', sunEl:'3°',
+        why:'Wide unobstructed western horizon — clouds catch fire after sundown and herons work the shallows.',
+        gallery:['1470770841072-f978cf4d019e','1444464666168-49d633b86797','1486365227551-f3f90034a57c'],
+        tips:['600mm+ for the herons; they spook at ~30m','Wellington gravel lot is the closest access','Stay 20 min past sunset for the afterglow'] },
+      { id:'oldtown', name:'Old Town & Chinatown', type:'Street', img:'1449824913935-59a10b8d2000',
+        tagline:'Neon signage & moody alley light', score:78, scoreColor:'#cdbf8f',
+        window:'8:15–9:30 PM', windowType:'blue', crowd:'Moderate', crowdLevel:.5, distance:'1.6 mi',
+        sky:'Clear', cloud:'8%', temp:'57°', sunAz:0, sunLabel:'Mixed', sunEl:'—',
+        why:'When the sky goes blue the neon balances perfectly — the classic Portland sign glows over wet pavement.',
+        gallery:['1449824913935-49d633b86797','1514565131-fce0801e5785','1503899036084-c55cdd92da26'],
+        tips:['Shoot right when streetlights kick on for color balance','35mm is the workhorse for tight alleys','Weekends bring crowds — Tue–Thu are calmer'] },
+      { id:'rooftop', name:'KOIN Rooftop View', type:'Cityscape', img:'1514565131-fce0801e5785',
+        tagline:'High vantage over the river & bridges', score:75, scoreColor:'#cdbf8f',
+        window:'8:25–9:10 PM', windowType:'blue', crowd:'Low', crowdLevel:.3, distance:'0.8 mi',
+        sky:'Clear', cloud:'8%', temp:'58°', sunAz:300, sunLabel:'NW', sunEl:'—',
+        why:'Elevated blue-hour panorama stitches every bridge together as the city lights switch on.',
+        gallery:['1514565131-fce0801e5785','1444723121867-7a241cacace9','1503899036084-c55cdd92da26'],
+        tips:['Bring a wide 16–35mm for the full bridge sweep','Glass railing — use a rubber lens hood to kill reflections','Last entry is 8:45 PM'] },
+    ];
+  }
+
+  spot(id){ return this.data().find(s => s.id === id) || null; }
+
+  go(screen, id){ this.setState({ screen, activeId: id != null ? id : this.state.activeId }); const sc = document.querySelector('div[style*="inset: 0"]'); }
+
+  windowMeta(type){
+    if(type==='golden') return { color:'#E9B872', icon:'☀' };
+    if(type==='blue') return { color:'#7FA0CF', icon:'🌙' };
+    return { color:'#9DB89A', icon:'☁' };
+  }
+  crowdColor(level){ return level < .35 ? '#7FB07A' : level < .65 ? '#E0B15A' : '#D17A6B'; }
+  formatDist(str){ const n=parseFloat(str); if(isNaN(n)) return str; return (this.props.unitSystem==='km') ? (n*1.609).toFixed(1)+' km' : str; }
+
+  spotView(s){
+    const wm = this.windowMeta(s.windowType);
+    return Object.assign({}, s, {
+      bg:`url('https://images.unsplash.com/photo-${s.img}?w=900&q=80&auto=format&fit=crop')`,
+      distance:this.formatDist(s.distance),
+      window:s.window, windowColor:wm.color, windowIcon:wm.icon,
+      crowdColor:this.crowdColor(s.crowdLevel),
+      open:()=>this.go('detail', s.id),
+    });
+  }
+
+  // hourly light-quality curve for the detail screen
+  lightBars(spot){
+    const hours=[6,8,10,12,14,16,18,19,20,21];
+    const labels=['6a','8','10','12p','2','4','6p','7','8','9'];
+    const q=[.55,.3,.18,.12,.15,.35,.85,1,.7,.45];
+    const types=['blue','day','day','day','day','day','golden','golden','blue','blue'];
+    return hours.map((h,i)=>{
+      const wm=this.windowMeta(types[i]);
+      const isNow = h===16;
+      return { label:labels[i], isNow,
+        style:{ height:(14+q[i]*92)+'px', width:'100%', borderRadius:'5px',
+          background: wm.color, opacity: types[i]==='day'?.35:.95,
+          boxShadow: isNow?'0 0 0 2px rgba(244,241,234,.9)':'none' } };
+    });
+  }
+  crowdBars(spot){
+    const base=spot.crowdLevel;
+    const shape=[.2,.35,.6,.8,.7,.5,.65,.55,.3,.15];
+    const labels=['6a','8','10','12p','2','4','6p','7','8','9'];
+    return shape.map((v,i)=>{
+      const lvl=Math.min(1, v*(.6+base));
+      return { label:labels[i],
+        style:{ height:(8+lvl*70)+'px', width:'100%', borderRadius:'4px', background:this.crowdColor(lvl), opacity:.9 } };
+    });
+  }
+
+  routeView(){
+    const list = this.state.route.map(id=>this.spot(id)).filter(Boolean);
+    const arrivals = ['5:55 PM','6:45 PM','8:20 PM','9:30 PM'];
+    const acts = ['Golden hour · 38 min','Sunset glow · 25 min','Blue hour · 30 min','Night · flexible'];
+    const drives = ['','14 min drive','9 min drive','7 min drive'];
+    return list.map((s,i)=>({
+      id:s.id, name:s.name, type:s.type, distance:this.formatDist(s.distance), n:i+1,
+      bg:`url('https://images.unsplash.com/photo-${s.img}?w=600&q=80&auto=format&fit=crop')`,
+      arrival:arrivals[i]||'—', act:acts[i]||'Flexible', windowColor:this.windowMeta(s.windowType).color,
+      drive:drives[i]||'short drive', hasDrive:i>0,
+      remove:()=>this.setState(st=>({route:st.route.filter(x=>x!==s.id)})),
+      isLast: i===list.length-1,
+    }));
+  }
+
+  galleryView(spot){
+    return spot.gallery.map((g,i)=>({ i,
+      style:{ background:`url('https://images.unsplash.com/photo-${g}?w=500&q=80&auto=format&fit=crop') center/cover`,
+        height:i===0?'200px':'96px', borderRadius:'14px' } }));
+  }
+
+  renderVals(){
+    const s=this.state;
+    const all=this.data();
+    const active=this.spot(s.activeId);
+    const inRoute = active ? s.route.includes(active.id) : false;
+    const saved = active ? s.saved.includes(active.id) : false;
+
+    const nav=[
+      {key:'today',icon:'◎',label:'Today'},
+      {key:'map',icon:'⊕',label:'Map'},
+      {key:'routes',icon:'⤳',label:'Routes'},
+      {key:'saved',icon:'♥',label:'Saved'},
+    ].map(n=>({ ...n,
+      color: (s.screen===n.key || (n.key==='today'&&s.screen==='detail')) ? '#E9B872' : '#6E6C75',
+      go:()=>this.go(n.key) }));
+
+    let av={};
+    if(active){
+      const wm=this.windowMeta(active.windowType);
+      av={
+        a_name:active.name, a_type:active.type, a_tagline:active.tagline, a_why:active.why,
+        a_score:active.score, a_scoreColor:active.scoreColor, a_distance:this.formatDist(active.distance),
+        a_window:active.window, a_windowColor:wm.color, a_windowIcon:wm.icon,
+        a_crowd:active.crowd, a_crowdColor:this.crowdColor(active.crowdLevel),
+        a_sky:active.sky, a_cloud:active.cloud, a_temp:active.temp,
+        a_sunLabel:active.sunLabel, a_sunEl:active.sunEl,
+        a_heroBg:`url('https://images.unsplash.com/photo-${active.img}?w=1000&q=80&auto=format&fit=crop')`,
+        a_gallery:this.galleryView(active),
+        a_lightBars:this.lightBars(active),
+        a_crowdBars:this.crowdBars(active),
+        a_tips:active.tips.map((t,i)=>({n:i+1,text:t})),
+        a_sunDialStyle:{ transform:`rotate(${active.sunAz}deg)` },
+        a_inRouteLabel: inRoute ? '✓ In tonight\u2019s route' : '+ Add to route',
+        a_inRouteBg: inRoute ? 'rgba(127,176,122,.16)' : '#E9B872',
+        a_inRouteColor: inRoute ? '#9DD39A' : '#1a1408',
+        a_inRouteBorder: inRoute ? '1px solid rgba(127,176,122,.4)' : '1px solid transparent',
+        a_toggleRoute:()=>this.setState(st=>({route: st.route.includes(active.id)? st.route.filter(x=>x!==active.id): [...st.route, active.id]})),
+        a_savedColor: saved ? '#E07A8B' : '#F4F1EA',
+        a_savedIcon: saved ? '♥' : '♡',
+        a_toggleSave:()=>this.setState(st=>({saved: st.saved.includes(active.id)? st.saved.filter(x=>x!==active.id): [...st.saved, active.id]})),
+      };
+    }
+
+    const routeList=this.routeView();
+    const routeSuggestions=all.filter(x=>!s.route.includes(x.id)).slice(0,3).map(x=>({
+      id:x.id, name:x.name, type:x.type, window:x.window, windowColor:this.windowMeta(x.windowType).color,
+      bg:`url('https://images.unsplash.com/photo-${x.img}?w=400&q=80&auto=format&fit=crop')`,
+      add:()=>this.setState(st=>({route:[...st.route, x.id]})),
+    }));
+    const savedList=all.filter(x=>s.saved.includes(x.id)).map(x=>this.spotView(x));
+    const mapPins=all.map((x,i)=>{
+      const pos=[[58,30],[44,62],[68,55],[24,40],[50,48],[40,52]][i]||[50,50];
+      return { id:x.id, score:x.score, color:this.windowMeta(x.windowType).color,
+        style:{ position:'absolute', left:pos[0]+'%', top:pos[1]+'%', transform:'translate(-50%,-50%)', cursor:'pointer', zIndex:5 },
+        open:()=>this.go('detail', x.id), name:x.name, type:x.type, window:x.window };
+    });
+
+    return {
+      isToday:s.screen==='today', isDetail:s.screen==='detail',
+      isRoutes:s.screen==='routes', isMap:s.screen==='map', isSaved:s.screen==='saved',
+      dateLabel:'Thu · May 16', locationName:this.props.locationName ?? 'Portland, OR',
+      heroPhase:'Golden hour incoming', heroCountdown:'2h 12m', heroWindow:'6:42 PM',
+      heroSky:'Clear', heroCloud:'12%', heroTemp:'61°',
+      spotCount:all.length, spotsView:all.map(x=>this.spotView(x)),
+      navItems:nav,
+      routeList, routeCount:routeList.length, routeHasItems:routeList.length>0,
+      routeSuggestions, routeStart:'5:55 PM', routeEnd:'9:00 PM',
+      routeSunset:'7:08 PM', routeDistance:'17 mi · 3 stops',
+      savedList, savedCount:savedList.length,
+      mapPins,
+      back:()=>this.go('today'),
+      goRoutes:()=>this.go('routes'),
+      ...av,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<title>Vantage — Competitive Landscape</title>
+<style>
+  :root {
+    --ground: #e9edf1; --paper: #fff; --sunk: #f2f6f9;
+    --ink: #131b24; --muted: #55636f; --faint: #8593a0;
+    --accent: #2f6685; --accent-soft: #eaf1f6;
+    --gold: #b07f1a; --risk: #a8701a; --challenge: #a34b3b; --valid: #4c7449;
+    --hair: rgba(19,27,36,.12); --hair-strong: rgba(19,27,36,.22);
+    --shadow: 0 1px 2px rgba(19,27,36,.04), 0 14px 34px rgba(19,27,36,.07);
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --serif: Charter, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --mono: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark){ :root{
+    --ground:#0e141a; --paper:#161e26; --sunk:#121a21; --ink:#e8edf2; --muted:#9aa7b3; --faint:#66727e;
+    --accent:#7FA0CF; --accent-soft:rgba(127,160,207,.12); --gold:#E9B872; --risk:#d6a24e; --challenge:#d1795f; --valid:#8fb389;
+    --hair:rgba(255,255,255,.10); --hair-strong:rgba(255,255,255,.2);
+    --shadow:0 1px 0 rgba(255,255,255,.03), 0 16px 40px rgba(0,0,0,.4);
+  }}
+  :root[data-theme="light"]{ --ground:#e9edf1; --paper:#fff; --sunk:#f2f6f9; --ink:#131b24; --muted:#55636f; --faint:#8593a0;
+    --accent:#2f6685; --accent-soft:#eaf1f6; --gold:#b07f1a; --risk:#a8701a; --challenge:#a34b3b; --valid:#4c7449;
+    --hair:rgba(19,27,36,.12); --hair-strong:rgba(19,27,36,.22); --shadow:0 1px 2px rgba(19,27,36,.04),0 14px 34px rgba(19,27,36,.07); }
+  :root[data-theme="dark"]{ --ground:#0e141a; --paper:#161e26; --sunk:#121a21; --ink:#e8edf2; --muted:#9aa7b3; --faint:#66727e;
+    --accent:#7FA0CF; --accent-soft:rgba(127,160,207,.12); --gold:#E9B872; --risk:#d6a24e; --challenge:#d1795f; --valid:#8fb389;
+    --hair:rgba(255,255,255,.10); --hair-strong:rgba(255,255,255,.2); --shadow:0 1px 0 rgba(255,255,255,.03),0 16px 40px rgba(0,0,0,.4); }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 860px; margin: 0 auto; padding: 60px 24px 100px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+
+  header { border-bottom: 2px solid var(--hair-strong); padding-bottom: 28px; }
+  h1 { font-family: var(--sans); font-weight: 800; font-size: clamp(32px, 6vw, 50px); line-height: 1.05; letter-spacing: -.02em; margin: 12px 0 14px; text-wrap: balance; }
+  .thesis { font-family: var(--serif); font-size: 20px; color: var(--ink); max-width: 60ch; }
+  .thesis b { color: var(--accent); }
+  .meta { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .meta b { color: var(--muted); }
+
+  section { margin-top: 56px; }
+  .kicker { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .kicker .num { font-family: var(--mono); font-size: 12px; color: var(--faint); border: 1px solid var(--hair); border-radius: 5px; padding: 2px 7px; }
+  h2 { font-family: var(--sans); font-weight: 700; font-size: 24px; letter-spacing: -.015em; }
+  p { max-width: 66ch; color: var(--muted); }
+  p.body-ink { color: var(--ink); }
+  p + p { margin-top: 13px; }
+  b.ink { color: var(--ink); font-weight: 600; }
+
+  /* ---- Positioning map ---- */
+  .map-scroll { overflow-x: auto; }
+  .map { position: relative; min-width: 560px; height: 460px; margin: 8px 0 4px;
+    border: 1px solid var(--hair-strong); border-radius: 14px; background:
+      linear-gradient(var(--hair), var(--hair)) 50% 0/1px 100% no-repeat,
+      linear-gradient(var(--hair), var(--hair)) 0 50%/100% 1px no-repeat,
+      var(--paper); box-shadow: var(--shadow); }
+  .quad-label { position: absolute; font-family: var(--mono); font-size: 10px; letter-spacing: .5px; text-transform: uppercase; color: var(--faint); }
+  .q-tl { top: 12px; left: 14px; } .q-tr { top: 12px; right: 14px; text-align: right; color: var(--accent); font-weight: 700; }
+  .q-bl { bottom: 12px; left: 14px; } .q-br { bottom: 12px; right: 14px; text-align: right; }
+  .axis { position: absolute; font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .ax-top { top: -22px; left: 50%; transform: translateX(-50%); } .ax-bot { bottom: -22px; left: 50%; transform: translateX(-50%); }
+  .ax-left { left: -8px; top: 50%; transform: translate(-100%, -50%); white-space: nowrap; } .ax-right { right: -8px; top: 50%; transform: translate(100%, -50%); white-space: nowrap; }
+  .dot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dot .pt { width: 11px; height: 11px; border-radius: 50%; background: var(--muted); border: 2px solid var(--paper); }
+  .dot .nm { font-family: var(--sans); font-size: 11.5px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+  .dot.us .pt { width: 18px; height: 18px; background: var(--gold); box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 22%, transparent); }
+  .dot.us .nm { color: var(--gold); font-weight: 800; font-size: 13px; }
+  .map-note { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 26px; }
+
+  /* ---- Field table ---- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--hair); border-radius: 12px; background: var(--paper); box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; min-width: 700px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 12px 15px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); background: var(--sunk); font-weight: 600; }
+  tbody tr:last-child td { border-bottom: none; }
+  td .nm { font-family: var(--sans); font-weight: 700; color: var(--ink); }
+  td.gap { color: var(--challenge); }
+  tr.us td { background: color-mix(in srgb, var(--gold) 9%, var(--paper)); }
+  tr.us td .nm { color: var(--gold); }
+
+  /* ---- Threat callout ---- */
+  .threat { background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--challenge); border-radius: 12px; padding: 22px 24px; box-shadow: var(--shadow); }
+  .threat h3 { font-family: var(--sans); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .threat .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--challenge); margin-bottom: 8px; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+  @media (max-width: 560px){ .split { grid-template-columns: 1fr; } }
+  .split .h { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+  .split p { font-size: 14px; margin: 0; }
+
+  /* ---- Win cards ---- */
+  .wins { display: flex; flex-direction: column; gap: 14px; }
+  .win { background: var(--paper); border: 1px solid var(--hair); border-radius: 12px; padding: 20px 22px; box-shadow: var(--shadow);
+    border-left: 3px solid var(--valid); }
+  .win h3 { font-family: var(--sans); font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .win p { font-size: 14.5px; margin: 0; }
+  .win .tag { font-family: var(--mono); font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--valid); }
+
+  ul.risks { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+  ul.risks li { display: grid; grid-template-columns: 20px 1fr; gap: 14px; font-size: 15px; color: var(--muted); }
+  ul.risks li::before { content: "▲"; color: var(--risk); font-size: 12px; margin-top: 3px; }
+  ul.risks li b { color: var(--ink); font-weight: 600; }
+
+  .verdict { background: var(--accent); border-radius: 14px; padding: 26px 28px; margin-top: 18px; color: #fff; }
+  @media (prefers-color-scheme: dark){ .verdict { color: #0e141a; } }
+  :root[data-theme="dark"] .verdict { color: #0e141a; } :root[data-theme="light"] .verdict { color: #fff; }
+  .verdict h2 { color: inherit; } .verdict p { color: inherit; opacity: .95; max-width: 60ch; }
+
+  footer { margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--hair); font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Competitive Landscape</div>
+    <h1>Every piece of Vantage exists. The combination doesn't.</h1>
+    <p class="thesis">The photo-app market is crowded — but it splits cleanly into “<b>where to shoot</b>,” “<b>when the light's good</b>,” and “<b>ideas to shoot</b>.” No one fuses them into a <b>proactive, activity-aware nudge</b> — and no one is trying to reactivate the camera in the drawer.</p>
+    <div class="meta">
+      <span><b>For</b> Vantage strategy</span>
+      <span><b>Scanned</b> 15+ apps</span>
+      <span><b>Date</b> Jul 11, 2026</span>
+      <span><b>Companion to</b> the Product Brief</span>
+    </div>
+  </header>
+
+  <!-- MAP -->
+  <section>
+    <div class="kicker"><span class="num">01</span><h2>Where everyone sits</h2></div>
+    <p class="body-ink" style="margin-bottom:6px">Two axes decide it: does the app tell you <b class="ink">when</b> (light/weather) or <b class="ink">where/what</b> (place, people, events)? And do you <b class="ink">open it</b>, or does it <b class="ink">reach out to you</b>?</p>
+    <div class="map-scroll">
+      <div class="map" style="margin-top:40px;margin-bottom:44px" role="img" aria-label="Positioning map: competitors cluster in the 'when/light' and 'where/pull' zones; Vantage sits alone in the proactive, place-and-activity quadrant.">
+        <span class="axis ax-top">↑ It nudges you</span>
+        <span class="axis ax-bot">You open it ↓</span>
+        <span class="axis ax-left">When · light &amp; weather ←</span>
+        <span class="axis ax-right">→ Where · people &amp; events</span>
+        <span class="quad-label q-tl">Proactive · conditions</span>
+        <span class="quad-label q-tr">Proactive · place &amp; activity<br>— the open quadrant —</span>
+        <span class="quad-label q-bl">Pull · conditions</span>
+        <span class="quad-label q-br">Pull · place</span>
+
+        <div class="dot" style="left:17%;top:20%"><span class="pt"></span><span class="nm">Alpenglow</span></div>
+        <div class="dot" style="left:27%;top:33%"><span class="pt"></span><span class="nm">Sunsethue</span></div>
+        <div class="dot" style="left:15%;top:72%"><span class="pt"></span><span class="nm">PhotoPills / TPE</span></div>
+        <div class="dot" style="left:37%;top:57%"><span class="pt"></span><span class="nm">Fotocast</span></div>
+        <div class="dot" style="left:46%;top:26%"><span class="pt"></span><span class="nm">Mission:Pic (prompts)</span></div>
+        <div class="dot" style="left:79%;top:71%"><span class="pt"></span><span class="nm">Locationscout</span></div>
+        <div class="dot" style="left:88%;top:80%"><span class="pt"></span><span class="nm">PhotoHound</span></div>
+        <div class="dot us" style="left:80%;top:22%"><span class="pt"></span><span class="nm">VANTAGE</span></div>
+      </div>
+    </div>
+    <p class="map-note">The top-right quadrant — proactive + place/activity — is empty. Alpenglow is proactive but about the sky; Locationscout knows places but waits to be opened.</p>
+  </section>
+
+  <!-- FIELD -->
+  <section>
+    <div class="kicker"><span class="num">02</span><h2>The field</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>App</th><th>Really about</th><th>For whom</th><th>Price</th><th>Gap vs. Vantage</th></tr></thead>
+        <tbody>
+          <tr><td><span class="nm">Fotocast</span></td><td>Hyperlocal weather + gear/condition score</td><td>Outdoor / landscape</td><td>Free · $30/yr</td><td class="gap">No places or events; sky-first</td></tr>
+          <tr><td><span class="nm">Locationscout</span></td><td>Crowdsourced photo spots, "Around Me"</td><td>Travel / landscape</td><td>~$60/yr</td><td class="gap">Pull-only; no nudge; no events</td></tr>
+          <tr><td><span class="nm">PhotoHound</span></td><td>Curated spots + shooting guides</td><td>Travel / landscape</td><td>Freemium</td><td class="gap">Pull-only; not personal</td></tr>
+          <tr><td><span class="nm">Alpenglow / Sunsethue</span></td><td>Sunset/light quality forecast + alerts</td><td>Landscape</td><td>Freemium</td><td class="gap">Only the sky; no place or subject</td></tr>
+          <tr><td><span class="nm">PhotoPills / TPE</span></td><td>Sun/moon planning, AR</td><td>Pros / landscape</td><td>~$11 once</td><td class="gap">Tells you when, never where</td></tr>
+          <tr><td><span class="nm">Mission:Pic / LearnPhoto365</span></td><td>Daily prompts &amp; assignments</td><td>Learners</td><td>Cheap / free</td><td class="gap">Generic ideas; no place, light, or gear</td></tr>
+          <tr class="us"><td><span class="nm">Vantage</span></td><td>Proactive, gear-aware nudge to shoot activity/events near you</td><td>Dormant &amp; street shooters</td><td>TBD</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CLOSEST THREAT -->
+  <section>
+    <div class="kicker"><span class="num">03</span><h2>The closest threat: Fotocast</h2></div>
+    <div class="threat">
+      <div class="lbl">Uncomfortably adjacent</div>
+      <h3>It already ships the parts we thought were ours.</h3>
+      <p style="color:var(--ink)">Fotocast has a <b class="ink">gear database</b>, a <b class="ink">0–10 “is it good to shoot” score</b> by photographer type, condition-based tips, and an inspiration feed. So gear-personalization and a “great day” score are <b class="ink">not</b> white space — they're on the market at $30/year.</p>
+      <div class="split">
+        <div><div class="h">But it's fundamentally…</div><p style="color:var(--muted)">A <b class="ink">weather app.</b> It answers “are conditions good?” for outdoor/landscape work. It has no sense of place discovery, and no idea that a festival or a crowd is happening three blocks away.</p></div>
+        <div><div class="h">So Vantage still differs on…</div><p style="color:var(--muted)">The <b class="ink">where &amp; what</b> — activity, events, street energy — plus a <b class="ink">proactive nudge</b> and a <b class="ink">reactivation mission</b> Fotocast doesn't share.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHERE WE WIN -->
+  <section>
+    <div class="kicker"><span class="num">04</span><h2>Where Vantage is genuinely uncontested</h2></div>
+    <div class="wins">
+      <div class="win"><span class="tag">White space · strong</span><h3>The activity / event / street dimension</h3><p>Every competitor answers “is the sky good?” None answer “where are the <em>people and moments</em>?” No one surfaces a festival, a game, or a buzzing district as a shoot. This is open water.</p></div>
+      <div class="win"><span class="tag">White space · strong</span><h3>Reactivating the dormant camera</h3><p>All of them serve photographers who've already decided to shoot — pros, landscape hobbyists. Nobody targets the person with gear in a drawer who needs a <em>reason to start</em>. That audience and framing are unclaimed.</p></div>
+      <div class="win"><span class="tag">White space · moderate</span><h3>The fusion, delivered as one nudge</h3><p>Place + what's happening + light + your kit, pushed only when it's a great day. Each piece exists in isolation; combined, proactive, and street-focused, no one does it. (Bonus: AI “what to shoot” guidance is empty — all AI photo tools are post-processing.)</p></div>
+    </div>
+  </section>
+
+  <!-- RISKS -->
+  <section>
+    <div class="kicker"><span class="num">05</span><h2>Honest risks</h2></div>
+    <ul class="risks">
+      <li><b>Our edges are copyable.</b> Fotocast could add locations; Locationscout could add a proactive nudge. The moat is positioning, audience, and execution — not a defensible feature.</li>
+      <li><b>The market is crowded and habitual.</b> Photographers already juggle several free apps. App fatigue is real; “obviously better” is a high bar.</li>
+      <li><b>Crowded ≠ dead — it's validation.</b> The fact that Fotocast built gear + score, and Alpenglow built quality-alerts, proves people want condition-aware guidance. Demand is real; the question is our angle.</li>
+    </ul>
+  </section>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="kicker"><span class="num">06</span><h2>Strategic takeaway</h2></div>
+    <div class="verdict">
+      <h2>Don't compete on the light. Own the life.</h2>
+      <p>Selling Vantage on gear-matching or a “good day” score puts us head-to-head with Fotocast and Alpenglow — late and undifferentiated. The winning wedge is the thing no one else touches: <b>where the human energy and events are worth shooting today</b>, delivered as a nudge, aimed at people who need a reason to pick the camera back up.</p>
+    </div>
+  </section>
+
+  <footer>
+    Vantage — competitive landscape. A companion to the Product Brief and North Star. Sources: app store listings &amp; official sites for Fotocast, Locationscout, PhotoHound, Alpenglow, Sunsethue, PhotoPills, TPE, Mission:Pic, LearnPhoto365 (Jul 2026).
+  </footer>
+</div>

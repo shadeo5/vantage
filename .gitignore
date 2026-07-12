@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+**/node_modules/
+
+# expo / metro
+.expo/
+**/.expo/
+dist/
+web-build/
+.metro-health-check*
+
+# native build artifacts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# secrets / env (keep .env.example)
+.env
+**/.env
+*.env.local
+
+# logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# os
+.DS_Store
+**/.DS_Store
+
+# local editor / tooling
+.claude/settings.local.json

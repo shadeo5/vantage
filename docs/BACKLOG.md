@@ -1,0 +1,72 @@
+# Vantage — Backlog (epics & stories)
+
+**How we work (calibrated to stage):** epics/themes are mapped out now for tracking; **stories get detailed just-in-time** for the epic we're about to build (not the whole tree upfront), because the product is still pre-validation and requirements will shift. **Acceptance criteria + automated tests** are written for stable, regression-prone logic — not everything. Rigor scales up as the product validates or the team grows.
+
+**Status:** ✅ done · ▶ in progress · 🎯 next · ⬜ planned · ◽ later
+
+---
+
+## E0 · App shell & core UX  ✅ (built)
+The nudge-first app, rebuilt from the Claude Design handoff v2.
+- ✅ Today — gear banner, "your shoot tonight", inspiration hero + "why this pick?", ranked "best near you"
+- ✅ Spot detail — hero, why, live light-ramp chart, "what to look for", gallery, getting there
+- ✅ Plan — this-week slate, day groups, Light/Activity/Event tags, "I'm going"
+- ✅ Bag — gear onboarding (cameras, lens/style chips)
+- ✅ Lock — notification moment → tap to enter
+- ✅ Bottom tab nav (Today / Plan / Bag)
+- ◽ Saved collection screen (hearts persist somewhere) — deferred
+
+---
+
+## E1 · Content  🎯 NEXT — the biggest open workstream
+The app currently runs on 5 hand-curated Atlanta spots + Unsplash placeholders. This epic answers: where does real content come from, and in what voice?
+- 🎯 **C1 — Spot sourcing strategy.** Decide how spots are generated/curated at scale (LLM-assisted from OSM + local knowledge? editorial? community?). *AC: a documented, repeatable way to produce a new city's spot list with the fields the UI needs (name, why, look-for, getting-there, coords, window type).*
+- 🎯 **C2 — Imagery.** Interim placeholder approach + real sourcing path (Wikimedia/licensed/user). *AC: hero + gallery images load reliably per spot; licensing path documented; no fake stock misrepresenting a place.*
+- 🎯 **C3 — Voice & tone guide.** Short guide for the app's writing (inspiring, personal, "grab your 35mm and go"). *AC: 1-page voice doc; existing copy audited against it.*
+- ⬜ **C4 — Content generation pipeline.** Tooling to draft per-spot copy at scale, human-reviewed.
+- Note: mixed-genre content (street + cityscape + nature) is confirmed good — validated as "top areas to shoot today."
+
+---
+
+## E2 · Personalization & Gear  ⬜
+Make "your kit" real and load-bearing (it's currently a static "35mm").
+- ⬜ **G1 — Persist the gear profile** (cameras + lenses/style) locally, then synced.
+- ⬜ **G2 — Gear → subject matching.** Telephoto→distance/sports; fast prime→low-light street; wide→architecture; macro→details. Drives the "why … your kit" line and per-spot "fits/grab a tele".
+- ⬜ **G3 — Gear banner re-prompt logic.** Dismiss = 30-day floor; re-ask event-based (after "I'm going" / on 2nd–3rd return), not a blind timer.
+
+---
+
+## E3 · The nudge & notifications  ⬜
+Turn the in-app hero into an actual proactive nudge — the north star.
+- ⬜ **N1 — "Is today great?" threshold.** A quality bar that decides whether to nudge at all (inspire, don't nag).
+- ⬜ **N2 — Push delivery** (`expo-notifications` + backend trigger). Requires E4 + a dev/prod build.
+- ⬜ **N3 — Nudge copy generation** — personal, non-spammy, gear-aware.
+- ⬜ **N4 — Shooting check-in / journal.** "Did you get out?" → doubles as the engagement/return metric *and* a shooting log (opt-in photo match later).
+
+---
+
+## E4 · Backend & data  ⬜
+- ⬜ **B1 — Supabase** — DB + auth + storage foundation.
+- ⬜ **B2 — Precompute + serve** — scheduled job generates districts per city into Postgres; app reads a ready list (near-instant loads; no phone hits Overpass). *(Layer 1 of the "loads instant" plan.)*
+- ⬜ **B3 — On-device cache** — stale-while-revalidate; instant relaunch even before a backend. *(Layer 2 — cheap early win.)*
+- ⬜ **B4 — Real events integration** — ESPN (sports, proven) + tentpole editorial (+ Ticketmaster later), geo-filtered. (Prototyped in `archive/poc`.)
+- ◽ **B5 — Supply analysis** — run the engine across many days/times to measure how many worth-it options a day has (decides single-hero vs. list). Partial until N1 exists.
+
+---
+
+## E5 · Platform & ship  ⬜
+- ⬜ **P1 — Dev build** (EAS) so it runs on real phones (unblocks device testing; current SDK 57 > store Expo Go).
+- ⬜ **P2 — Real location** (device GPS) instead of hardcoded downtown Atlanta.
+- ⬜ **P3 — Weather (Open-Meteo)** → weather-aware light chart (cloud cover tempers golden hour).
+- ◽ **P4 — Accounts / auth** (anonymous → real, once cross-device sync matters).
+- ◽ **P5 — App Store + Play submission.**
+
+---
+
+## E6 · Quality & maintainability  ▶
+- ✅ **Q1 — Dead code removed** (old OSM areas/events + old components).
+- ✅ **Q2 — Unit tests on core logic** (`lib/light.ts`, `lib/spots.ts`) incl. a regression guard for the suncalc degrees/radians gotcha. `npm test`.
+- ⬜ **Q3 — Metrics instrumentation** — engagement (nudge response + return), "I'm going" taps. Truth-checked against real shooting.
+- ⬜ **Q4 — Error / loading / empty states** across screens (network images, data fetches).
+- ◽ **Q5 — Component / e2e tests** once flows stabilize.
+- ◽ **Q6 — Accessibility pass** (labels, contrast, touch targets).

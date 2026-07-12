@@ -1,0 +1,215 @@
+<title>Vantage — Wireframes v1</title>
+<style>
+  :root{
+    --bg:#e7e7e9; --board:#dedee1; --ink:#1e1e22; --muted:#6b6b73; --faint:#9a9aa2;
+    --frame:#fbfbfc; --line:#c7c7cd; --block:#e3e3e7; --block2:#d8d8de; --dash:#b6b6be;
+    --cta:#2f4a63; --cta-ink:#fff; --note:#b5623e; --note-soft:#f2e2da;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --bg:#161619; --board:#1c1c20; --ink:#eaeaee; --muted:#9a9aa2; --faint:#63636b;
+    --frame:#232329; --line:#34343c; --block:#2c2c33; --block2:#33333b; --dash:#44444d;
+    --cta:#6f92b4; --cta-ink:#0e0e12; --note:#d3835f; --note-soft:#33241d;
+  }}
+  :root[data-theme="light"]{--bg:#e7e7e9;--board:#dedee1;--ink:#1e1e22;--muted:#6b6b73;--faint:#9a9aa2;--frame:#fbfbfc;--line:#c7c7cd;--block:#e3e3e7;--block2:#d8d8de;--dash:#b6b6be;--cta:#2f4a63;--cta-ink:#fff;--note:#b5623e;--note-soft:#f2e2da;}
+  :root[data-theme="dark"]{--bg:#161619;--board:#1c1c20;--ink:#eaeaee;--muted:#9a9aa2;--faint:#63636b;--frame:#232329;--line:#34343c;--block:#2c2c33;--block2:#33333b;--dash:#44444d;--cta:#6f92b4;--cta-ink:#0e0e12;--note:#d3835f;--note-soft:#33241d;}
+
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:52px 22px 90px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--note);}
+  h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.02em;margin:10px 0 12px;}
+  .intro{color:var(--muted);max-width:66ch;}
+  .intro b{color:var(--ink);}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+  .legend span{display:flex;align-items:center;gap:7px;}
+  .sw{width:22px;height:12px;border-radius:3px;display:inline-block;}
+  .sw.cta{background:var(--cta);} .sw.blk{background:var(--block);border:1px solid var(--line);}
+  .sw.img{border:1px dashed var(--dash);} .sw.note{background:var(--note);}
+
+  .screen{display:grid;grid-template-columns:300px 1fr;gap:30px;align-items:start;margin-top:46px;
+    padding-top:40px;border-top:1px solid var(--line);}
+  @media(max-width:720px){.screen{grid-template-columns:1fr;gap:20px;}}
+  .screen .cap{grid-column:1/-1;display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+  .screen .cap .id{font-family:var(--mono);font-size:12px;color:var(--frame);background:var(--note);
+    padding:3px 9px;border-radius:6px;font-weight:700;}
+  .screen .cap h2{font-size:21px;font-weight:700;letter-spacing:-.01em;}
+  .screen .cap .mode{font-family:var(--mono);font-size:10.5px;color:var(--muted);border:1px solid var(--line);
+    border-radius:999px;padding:2px 9px;text-transform:uppercase;letter-spacing:.5px;}
+
+  /* phone */
+  .phone{width:300px;background:var(--frame);border:1px solid var(--line);border-radius:26px;padding:12px 12px 16px;
+    box-shadow:0 12px 30px rgba(0,0,0,.12);}
+  .status{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--faint);padding:2px 6px 10px;}
+  .scr{display:flex;flex-direction:column;gap:10px;}
+  .b{background:var(--block);border-radius:6px;}
+  .bar{height:9px;background:var(--block2);border-radius:5px;}
+  .bar.s{width:45%;} .bar.m{width:70%;} .bar.l{width:90%;}
+  .lbl{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);}
+  .h-txt{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+  .sub{font-size:11.5px;color:var(--muted);}
+  .img{border:1px dashed var(--dash);border-radius:8px;background:repeating-linear-gradient(135deg,transparent,transparent 8px,var(--block) 8px,var(--block) 9px);
+    display:flex;align-items:center;justify-content:center;color:var(--faint);font-family:var(--mono);font-size:9px;}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{font-size:10px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px;background:var(--frame);}
+  .chip.gear{border-color:var(--note);color:var(--note);}
+  .cta{background:var(--cta);color:var(--cta-ink);border-radius:9px;text-align:center;font-size:12px;font-weight:700;padding:10px;}
+  .cta.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600;}
+  .row{display:flex;gap:8px;} .row>*{flex:1;}
+  .card{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:7px;background:var(--frame);}
+  .mini{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:8px;background:var(--frame);}
+  .mini .thumb{width:38px;height:38px;flex:none;}
+  .nav{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding-top:9px;margin-top:2px;font-family:var(--mono);font-size:9px;color:var(--faint);}
+  .nav .on{color:var(--note);font-weight:700;}
+  .bars-chart{display:flex;align-items:flex-end;gap:3px;height:40px;}
+  .bars-chart i{flex:1;background:var(--block2);border-radius:2px;}
+
+  /* notes */
+  .notes{display:flex;flex-direction:column;gap:12px;}
+  .note{display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:start;}
+  .note .n{width:22px;height:22px;border-radius:50%;background:var(--note-soft);color:var(--note);font-family:var(--mono);
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .note .t{font-size:14px;color:var(--muted);} .note .t b{color:var(--ink);font-weight:600;}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--faint);}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Wireframes · v1 · low-fidelity</div>
+  <h1>Vantage — the nudge-first redesign</h1>
+  <p class="intro">Structure, not styling. These wire the strategy we locked: <b>one reason to shoot today</b> (the nudge), a <b>plan-ahead slate</b> (discovery), gear-based <b>personalization</b>, and detail that <b>teaches the eye</b> (the come-back value). Grey = placeholder, dashed = image, blue = primary action, orange = annotation. React to flow and hierarchy — colors and polish come later.</p>
+  <div class="legend">
+    <span><i class="sw blk"></i> placeholder</span>
+    <span><i class="sw img"></i> image</span>
+    <span><i class="sw cta"></i> primary action</span>
+    <span><i class="sw note"></i> annotation</span>
+  </div>
+
+  <!-- SCREEN 1 -->
+  <div class="screen">
+    <div class="cap"><span class="id">01</span><h2>Today — the nudge</h2><span class="mode">daily · "right now, go"</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Atlanta</span></div>
+      <div class="scr">
+        <div class="mini" style="border-color:var(--note);background:var(--note-soft);"><span class="sub" style="flex:1;color:var(--note);">🎒 Add your gear — picks matched to your lens</span><span class="chip" style="border-color:var(--note);color:var(--note);">✕</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="sub">Sat · Jul 11 · good evening</div>
+          <span class="chip gear">🎒 35mm · X100</span>
+        </div>
+        <div class="lbl">Your shoot today</div>
+        <div class="card">
+          <div class="img" style="height:96px;">EXAMPLE FRAME</div>
+          <div class="h-txt">Sweet Auburn is alive tonight.</div>
+          <div class="sub">Golden hour hits 8:15 — perfect for the fast 35mm in your bag.</div>
+          <div class="chiprow"><span class="chip">6 min away</span><span class="chip">street life</span><span class="chip">☀ 8:15–8:48</span></div>
+          <div class="cta">I'm going</div>
+        </div>
+        <div class="mini" style="border-style:dashed;"><span class="sub" style="margin:0 auto;">▾ why this? &nbsp; ☀ light + 🎪 activity + 🎒 your kit</span></div>
+        <div class="lbl">Best near you · 7 tonight</div>
+        <div class="mini"><span class="chip gear">2</span><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="bar m"></div><div class="bar s"></div></div></div>
+        <div class="mini"><span class="chip">3</span><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="bar l"></div><div class="bar s"></div></div></div>
+        <div class="mini"><span class="chip">4</span><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="bar m"></div><div class="bar s"></div></div></div>
+        <div class="nav"><span class="on">TODAY</span><span>PLAN</span><span>BAG</span></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><div class="n">1</div><div class="t"><b>Lead with the nudge, keep the ranking.</b> The top pick is elevated as the hero; the ranked list stays right beneath it. Whether we ever collapse to a single pick is a later, data-dependent call — not a wireframe call.</div></div>
+      <div class="note"><div class="n">2</div><div class="t"><b>The kit is visible.</b> The gear chip and "perfect for your 35mm" make personalization felt, not hidden. It's why the pick feels like it's for you.</div></div>
+      <div class="note"><div class="n">3</div><div class="t"><b>"Why this?" earns trust.</b> A tap reveals the reasoning (light + activity + gear) so it reads as a considered pick, not a random ping.</div></div>
+      <div class="note"><div class="n">4</div><div class="t"><b>"I'm going" is the intent signal</b> — our engagement metric — and the door into the plan. No "show another" needed: the ranked list below <em>is</em> the alternatives.</div></div>
+      <div class="note"><div class="n">5</div><div class="t"><b>"Best near you" keeps the ranking</b> — and hints at supply ("7 tonight"). How many worth-it options a day actually has decides single-hero vs. list. We don't know that yet, so we keep the list.</div></div>
+      <div class="note"><div class="n">6</div><div class="t"><b>Gear is a dismissible banner, not a gate.</b> Value first — a new user gets generic-but-decent nudges immediately. Swipe it away → quiet for 30 days (a floor); best re-prompt is event-based, right after "I'm going." Gear also lives permanently in the <b>Bag</b> tab (screen 03).</div></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen">
+    <div class="cap"><span class="id">02</span><h2>Spot detail — discovery</h2><span class="mode">the come-back value</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="scr">
+        <div class="img" style="height:120px;position:relative;">‹ back &nbsp;·&nbsp; ♡ save</div>
+        <div class="h-txt">Sweet Auburn</div>
+        <div class="sub">historic district · street &amp; portraits</div>
+        <div class="lbl">Why here</div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><div class="bar l"></div><div class="bar l"></div><div class="bar m"></div></div>
+        <div class="lbl">When the light works</div>
+        <div class="bars-chart"><i style="height:20%"></i><i style="height:35%"></i><i style="height:70%"></i><i style="height:95%"></i><i style="height:55%"></i><i style="height:30%"></i><i style="height:25%"></i><i style="height:45%"></i><i style="height:85%"></i><i style="height:60%"></i></div>
+        <div class="lbl">What to look for here</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="mini" style="padding:7px;"><span class="sub">① Murals along Auburn Ave — backlit at dusk</span></div>
+          <div class="mini" style="padding:7px;"><span class="sub">② Market crowd — candid portraits</span></div>
+        </div>
+        <div class="lbl">What people shoot here</div>
+        <div class="row"><div class="img" style="height:52px;">IMG</div><div class="img" style="height:52px;">IMG</div><div class="img" style="height:52px;">IMG</div></div>
+        <div class="cta">I'm going</div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><div class="n">1</div><div class="t"><b>This is the discovery layer</b> — what you come *back* for. It's where the app teaches your eye, not just points a direction.</div></div>
+      <div class="note"><div class="n">2</div><div class="t"><b>"What to look for here" is the Hugh-in-your-pocket bit</b> — concrete, low-promise guidance (a mural, a corner, a crowd), not fake "intuition."</div></div>
+      <div class="note"><div class="n">3</div><div class="t"><b>"What people shoot here" carries the inspiration.</b> Real example frames are how photographers decide — this is where imagery stops being optional.</div></div>
+      <div class="note"><div class="n">4</div><div class="t">The light chart is the <b>ramp curve</b> we already built — reused here as evidence, not the headline.</div></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 -->
+  <div class="screen">
+    <div class="cap"><span class="id">03</span><h2>Gear onboarding — "what's in your bag?"</h2><span class="mode">personalization intake</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="scr">
+        <div class="lbl">Setup · 2 of 3</div>
+        <div class="h-txt" style="font-size:19px;">What's in your bag?</div>
+        <div class="sub">So we only suggest shoots your gear can nail — and tell you which lens to grab.</div>
+        <div style="height:8px"></div>
+        <div class="lbl">Cameras</div>
+        <div class="mini"><span class="sub" style="flex:1;">Fujifilm X100VI</span><span class="chip">▾</span></div>
+        <div class="mini" style="border-style:dashed;justify-content:center;"><span class="sub">+ add a camera</span></div>
+        <div class="lbl">Lenses / focal lengths</div>
+        <div class="chiprow"><span class="chip gear">35mm f/2</span><span class="chip">+ 50mm</span><span class="chip">+ 23mm</span><span class="chip">+ 200mm</span></div>
+        <div style="height:6px"></div>
+        <div class="mini" style="border-style:dashed;"><span class="sub" style="margin:0 auto;">Not sure? Pick your style instead →</span></div>
+        <div style="height:8px"></div>
+        <div class="cta">Continue</div>
+        <div class="cta ghost">Skip — I'll add later</div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><div class="n">1</div><div class="t"><b>The payoff is stated up front</b> — "which lens to grab." Personalization has to feel like it's *for* the user, not data collection.</div></div>
+      <div class="note"><div class="n">2</div><div class="t"><b>Low friction, always skippable.</b> An enthusiast will fill this in; a casual user shouldn't be blocked by it. Gear can be added later.</div></div>
+      <div class="note"><div class="n">3</div><div class="t"><b>"Pick your style" escape hatch</b> for people who don't think in focal lengths — maps to the same matching under the hood.</div></div>
+      <div class="note"><div class="n">4</div><div class="t">Honest scope note: this is a <b>feature, not a differentiator</b> (Fotocast has gear too) — so it stays lightweight, never the pitch.</div></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4 -->
+  <div class="screen">
+    <div class="cap"><span class="id">04</span><h2>This week — the slate</h2><span class="mode">plan-ahead · discovery</span></div>
+    <div class="phone">
+      <div class="status"><span>9:41</span><span>Atlanta</span></div>
+      <div class="scr">
+        <div class="lbl">Your plan · 1 going</div>
+        <div class="h-txt" style="font-size:19px;">This week</div>
+        <div class="lbl" style="margin-top:4px;">Tonight · Sat</div>
+        <div class="card">
+          <div style="display:flex;gap:8px;"><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="h-txt" style="font-size:13px;">Sweet Auburn</div><div class="sub">street · ☀ 8:15 · fits 35mm</div></div></div>
+          <div class="cta" style="padding:7px;">✓ I'm going</div>
+        </div>
+        <div class="lbl">Sun</div>
+        <div class="card"><div style="display:flex;gap:8px;"><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="h-txt" style="font-size:13px;">Krog Street Market</div><div class="sub">crowds · midday · fits 35mm</div></div></div><div class="cta ghost" style="padding:7px;">I'm going</div></div>
+        <div class="lbl">Wed</div>
+        <div class="card"><div style="display:flex;gap:8px;"><div class="b thumb"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px;"><div class="h-txt" style="font-size:13px;">Braves @ Truist Park</div><div class="sub">event crowd · 7:15 · grab a tele</div></div></div><div class="cta ghost" style="padding:7px;">I'm going</div></div>
+        <div class="nav"><span>TODAY</span><span class="on">PLAN</span><span>BAG</span></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><div class="n">1</div><div class="t"><b>This is the "discovery/planning" mode</b> you flagged — a look-ahead slate, not a single nudge. Where the curious shooter browses and commits.</div></div>
+      <div class="note"><div class="n">2</div><div class="t"><b>"I'm going" lives here</b> and builds "Your plan." Committing ahead is a stronger intent signal than a tap on today's nudge.</div></div>
+      <div class="note"><div class="n">3</div><div class="t"><b>Each item still carries the personalization</b> ("fits 35mm" / "grab a tele") — the kit follows you through every surface.</div></div>
+      <div class="note"><div class="n">4</div><div class="t">Mix of <b>light-driven, activity-driven, and event-driven</b> reasons — proof the product isn't just a light app or just an events app.</div></div>
+    </div>
+  </div>
+
+  <footer>Vantage — wireframes v1. Low-fidelity on purpose. Companion to the strategy, north star, and competitive docs. React to structure &amp; flow; visual design is a later, separate pass.</footer>
+</div>

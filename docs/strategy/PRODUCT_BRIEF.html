@@ -1,0 +1,296 @@
+<title>Vantage — Product Brief &amp; Interrogation</title>
+<style>
+  :root {
+    /* Light: cool analytical paper — the critical counterpart to the product's warm identity. */
+    --ground: #e9edf1;
+    --paper: #ffffff;
+    --sunk: #f3f6f9;
+    --ink: #131b24;
+    --muted: #55636f;
+    --faint: #8593a0;
+    --accent: #2f6685;      /* blue-hour, deepened for light */
+    --accent-soft: #eaf1f6;
+    --risk: #a8701a;        /* amber */
+    --challenge: #a34b3b;   /* clay */
+    --valid: #4c7449;       /* green */
+    --hair: rgba(19,27,36,.12);
+    --hair-strong: rgba(19,27,36,.22);
+    --quote-bar: #b9c6d1;
+    --shadow: 0 1px 2px rgba(19,27,36,.04), 0 14px 34px rgba(19,27,36,.07);
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --serif: Charter, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --mono: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0e141a; --paper: #161e26; --sunk: #121a21;
+      --ink: #e8edf2; --muted: #9aa7b3; --faint: #66727e;
+      --accent: #7FA0CF; --accent-soft: rgba(127,160,207,.12);
+      --risk: #d6a24e; --challenge: #d1795f; --valid: #8fb389;
+      --hair: rgba(255,255,255,.10); --hair-strong: rgba(255,255,255,.2);
+      --quote-bar: #33414d;
+      --shadow: 0 1px 0 rgba(255,255,255,.03), 0 16px 40px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground:#e9edf1; --paper:#fff; --sunk:#f3f6f9; --ink:#131b24; --muted:#55636f; --faint:#8593a0;
+    --accent:#2f6685; --accent-soft:#eaf1f6; --risk:#a8701a; --challenge:#a34b3b; --valid:#4c7449;
+    --hair:rgba(19,27,36,.12); --hair-strong:rgba(19,27,36,.22); --quote-bar:#b9c6d1;
+    --shadow:0 1px 2px rgba(19,27,36,.04), 0 14px 34px rgba(19,27,36,.07);
+  }
+  :root[data-theme="dark"] {
+    --ground:#0e141a; --paper:#161e26; --sunk:#121a21; --ink:#e8edf2; --muted:#9aa7b3; --faint:#66727e;
+    --accent:#7FA0CF; --accent-soft:rgba(127,160,207,.12); --risk:#d6a24e; --challenge:#d1795f; --valid:#8fb389;
+    --hair:rgba(255,255,255,.10); --hair-strong:rgba(255,255,255,.2); --quote-bar:#33414d;
+    --shadow:0 1px 0 rgba(255,255,255,.03), 0 16px 40px rgba(0,0,0,.4);
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--serif);
+    line-height: 1.62; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 780px; margin: 0 auto; padding: 64px 24px 100px; }
+  .sans { font-family: var(--sans); }
+
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; }
+
+  /* Masthead */
+  header { border-bottom: 2px solid var(--hair-strong); padding-bottom: 30px; }
+  h1 { font-family: var(--sans); font-weight: 800; font-size: clamp(34px, 6.5vw, 52px);
+    line-height: 1.04; letter-spacing: -.02em; margin: 12px 0 16px; text-wrap: balance; }
+  .thesis { font-size: 19px; color: var(--ink); max-width: 60ch; }
+  .thesis b { color: var(--accent); }
+  .masthead-meta { font-family: var(--mono); font-size: 12px; color: var(--faint); margin-top: 22px;
+    display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .masthead-meta b { color: var(--muted); font-weight: 600; }
+
+  section { margin-top: 56px; }
+  .kicker { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+  .kicker .num { font-family: var(--mono); font-size: 12px; color: var(--faint);
+    border: 1px solid var(--hair); border-radius: 5px; padding: 2px 7px; }
+  h2 { font-family: var(--sans); font-weight: 700; font-size: 25px; letter-spacing: -.015em; }
+  p { max-width: 65ch; }
+  p + p { margin-top: 14px; }
+  .lead { color: var(--muted); }
+
+  /* Job-to-be-done block */
+  .jtbd { background: var(--paper); border: 1px solid var(--hair); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 22px 26px; box-shadow: var(--shadow); }
+  .jtbd .when { font-family: var(--sans); font-size: 15px; }
+  .jtbd .when b { color: var(--accent); }
+  .persona-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+  @media (max-width: 560px){ .persona-row { grid-template-columns: 1fr; } }
+  .persona { background: var(--sunk); border: 1px solid var(--hair); border-radius: 10px; padding: 16px 18px; }
+  .persona h4 { font-family: var(--sans); font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .persona p { font-size: 14px; color: var(--muted); margin: 0; }
+
+  /* Assumption cards */
+  .assumptions { display: flex; flex-direction: column; gap: 20px; }
+  .assump { background: var(--paper); border: 1px solid var(--hair); border-radius: 12px;
+    padding: 22px 24px; box-shadow: var(--shadow); }
+  .assump .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+  .assump .claim { font-family: var(--sans); font-weight: 700; font-size: 18px; letter-spacing: -.01em; flex: 1; }
+  .assump .interrogate { color: var(--muted); font-size: 16px; }
+  .assump .interrogate b { color: var(--ink); font-weight: 600; }
+  .assump .label { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 6px; }
+
+  .chip { font-family: var(--mono); font-size: 10.5px; font-weight: 600; letter-spacing: .4px;
+    padding: 4px 10px; border-radius: 999px; border: 1px solid; white-space: nowrap; text-transform: uppercase; }
+  .chip.high { color: var(--challenge); border-color: color-mix(in srgb, var(--challenge) 45%, transparent);
+    background: color-mix(in srgb, var(--challenge) 10%, transparent); }
+  .chip.med { color: var(--risk); border-color: color-mix(in srgb, var(--risk) 45%, transparent);
+    background: color-mix(in srgb, var(--risk) 12%, transparent); }
+  .chip.low { color: var(--valid); border-color: color-mix(in srgb, var(--valid) 45%, transparent);
+    background: color-mix(in srgb, var(--valid) 12%, transparent); }
+
+  /* Customer voice */
+  .voice { border-left: 3px solid var(--quote-bar); padding: 4px 0 4px 20px; margin: 14px 0 0;
+    font-style: italic; color: var(--ink); font-size: 16px; }
+  .voice cite { display: block; font-style: normal; font-family: var(--mono); font-size: 11px;
+    letter-spacing: .5px; color: var(--faint); margin-top: 8px; text-transform: uppercase; }
+
+  /* Alternatives table */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--hair); border-radius: 12px; background: var(--paper); }
+  table { border-collapse: collapse; width: 100%; min-width: 560px; font-family: var(--sans); font-size: 14px; }
+  th, td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--faint); background: var(--sunk); font-weight: 600; }
+  tbody tr:last-child td { border-bottom: none; }
+  td b { color: var(--ink); }
+
+  /* Validation checklist */
+  ul.checks { list-style: none; display: flex; flex-direction: column; gap: 14px; font-family: var(--sans); }
+  ul.checks li { display: grid; grid-template-columns: 26px 1fr; gap: 12px; font-size: 15px; color: var(--muted); }
+  ul.checks li b { color: var(--ink); font-weight: 600; }
+  ul.checks .box { width: 18px; height: 18px; border: 2px solid var(--accent); border-radius: 5px; margin-top: 3px; }
+
+  /* Verdict */
+  .verdict { background: var(--accent); color: #fff; border-radius: 14px; padding: 28px 30px; margin-top: 20px; }
+  :root[data-theme="dark"] .verdict, .verdict { }
+  @media (prefers-color-scheme: dark){ .verdict { color: #0e141a; } }
+  :root[data-theme="dark"] .verdict { color: #0e141a; }
+  :root[data-theme="light"] .verdict { color: #fff; }
+  .verdict h2 { color: inherit; }
+  .verdict p { color: inherit; opacity: .95; max-width: 62ch; }
+  .verdict .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 20px; }
+  @media (max-width: 560px){ .verdict .row { grid-template-columns: 1fr; } }
+  .verdict .cell .h { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; opacity: .8; }
+  .verdict .cell p { font-family: var(--sans); font-size: 14px; margin-top: 5px; }
+
+  footer { margin-top: 64px; padding-top: 22px; border-top: 1px solid var(--hair);
+    font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  a { color: var(--accent); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Product Brief · Customer Interrogation</div>
+    <h1>Is Vantage solving a problem people actually have?</h1>
+    <p class="thesis">We've built a working app that auto-generates “where to shoot” for Atlanta. This brief does the uncomfortable part: <b>pressure-testing the idea from the customer's chair</b> before we build further.</p>
+    <div class="masthead-meta">
+      <span><b>Product</b> Vantage</span>
+      <span><b>Stage</b> 3 slices built (web preview)</span>
+      <span><b>Purpose</b> Interrogate, not pitch</span>
+      <span><b>Date</b> Jul 11, 2026</span>
+    </div>
+  </header>
+
+  <!-- WHO -->
+  <section>
+    <div class="kicker"><span class="num">01</span><h2 class="sans">Who this is for, and the job they're hiring us to do</h2></div>
+    <p class="lead">Before features, the customer. A tool only matters at a specific moment, for a specific person.</p>
+    <div class="jtbd" style="margin-top:20px">
+      <div class="label" style="font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">The job-to-be-done</div>
+      <p class="when" style="margin:0">“When I have time to shoot but <b>don't know where to go</b> — a free evening, a new city, a familiar city gone stale — help me find somewhere worth pointing my camera, timed to good light, without hours of research.”</p>
+      <div class="persona-row">
+        <div class="persona"><h4>The traveler</h4><p>Two days in a city they don't know. High intent, high pain, low local knowledge. <b>Our strongest case.</b></p></div>
+        <div class="persona"><h4>The stuck local</h4><p>Shoots their own city, bored of the same spots, wants a nudge. Real, but has strong existing habits.</p></div>
+        <div class="persona"><h4>The small-town shooter</h4><p>Not in a major metro, genuinely underserved. Our stated differentiator — and our <b>least-tested</b> case.</p></div>
+        <div class="persona"><h4>The weekend hobbyist</h4><p>Casual, occasional. Lowest intent — may not open an app to decide.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE BET -->
+  <section>
+    <div class="kicker"><span class="num">02</span><h2 class="sans">The core bet</h2></div>
+    <p>Everything rests on one hypothesis: <b>photographers regularly face “I want to shoot but don't know where,” and existing tools don't solve it well.</b> If that pain is real and frequent, we have a product. If people mostly return to known spots or decide by instinct, we have a clever demo. The rest of this brief interrogates the beliefs underneath that bet.</p>
+  </section>
+
+  <!-- ASSUMPTIONS -->
+  <section>
+    <div class="kicker"><span class="num">03</span><h2 class="sans">Interrogating our assumptions</h2></div>
+    <p class="lead" style="margin-bottom:24px">Each is a belief the current build depends on, challenged from the customer's side. The chip is our <em>confidence</em>, not our hope.</p>
+    <div class="assumptions">
+
+      <div class="assump">
+        <div class="top"><div class="claim">POI density equals good street photography</div><span class="chip high">Low confidence</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">That a cluster of markets, plazas, and public art on OpenStreetMap is <b>where you'll get great street shots.</b></p>
+        <div class="voice">“A dense pile of <em>things</em> isn't a dense pile of <em>people and moments</em>. Truist Park has one giant POI and incredible street energy; a plaza full of monuments can be dead at 2pm.”<cite>The gap between map data and photographic reality</cite></div>
+      </div>
+
+      <div class="assump">
+        <div class="top"><div class="claim">The value is strongest in smaller cities — our differentiator</div><span class="chip high">Unvalidated</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">That underserved, non-major cities are where we win — yet we built and validated on <b>Atlanta, a data-rich easy case.</b> Small towns have few OSM POIs, no pro sports, thin events.</p>
+        <div class="voice">“We're claiming the hard case and testing the easy one. The exact place our data gets thin is the exact place we say we're most valuable.”<cite>The biggest honesty gap in the plan</cite></div>
+      </div>
+
+      <div class="assump">
+        <div class="top"><div class="claim">People will open an app to decide where to shoot</div><span class="chip med">Behavior risk</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">That there's an <b>open-the-app moment.</b> Today photographers use Instagram location tags, Google Maps, word of mouth, or just walk out the door.</p>
+        <div class="voice">“I already know the three spots I like. Why would I check an app?” — vs — “I'm in Lisbon for 48 hours and I'd kill for exactly this.”<cite>Two customers, opposite verdicts — segment decides everything</cite></div>
+      </div>
+
+      <div class="assump">
+        <div class="top"><div class="claim">A photography app can launch with no photographs</div><span class="chip med">Trust risk</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">That tonal-gradient cards are an acceptable placeholder. But the mockup made <b>example-shot galleries central</b> — photographers decide with their eyes.</p>
+        <div class="voice">“Show me what people actually shot here and I'm sold in two seconds. Tell me in text and I'm skeptical. A photo app with no photos feels unfinished.”<cite>Imagery may be core value, not polish</cite></div>
+      </div>
+
+      <div class="assump">
+        <div class="top"><div class="claim">Light timing matters as much for street as for landscape</div><span class="chip med">Borrowed signal</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">We inherited golden-hour from the landscape mockup. But street/portrait is often about <b>the person and the moment</b> — harsh midday light and overcast are prime for street.</p>
+        <div class="voice">“Golden hour is a landscape obsession. Half my best street frames are flat noon light with a great subject. Don't down-rank my afternoon.”<cite>Are we over-indexing on a landscape metric?</cite></div>
+      </div>
+
+      <div class="assump">
+        <div class="top"><div class="claim">Events (World Cup, Braves) are a useful signal — worth showing</div><span class="chip low">Plausible</span></div>
+        <div class="label">What we assume</div>
+        <p class="interrogate">That surfacing games and festivals adds value. It probably does — crowds are street gold — but some are <b>obvious</b> (locals know the Braves are home) and it can read as noise.</p>
+        <div class="voice">“The World Cup being in town, I know. What I <em>didn't</em> know is the farmers market three blocks away at 8am. Surface the non-obvious.”<cite>Events help — if they tell me something I didn't know</cite></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MOMENT OF USE -->
+  <section>
+    <div class="kicker"><span class="num">04</span><h2 class="sans">The moment of use we haven't nailed</h2></div>
+    <p>There are two very different customers hiding in one app, and they want opposite things:</p>
+    <p><b>“Right now” mode</b> — I'm out, camera in hand, tell me where to walk in the next hour. Wants: near-me, instant, live light, minimal reading.<br>
+    <b>“Planning” mode</b> — I'm at home plotting tomorrow or an upcoming trip. Wants: browse, save, build a route, richer detail.</p>
+    <p class="lead">Today's app leans “planning” (a ranked city list) but is framed “right now” (“Today in Atlanta,” a golden-hour countdown). Picking the primary moment — and designing hard for it — matters more than any single feature.</p>
+  </section>
+
+  <!-- ALTERNATIVES -->
+  <section>
+    <div class="kicker"><span class="num">05</span><h2 class="sans">What they use today — and why they'd switch</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Alternative</th><th>What it's good at</th><th>Where it fails our customer</th></tr></thead>
+        <tbody>
+          <tr><td><b>Instagram / location tags</b></td><td>Real photos, social proof</td><td>No timing, no “near me now,” endless scrolling</td></tr>
+          <tr><td><b>Google Maps</b></td><td>Real geography, reviews</td><td>Not photography-aware; “interesting to shoot” isn't a category</td></tr>
+          <tr><td><b>PhotoPills / sun apps</b></td><td>Excellent light &amp; sun math</td><td>Tells you <em>when</em>, never <em>where to go</em></td></tr>
+          <tr><td><b>Local knowledge / just walking</b></td><td>Free, intuitive, works</td><td>Fails in new cities and when a familiar city goes stale</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:18px">The honest read: no single tool does <b>“where + when, photography-aware, for right here”</b> — that's the wedge. But every alternative is free and habitual, so our bar for “obviously better” is high.</p>
+  </section>
+
+  <!-- MAP -->
+  <section>
+    <div class="kicker"><span class="num">06</span><h2 class="sans">The map, from the customer's side</h2></div>
+    <p>The proposed map re-plots the homepage districts as score teardrops. From the customer's chair, one question decides its worth: <b>does it help me decide where to physically go?</b></p>
+    <p>If pins sit at <b>true relative locations</b>, the map answers what the list can't — proximity, clustering, “what's around me.” If pins are placed <b>decoratively</b> (as the comp shows), the customer will still read position as location, and we'll have quietly taught them something false. For a <em>scouting</em> app, a map that misrepresents where things are is worse than no map.</p>
+    <div class="voice">“A dot on a map is a promise about where to walk. If it's just decoration, I'll trust it, get it wrong, and blame the app.”<cite>Truthful geography isn't a nice-to-have here</cite></div>
+  </section>
+
+  <!-- VALIDATION -->
+  <section>
+    <div class="kicker"><span class="num">07</span><h2 class="sans">Cheap ways to find out if we're right</h2></div>
+    <p class="lead" style="margin-bottom:22px">Before building more, buy down the riskiest assumptions for near-zero cost.</p>
+    <ul class="checks">
+      <li><span class="box"></span><span><b>The “would you go?” test.</b> Show 5–10 street photographers the current Atlanta list. Do the top areas match where they'd actually shoot? Directly tests the POI-density assumption.</span></li>
+      <li><span class="box"></span><span><b>Run the small-city case.</b> Point the existing script at a mid-size, non-metro city. See how thin the data gets. Tests our stated differentiator honestly.</span></li>
+      <li><span class="box"></span><span><b>The travel-intent probe.</b> Ask photographers: “new city, 2 days — would you use this?” vs “your home city — would you?” Find which segment has real pull.</span></li>
+      <li><span class="box"></span><span><b>Photos vs no-photos.</b> Show the same area with and without example shots. Measure trust/intent. Decides whether imagery is core or polish.</span></li>
+      <li><span class="box"></span><span><b>Light relevance.</b> Ask street shooters how much golden hour actually drives their <em>where</em>. Confirms or kills a borrowed landscape metric.</span></li>
+    </ul>
+  </section>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="kicker"><span class="num">08</span><h2 class="sans">Honest verdict</h2></div>
+    <div class="verdict">
+      <h2 class="sans">A promising engine, an unproven promise.</h2>
+      <p>We've shown we <em>can</em> auto-generate a plausible “where to shoot” list from free data — the technical bet is largely de-risked. What's <em>not</em> yet tested is whether it solves a real, frequent customer problem better than free habits — especially in the small cities we claim as our edge.</p>
+      <div class="row">
+        <div class="cell"><div class="h">Strongest</div><p>The traveler in an unfamiliar city. Clear job, weak alternatives, high pain.</p></div>
+        <div class="cell"><div class="h">Riskiest</div><p>“POI density = good street,” and validating on easy Atlanta while claiming hard small towns.</p></div>
+        <div class="cell"><div class="h">Do next</div><p>Talk to real photographers before more features. One “would you go?” session beats a slice.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Vantage — internal product brief. Companion to the technical decision record. Written to interrogate, not to reassure.
+  </footer>
+</div>

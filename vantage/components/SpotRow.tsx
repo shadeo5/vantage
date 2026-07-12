@@ -1,0 +1,36 @@
+import React from "react";
+import { View, Text, StyleSheet, ImageBackground, Pressable } from "react-native";
+import { colors, fonts } from "../theme";
+import { Spot, img, windowMeta } from "../lib/spots";
+
+export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank: number; windowTime: string; onPress: () => void }) {
+  const wm = windowMeta(spot.windowType);
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && { opacity: 0.85 }]}>
+      <ImageBackground source={{ uri: img(spot.img) }} style={styles.thumb} imageStyle={styles.thumbImg}>
+        <Text style={styles.rank}>{rank}</Text>
+      </ImageBackground>
+      <View style={styles.body}>
+        <Text style={styles.name} numberOfLines={1}>{spot.name}</Text>
+        <Text style={styles.reason} numberOfLines={1}>{spot.reason}</Text>
+        <View style={styles.meta}>
+          <Text style={[styles.window, { color: wm.color }]}>{wm.icon} {wm.label} · {windowTime}</Text>
+          <Text style={styles.dist}>{spot.distance}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: "row", gap: 13, alignItems: "center", backgroundColor: colors.surfaceSubtle, borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", borderRadius: 16, padding: 11 },
+  thumb: { width: 74, height: 74, justifyContent: "flex-start" },
+  thumbImg: { borderRadius: 12 },
+  rank: { margin: 5, color: colors.ink, fontFamily: fonts.serif, fontSize: 13, textShadowColor: "rgba(0,0,0,0.6)", textShadowRadius: 3 },
+  body: { flex: 1, minWidth: 0 },
+  name: { color: colors.ink, fontFamily: fonts.serif, fontSize: 17 },
+  reason: { color: colors.muted3, fontFamily: fonts.sans, fontSize: 13, marginTop: 2 },
+  meta: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 7 },
+  window: { fontFamily: fonts.sansSemi, fontSize: 12 },
+  dist: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12 },
+});

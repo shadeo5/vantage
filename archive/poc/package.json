@@ -1,0 +1,12 @@
+{
+  "name": "vantage-poc",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Throwaway proof-of-concept: auto-generate a street-photography 'go shoot here' list for Atlanta.",
+  "scripts": {
+    "scout": "node --env-file=.env scout.mjs"
+  },
+  "dependencies": {
+    "suncalc": "^1.9.0"
+  }
+}

@@ -1,0 +1,350 @@
+<title>Vantage — Technical Decisions</title>
+<style>
+  :root {
+    /* Dark is Vantage's native world — the default here. */
+    --ground: #0F0F11;
+    --surface: #161618;
+    --raised: #1d1d21;
+    --ink: #F4F1EA;
+    --muted: #9a98a2;
+    --faint: #6E6C75;
+    --gold: #E9B872;
+    --gold-deep: #F2A93B;
+    --blue: #7FA0CF;
+    --green: #9DB89A;
+    --clay: #D17A6B;
+    --hair: rgba(255,255,255,.09);
+    --hair-strong: rgba(255,255,255,.16);
+    --card-shadow: 0 1px 0 rgba(255,255,255,.03), 0 10px 30px rgba(0,0,0,.35);
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --ground: #F4F1EA;
+      --surface: #FBFAF6;
+      --raised: #ffffff;
+      --ink: #211d17;
+      --muted: #5f5a51;
+      --faint: #8a857b;
+      --gold: #9a6e1e;
+      --gold-deep: #b07f1a;
+      --blue: #3f5c86;
+      --green: #566f4c;
+      --clay: #a8503f;
+      --hair: rgba(20,15,8,.12);
+      --hair-strong: rgba(20,15,8,.20);
+      --card-shadow: 0 1px 2px rgba(30,22,10,.05), 0 12px 30px rgba(30,22,10,.06);
+    }
+  }
+  /* Explicit toggle wins over OS in both directions. */
+  :root[data-theme="light"] {
+    --ground: #F4F1EA; --surface: #FBFAF6; --raised: #ffffff;
+    --ink: #211d17; --muted: #5f5a51; --faint: #8a857b;
+    --gold: #9a6e1e; --gold-deep: #b07f1a; --blue: #3f5c86; --green: #566f4c; --clay: #a8503f;
+    --hair: rgba(20,15,8,.12); --hair-strong: rgba(20,15,8,.20);
+    --card-shadow: 0 1px 2px rgba(30,22,10,.05), 0 12px 30px rgba(30,22,10,.06);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0F0F11; --surface: #161618; --raised: #1d1d21;
+    --ink: #F4F1EA; --muted: #9a98a2; --faint: #6E6C75;
+    --gold: #E9B872; --gold-deep: #F2A93B; --blue: #7FA0CF; --green: #9DB89A; --clay: #D17A6B;
+    --hair: rgba(255,255,255,.09); --hair-strong: rgba(255,255,255,.16);
+    --card-shadow: 0 1px 0 rgba(255,255,255,.03), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .page { max-width: 820px; margin: 0 auto; padding: 72px 24px 96px; }
+
+  .eyebrow { font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); font-weight: 600; }
+
+  /* ---- Header ---- */
+  header { border-bottom: 1px solid var(--hair); padding-bottom: 34px; margin-bottom: 8px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(40px, 8vw, 64px);
+    line-height: 1.02; letter-spacing: -.01em; margin: 14px 0 10px; text-wrap: balance; }
+  .lede { font-size: 18px; color: var(--muted); max-width: 60ch; }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .meta .tag { font-family: var(--mono); font-size: 12px; color: var(--muted);
+    border: 1px solid var(--hair); border-radius: 999px; padding: 5px 12px; background: var(--surface); }
+  .meta .tag b { color: var(--ink); font-weight: 600; }
+
+  /* ---- Sections ---- */
+  section { margin-top: 60px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px; }
+  .sec-head h2 { font-family: var(--serif); font-weight: 500; font-size: 27px; letter-spacing: -.01em; }
+  .sec-head .n { font-family: var(--mono); font-size: 13px; color: var(--faint);
+    border: 1px solid var(--hair); border-radius: 6px; padding: 2px 8px; }
+  .intro-p { color: var(--muted); max-width: 66ch; margin-bottom: 26px; }
+
+  /* ---- Decision cards ---- */
+  .grid { display: flex; flex-direction: column; gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--hair); border-radius: 16px;
+    padding: 22px 24px; box-shadow: var(--card-shadow); }
+  .card .kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .card h3 { font-family: var(--serif); font-weight: 500; font-size: 20px; letter-spacing: -.005em; }
+  .card .body { font-size: 15px; }
+  .card .decision { color: var(--ink); }
+  .card .why { color: var(--muted); margin-top: 7px; }
+  .card .why b, .card .decision b { color: var(--ink); font-weight: 600; }
+  .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .5px; text-transform: uppercase;
+    color: var(--faint); }
+
+  /* ---- Status pills ---- */
+  .pill { font-family: var(--mono); font-size: 11px; letter-spacing: .3px; font-weight: 600;
+    padding: 3px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+  .pill.done   { color: var(--green); border-color: color-mix(in srgb, var(--green) 45%, transparent);
+    background: color-mix(in srgb, var(--green) 12%, transparent); }
+  .pill.plan   { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 45%, transparent);
+    background: color-mix(in srgb, var(--blue) 12%, transparent); }
+  .pill.drop   { color: var(--clay); border-color: color-mix(in srgb, var(--clay) 45%, transparent);
+    background: color-mix(in srgb, var(--clay) 12%, transparent); }
+  .pill.gold   { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+    background: color-mix(in srgb, var(--gold) 12%, transparent); }
+
+  /* ---- Data source table ---- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--hair); border-radius: 16px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14px; }
+  th, td { text-align: left; padding: 13px 18px; border-bottom: 1px solid var(--hair); vertical-align: top; }
+  thead th { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--faint); font-weight: 600; background: var(--raised); }
+  tbody tr:last-child td { border-bottom: none; }
+  td .src { font-family: var(--mono); color: var(--ink); font-size: 13.5px; }
+  td .use { color: var(--muted); }
+
+  /* ---- Learnings ---- */
+  .learn { display: flex; flex-direction: column; gap: 2px; }
+  .learn .row { display: grid; grid-template-columns: 130px 1fr; gap: 18px; padding: 16px 4px;
+    border-bottom: 1px solid var(--hair); align-items: start; }
+  .learn .row:last-child { border-bottom: none; }
+  .learn .row .k { font-family: var(--serif); font-size: 16px; color: var(--ink); }
+  .learn .row .v { color: var(--muted); font-size: 14.5px; }
+  .learn .row .v b { color: var(--ink); font-weight: 600; }
+  @media (max-width: 540px) { .learn .row { grid-template-columns: 1fr; gap: 4px; } }
+
+  /* ---- Roadmap ---- */
+  .road { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--hair);
+    border-radius: 16px; overflow: hidden; }
+  .road .step { display: flex; align-items: center; gap: 16px; padding: 15px 20px;
+    border-bottom: 1px solid var(--hair); background: var(--surface); }
+  .road .step:last-child { border-bottom: none; }
+  .road .step .idx { font-family: var(--mono); font-size: 13px; color: var(--faint); width: 20px;
+    font-variant-numeric: tabular-nums; }
+  .road .step .name { font-family: var(--serif); font-size: 17px; flex: 1; }
+  .road .step .desc { color: var(--muted); font-size: 13.5px; flex: 2; min-width: 0; }
+  @media (max-width: 600px) { .road .step .desc { display: none; } }
+
+  ul.open { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  ul.open li { padding-left: 20px; position: relative; color: var(--muted); max-width: 66ch; }
+  ul.open li::before { content: "?"; position: absolute; left: 0; color: var(--gold);
+    font-family: var(--serif); font-weight: 600; }
+  ul.open li b { color: var(--ink); font-weight: 600; }
+
+  footer { margin-top: 72px; padding-top: 24px; border-top: 1px solid var(--hair);
+    color: var(--faint); font-size: 13px; }
+
+  a { color: var(--gold); }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { animation: rise .5s ease both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="page">
+  <header class="reveal">
+    <div class="eyebrow">Technical Decision Record</div>
+    <h1>Vantage</h1>
+    <p class="lede">A photographer's scout that answers <b>“what should I shoot near me right now?”</b> — and the reasoning behind how it's built. This is the running log of the choices that shaped the app, why we made them, and what we deliberately deferred.</p>
+    <div class="meta">
+      <span class="tag">Project <b>Vantage / StreetPhotoApp</b></span>
+      <span class="tag">Updated <b>Jul 11, 2026</b></span>
+      <span class="tag">Stage <b>Slice 3 of 6</b></span>
+      <span class="tag">City <b>Atlanta</b></span>
+    </div>
+  </header>
+
+  <!-- PRODUCT -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>The thesis</h2></div>
+    <p class="intro-p">What the product actually is — the decisions that define the problem before any code.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="kicker"><span class="lbl">Focus</span></div>
+        <h3>Street-first, landscape later</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Build and prove the <b>street / street-portrait</b> case first; add landscape later.</p>
+          <p class="why"><b>Why:</b> Landscape is already solved — you can Google “best photo spots in a national park.” The hard, differentiated value is finding <b>human activity and density</b> to shoot, which is worst when you're <em>not</em> in a major city. Don't spend effort re-solving what a search engine does.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Data strategy</span></div>
+        <h3>Auto-generate, don't hand-curate</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Generate the “go shoot here” list from open data instead of manually curating spots.</p>
+          <p class="why"><b>Why:</b> No existing spot database, and curation doesn't scale to every city. A throwaway proof-of-concept confirmed the generated Atlanta list was genuinely useful.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Identity</span></div>
+        <h3>Keep the “Vantage” look, rebuild the brain</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Reuse the existing dark, editorial Vantage design; replace its <em>content signals</em> from landscape (vistas, quiet) to street (activity, crowds).</p>
+          <p class="why"><b>Why:</b> The design was already done and strong. For street, a busy scene is the goal — the opposite of the scenic-scout framing the mockup implied.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>Data &amp; architecture</h2></div>
+    <p class="intro-p">How the “go shoot here” list is actually assembled and ranked.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="kicker"><span class="lbl">Places</span></div>
+        <h3>OpenStreetMap → walkable districts</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Pull interesting POIs (markets, squares, pedestrian streets, arts venues, parks, public art) from OpenStreetMap via Overpass, then <b>cluster them into districts</b> (greedy, ~500m merge).</p>
+          <p class="why"><b>Why:</b> Raw output listed a dozen individual statues near the Capitol. Photographers want an <em>area</em> to wander, not a pin per statue. Clustering turns 295 POIs into ~95 coherent districts.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Events</span></div>
+        <h3>Filter by geography, never by name</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Match events by <b>venue latitude/longitude + radius</b>, not by a city text field.</p>
+          <p class="why"><b>Why:</b> Searching “Atlanta” returned a soccer club in Argentina named Atlanta. Location is a coordinate, not a string.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Coverage</span></div>
+        <h3>Multi-source events + an editorial “tentpole” layer</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Combine several event feeds, and <b>hand-pin</b> a small set of huge, known-months-ahead events.</p>
+          <p class="why"><b>Why:</b> No single API is complete. The FIFA World Cup semifinal in Atlanta sells through FIFA (not Ticketmaster) and wasn't in the sports feed yet (knockout teams undecided). The editorial layer guarantees the biggest shoot in town never silently drops.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Light</span></div>
+        <h3>Sun altitude drives the light curve</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Compute golden/blue-hour and a per-30-min <b>light-quality curve</b> from the sun's altitude with SunCalc — no network.</p>
+          <p class="why"><b>Why:</b> Light is pure astronomy; it's exact, free, and offline. Bar height ramps up to the golden-hour peaks and down through the harsh midday trough, rather than flat category blocks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA SOURCES -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Data sources</h2></div>
+    <p class="intro-p">Everything is free and open. No scraping. Keys only where noted.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Source</th><th>Provides</th><th>Cost / key</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="src">OpenStreetMap · Overpass</span></td><td class="use">Places → districts</td><td class="use">Free, no key</td><td><span class="pill done">LIVE</span></td></tr>
+          <tr><td><span class="src">SunCalc</span></td><td class="use">Golden/blue hour, sun altitude, light curve</td><td class="use">Free, offline</td><td><span class="pill done">LIVE</span></td></tr>
+          <tr><td><span class="src">ESPN (unofficial)</span></td><td class="use">Full sports schedules (Braves, Hawks, Falcons)</td><td class="use">Free, no key</td><td><span class="pill done">LIVE</span></td></tr>
+          <tr><td><span class="src">Tentpole (editorial)</span></td><td class="use">Huge events APIs miss (World Cup)</td><td class="use">Hand-maintained</td><td><span class="pill done">LIVE</span></td></tr>
+          <tr><td><span class="src">Ticketmaster Discovery</span></td><td class="use">Concerts, arts</td><td class="use">Free key</td><td><span class="pill plan">PLANNED</span></td></tr>
+          <tr><td><span class="src">TheSportsDB</span></td><td class="use">Sports (initial attempt)</td><td class="use">Free tier caps at 5 results</td><td><span class="pill drop">REPLACED</span></td></tr>
+          <tr><td><span class="src">Open-Meteo</span></td><td class="use">Weather / cloud cover</td><td class="use">Free, no key</td><td><span class="pill plan">PLANNED</span></td></tr>
+          <tr><td><span class="src">Mapbox</span></td><td class="use">The map screen</td><td class="use">Free tier</td><td><span class="pill plan">PLANNED</span></td></tr>
+          <tr><td><span class="src">Supabase</span></td><td class="use">Accounts, saving</td><td class="use">Free tier</td><td><span class="pill plan">PLANNED</span></td></tr>
+          <tr><td><span class="src">Flickr</span></td><td class="use">Photo hotspots (originally)</td><td class="use">Now paid Pro</td><td><span class="pill drop">DROPPED</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FRONTEND -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Frontend &amp; build</h2></div>
+    <div class="grid">
+      <div class="card">
+        <div class="kicker"><span class="lbl">Framework</span></div>
+        <h3>Expo (React Native) + TypeScript</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> One codebase for iOS and Android, on Expo SDK 57.</p>
+          <p class="why"><b>Why:</b> A single JavaScript/TypeScript codebase ships to both platforms and is the friendliest path for a non-native developer working with AI assistance.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Navigation</span></div>
+        <h3>State-based screens for now</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Switch screens with a simple state value; add a real navigation library only when the tab bar lands.</p>
+          <p class="why"><b>Why:</b> The thinnest thing that makes tapping a card work — and it mirrors how the original mockup managed screens. Don't add infrastructure before it's needed.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Imagery</span></div>
+        <h3>Photo-less cards, on purpose</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Use tonal gradients on cards instead of stock photos, for now.</p>
+          <p class="why"><b>Why:</b> No licensed imagery yet. Fake stock would misrepresent the product; honest placeholders read as intentional. Imagery is a real, open decision (see below).</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kicker"><span class="lbl">Method</span></div>
+        <h3>Vertical slices</h3>
+        <div class="body">
+          <p class="decision"><b>Decision:</b> Build in thin, end-to-end, phone-runnable slices — data → logic → UI — one at a time.</p>
+          <p class="why"><b>Why:</b> Every slice is something you can open and use. We never sit on a broken half-built app.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEARNINGS -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Learnings &amp; gotchas</h2></div>
+    <p class="intro-p">Things that bit us — kept here so they don't bite twice.</p>
+    <div class="learn">
+      <div class="row"><div class="k">Flickr → Pro</div><div class="v">Flickr now requires a <b>paid Pro subscription</b> just for an API key. Dropped it — OpenStreetMap is free and better-aimed at street anyway.</div></div>
+      <div class="row"><div class="k">Rate limits</div><div class="v">Firing 60 parallel requests at a free API earned an instant <b>HTTP 429</b>. Fixed by querying smart (per-team endpoints), not brute-forcing every day.</div></div>
+      <div class="row"><div class="k">Free-tier caps</div><div class="v">TheSportsDB's free tier silently caps at <b>~5 results per endpoint</b> — useless for real schedules. Switched to <b>ESPN's free API</b>, which returns complete seasons and is CORS-enabled for web.</div></div>
+      <div class="row"><div class="k">Geo, not names</div><div class="v">Text matching “Atlanta” pulled in an <b>Argentine football club</b>. Always filter by coordinates + radius.</div></div>
+      <div class="row"><div class="k">SunCalc units</div><div class="v">This SunCalc build returns sun altitude in <b>degrees, not radians</b> — converting again inflated values and flattened the light chart. Will matter again for the sun-compass.</div></div>
+      <div class="row"><div class="k">Overpass 406/504</div><div class="v">Overpass rejects a missing <b>User-Agent</b> (406) and times out under load (504). Fixed with a real UA header and <b>mirror fallback</b>.</div></div>
+      <div class="row"><div class="k">Expo Go vs SDK</div><div class="v">Store Expo Go is older than SDK 57, so phones show “needs update.” Testing on <b>web preview</b> for now; a dev build (or SDK downgrade) unlocks phones later.</div></div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Build roadmap</h2></div>
+    <div class="road">
+      <div class="step"><span class="idx">1</span><span class="name">Today — evergreen areas</span><span class="desc">Ranked Atlanta districts + golden-hour countdown</span><span class="pill done">DONE</span></div>
+      <div class="step"><span class="idx">2</span><span class="name">Area detail</span><span class="desc">Light curve, why, and what's inside each district</span><span class="pill done">DONE</span></div>
+      <div class="step"><span class="idx">3</span><span class="name">What's happening</span><span class="desc">Events — World Cup semifinal + Braves home games</span><span class="pill done">DONE</span></div>
+      <div class="step"><span class="idx">4</span><span class="name">Map</span><span class="desc">Districts &amp; events as pins (Mapbox)</span><span class="pill plan">NEXT</span></div>
+      <div class="step"><span class="idx">5</span><span class="name">Saved</span><span class="desc">Heart areas, persist (local → Supabase)</span><span class="pill plan">PLANNED</span></div>
+      <div class="step"><span class="idx">6</span><span class="name">Near me</span><span class="desc">Real device GPS instead of downtown</span><span class="pill plan">PLANNED</span></div>
+    </div>
+  </section>
+
+  <!-- OPEN -->
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Open questions</h2></div>
+    <ul class="open">
+      <li><b>Area imagery.</b> Where do photos come from — Wikimedia Commons (free, attribution), Mapbox thumbnails, or user-contributed? Licensing is a real product decision.</li>
+      <li><b>What each area should capture.</b> The data model per spot — sample shots, subjects/genre, access, safety, energy — plus what truly signals a good <em>street</em> spot beyond POI density.</li>
+      <li><b>Live busyness.</b> Real-time “is this street crowded right now” has no clean free source; scheduled events + POI density are today's proxies.</li>
+      <li><b>Weather-aware light.</b> The light curve is pure sun geometry; Open-Meteo cloud cover should temper it so golden hour only lights up when the sky cooperates.</li>
+      <li><b>Accounts.</b> Anonymous/local vs. real sign-up — needed once saving and routes sync across devices.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Vantage — living technical record. Dark by default, mirroring the app's own visual world; use the theme toggle for a light read. Sources: OpenStreetMap contributors (ODbL), SunCalc, TheSportsDB, Ticketmaster.
+  </footer>
+</div>

@@ -1,0 +1,257 @@
+<title>Vantage — North Star</title>
+<style>
+  :root {
+    /* Warm, cinematic golden-hour world — the app's emotional identity. Dark is home. */
+    --ground: #100C08;
+    --ground-2: #17110b;
+    --surface: #1c150d;
+    --ink: #F6F1E8;
+    --muted: #b3a999;
+    --faint: #7d746a;
+    --gold: #E9B872;
+    --gold-bright: #F2A93B;
+    --blue: #7FA0CF;
+    --hair: rgba(255,238,214,.11);
+    --hair-strong: rgba(255,238,214,.2);
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --mono: 'SF Mono', 'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --ground: #F3EBDD; --ground-2: #efe6d6; --surface: #fbf6ec;
+      --ink: #241b10; --muted: #6a5f4e; --faint: #94897a;
+      --gold: #9a6e1e; --gold-bright: #b07f1a; --blue: #3f5c86;
+      --hair: rgba(40,27,10,.13); --hair-strong: rgba(40,27,10,.24);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F3EBDD; --ground-2:#efe6d6; --surface:#fbf6ec; --ink:#241b10; --muted:#6a5f4e; --faint:#94897a;
+    --gold:#9a6e1e; --gold-bright:#b07f1a; --blue:#3f5c86; --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+  }
+  :root[data-theme="dark"]{
+    --ground:#100C08; --ground-2:#17110b; --surface:#1c150d; --ink:#F6F1E8; --muted:#b3a999; --faint:#7d746a;
+    --gold:#E9B872; --gold-bright:#F2A93B; --blue:#7FA0CF; --hair:rgba(255,238,214,.11); --hair-strong:rgba(255,238,214,.2);
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); line-height: 1.6;
+    -webkit-font-smoothing: antialiased; }
+  .page { max-width: 800px; margin: 0 auto; padding: 0 24px 110px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+
+  /* ---- HERO ---- */
+  .hero { position: relative; padding: 118px 0 70px; overflow: hidden; }
+  .hero .glow { position: absolute; top: -120px; right: -80px; width: 460px; height: 460px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(242,169,59,.30), rgba(233,184,114,.08) 45%, transparent 68%);
+    pointer-events: none; filter: blur(6px); }
+  .hero h1 { position: relative; font-family: var(--serif); font-weight: 500;
+    font-size: clamp(42px, 8.5vw, 78px); line-height: 1.02; letter-spacing: -.015em;
+    margin: 20px 0 24px; text-wrap: balance; }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero .sub { position: relative; font-size: 20px; color: var(--muted); max-width: 54ch; }
+  .hero .sub b { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 76px; }
+  .kick { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 16px; }
+  h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(26px, 4.5vw, 34px); letter-spacing: -.01em;
+    line-height: 1.12; text-wrap: balance; }
+  p { max-width: 64ch; }
+  p + p { margin-top: 15px; }
+  .lead { font-size: 18px; color: var(--muted); }
+  .lead b { color: var(--ink); font-weight: 600; }
+
+  /* ---- The notification centerpiece ---- */
+  .phone-wrap { display: flex; justify-content: center; margin: 40px 0 8px; }
+  .phone { width: 330px; max-width: 100%; border-radius: 40px; padding: 26px 20px 30px;
+    background: linear-gradient(170deg, #24344d 0%, #3a2f22 52%, #58381c 100%);
+    box-shadow: 0 30px 70px rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.1); position: relative; overflow: hidden; }
+  .phone .sun { position: absolute; top: 40px; right: -30px; width: 150px; height: 150px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(242,169,59,.55), transparent 62%); }
+  .phone .clock { text-align: center; color: #fff; position: relative; }
+  .phone .clock .t { font-family: var(--serif); font-size: 62px; font-weight: 500; line-height: 1; letter-spacing: -.02em; }
+  .phone .clock .d { font-family: var(--sans); font-size: 14px; opacity: .85; margin-top: 6px; letter-spacing: .3px; }
+  .notif { margin-top: 120px; background: rgba(20,16,12,.62); backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,.14); border-radius: 20px; padding: 14px 15px; position: relative; }
+  .notif .head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .notif .ic { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, #F2A93B, #E9B872);
+    display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .notif .app { font-family: var(--sans); font-size: 12px; font-weight: 700; color: #fff; letter-spacing: .3px; }
+  .notif .ago { font-family: var(--sans); font-size: 11px; color: rgba(255,255,255,.6); margin-left: auto; }
+  .notif .title { font-family: var(--sans); font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 3px; }
+  .notif .body { font-family: var(--sans); font-size: 14px; color: rgba(255,255,255,.86); line-height: 1.45; }
+  .caption { text-align: center; font-family: var(--mono); font-size: 11.5px; color: var(--faint);
+    letter-spacing: .5px; margin-top: 18px; }
+
+  /* ---- Clause decode ---- */
+  .decode { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+  .decode .r { display: grid; grid-template-columns: 200px 1fr auto; gap: 16px; align-items: center;
+    padding: 15px 18px; background: var(--surface); border: 1px solid var(--hair); border-radius: 12px; }
+  .decode .r .q { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--gold); }
+  .decode .r .m { color: var(--muted); font-size: 14.5px; font-family: var(--sans); }
+  .decode .r .s { font-family: var(--mono); font-size: 10px; letter-spacing: .5px; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
+  .decode .r .s.have { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 45%, transparent); }
+  .decode .r .s.new { color: var(--gold-bright); border-color: color-mix(in srgb, var(--gold-bright) 45%, transparent); }
+  @media (max-width: 620px){ .decode .r { grid-template-columns: 1fr; gap: 6px; } .decode .r .s { justify-self: start; } }
+
+  /* ---- Before / after ---- */
+  .flip { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 26px; }
+  @media (max-width: 560px){ .flip { grid-template-columns: 1fr; } }
+  .flip .col { border: 1px solid var(--hair); border-radius: 14px; padding: 22px; background: var(--surface); }
+  .flip .col.to { border-color: color-mix(in srgb, var(--gold) 40%, transparent);
+    background: color-mix(in srgb, var(--gold) 7%, var(--surface)); }
+  .flip .col h4 { font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--faint); margin-bottom: 10px; }
+  .flip .col.to h4 { color: var(--gold); }
+  .flip .col .big { font-family: var(--serif); font-size: 21px; line-height: 1.25; }
+  .flip .col p { font-size: 14px; color: var(--muted); margin-top: 10px; }
+
+  /* ---- Principles ---- */
+  .principles { display: flex; flex-direction: column; gap: 2px; margin-top: 22px; }
+  .principles .p { display: grid; grid-template-columns: 34px 1fr; gap: 18px; padding: 20px 4px;
+    border-bottom: 1px solid var(--hair); }
+  .principles .p:last-child { border-bottom: none; }
+  .principles .p .n { font-family: var(--serif); font-size: 20px; color: var(--gold); }
+  .principles .p .k { font-family: var(--serif); font-size: 20px; margin-bottom: 5px; }
+  .principles .p .v { color: var(--muted); font-size: 15px; font-family: var(--sans); max-width: 60ch; }
+  .principles .p .v b { color: var(--ink); font-weight: 600; }
+
+  /* ---- Design brief callout ---- */
+  .brief { border: 1px solid var(--hair-strong); border-radius: 16px; padding: 28px 28px 8px; margin-top: 24px;
+    background: var(--ground-2); }
+  .brief .item { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 18px 0; border-bottom: 1px solid var(--hair); }
+  .brief .item:last-child { border-bottom: none; }
+  .brief .item .t { font-family: var(--sans); font-weight: 700; font-size: 16px; }
+  .brief .item .d { color: var(--muted); font-size: 14.5px; font-family: var(--sans); }
+  .brief .item .d b { color: var(--ink); }
+
+  /* ---- Path ---- */
+  .path { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--hair); border-radius: 14px; overflow: hidden; margin-top: 22px; }
+  .path .s { display: flex; align-items: baseline; gap: 16px; padding: 17px 20px; border-bottom: 1px solid var(--hair); background: var(--surface); }
+  .path .s:last-child { border-bottom: none; }
+  .path .s .n { font-family: var(--mono); font-size: 12px; color: var(--faint); width: 22px; }
+  .path .s .k { font-family: var(--serif); font-size: 18px; flex: 1; }
+  .path .s .d { color: var(--muted); font-size: 13.5px; font-family: var(--sans); flex: 1.4; min-width: 0; }
+  @media (max-width: 600px){ .path .s .d { display: none; } }
+
+  .close { font-family: var(--serif); font-style: italic; font-size: clamp(24px, 5vw, 34px); color: var(--gold);
+    line-height: 1.25; text-wrap: balance; margin-top: 70px; max-width: 20ch; }
+
+  footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--hair);
+    font-family: var(--mono); font-size: 12px; color: var(--faint); }
+  a { color: var(--gold); }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade { animation: fade 1s ease both; }
+    @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="page">
+  <div class="hero fade">
+    <div class="glow"></div>
+    <div class="eyebrow">Vantage · North Star</div>
+    <h1>The best camera is the one you <em>actually pick up.</em></h1>
+    <p class="sub">Millions of good cameras sit in drawers. Vantage exists to get them back into hands — to give someone a <b>reason to shoot today</b>, tuned to the gear they already own.</p>
+  </div>
+
+  <section>
+    <div class="kick">The whole product, in one moment</div>
+    <h2>Not a search box you remember to open. A tap on the shoulder you didn't expect.</h2>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="sun"></div>
+        <div class="clock">
+          <div class="t">4:58</div>
+          <div class="d">Saturday, July 11</div>
+        </div>
+        <div class="notif">
+          <div class="head">
+            <span class="ic">🌇</span>
+            <span class="app">VANTAGE</span>
+            <span class="ago">now</span>
+          </div>
+          <div class="title">Great evening to shoot — grab the 50mm.</div>
+          <div class="body">Golden hour hits 8:15 and Sweet Auburn is buzzing tonight. Perfect for the fast prime in your bag. 6 min away.</div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">The end goal, made real.</p>
+  </section>
+
+  <section>
+    <div class="kick">Reading the promise</div>
+    <h2>Every clause is a capability — some built, some ahead.</h2>
+    <p class="lead" style="margin-top:14px">“Based on <b>events today</b> and <b>your kit</b>, it's a <b>great day</b> to shoot <b>this</b>, <b>here</b>.”</p>
+    <div class="decode">
+      <div class="r"><span class="q">“events today”</span><span class="m">what's happening + the light + the weather</span><span class="s have">Mostly built</span></div>
+      <div class="r"><span class="q">“your kit”</span><span class="m">a gear profile → matched to subjects</span><span class="s new">New</span></div>
+      <div class="r"><span class="q">“a great day”</span><span class="m">a quality bar — only nudge when it's worth it</span><span class="s new">New</span></div>
+      <div class="r"><span class="q">“shoot this”</span><span class="m">a subject that fits your gear + the moment</span><span class="s new">New</span></div>
+      <div class="r"><span class="q">“here”</span><span class="m">a real place near you</span><span class="s have">Built (+ GPS ahead)</span></div>
+      <div class="r"><span class="q">the nudge</span><span class="m">decided server-side, pushed while the app sleeps</span><span class="s new">New (backend)</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kick">Who we're really for</div>
+    <h2>We're not serving intent. We're creating it.</h2>
+    <p class="lead" style="margin-top:14px">Most tools help people who've <em>already decided</em> to shoot. Our hero hasn't decided yet — they own a camera and haven't touched it in months. The whole product is the spark, not the map.</p>
+    <div class="flip">
+      <div class="col from">
+        <h4>What the old design assumed</h4>
+        <div class="big">A search tool for photographers already deciding where to go.</div>
+        <p>Home = a ranked list of spots to browse. Utility. Serves existing intent.</p>
+      </div>
+      <div class="col to">
+        <h4>What we're actually building</h4>
+        <div class="big">An inspiration engine that reaches out first.</div>
+        <p>Home = one personal, timely reason to shoot today, matched to your kit. It creates intent.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kick">Principles</div>
+    <h2>Four commitments that keep this honest.</h2>
+    <div class="principles">
+      <div class="p"><div class="n">1</div><div><div class="k">Inspire, don't nag.</div><div class="v">We stay silent unless today is <b>genuinely</b> good. A high bar to send is what separates a muse from spam.</div></div></div>
+      <div class="p"><div class="n">2</div><div><div class="k">Personal to the bag.</div><div class="v">The suggestion knows your gear. A telephoto gets crowds and courts; a fast prime gets low-light streets and portraits. <b>Your kit shapes the shoot.</b></div></div></div>
+      <div class="p"><div class="n">3</div><div><div class="k">We reach out.</div><div class="v">The magic is proactive. The user shouldn't have to remember us — <b>we remember them</b>, at the right moment.</div></div></div>
+      <div class="p"><div class="n">4</div><div><div class="k">Lower the barrier, always.</div><div class="v">Every choice removes friction between “camera in a drawer” and “out shooting.” Timing, place, subject — pre-answered.</div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kick">What this means for the design</div>
+    <h2>The current screens serve an older idea. Here's what has to change.</h2>
+    <p class="lead" style="margin-top:14px">This section doubles as the redesign brief — the vision above, translated into what the app must become.</p>
+    <div class="brief">
+      <div class="item"><div class="t">The home screen's job flips</div><div class="d">From “<b>browse 15 ranked areas</b>” to “<b>here's your one reason to shoot today</b>” — a single, personal, hero-led answer. The list becomes backup below the fold, not the point.</div></div>
+      <div class="item"><div class="t">Gear becomes a first-class citizen</div><div class="d">A warm “what's in your bag?” onboarding, a kit profile, and visible influence — the app should <b>show</b> that a suggestion was chosen for your lens.</div></div>
+      <div class="item"><div class="t">Tone shifts from utility to inspiration</div><div class="d">Less scoring, badges, and density counts; more voice, story, and invitation. Copy that makes you <b>want</b> to grab the camera.</div></div>
+      <div class="item"><div class="t">The notification is a designed surface</div><div class="d">The push, the lock-screen moment, and the “here's why” it opens into are core screens — not an afterthought bolted on at the end.</div></div>
+      <div class="item"><div class="t">Photography returns to a photography app</div><div class="d">Example shots — what people actually captured here — carry the inspiration. Sourcing real imagery moves from “later” toward “core.”</div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="kick">The path there</div>
+    <h2>Chase the notification's brain before its plumbing.</h2>
+    <p class="lead" style="margin-top:14px">Prove the magic in-app first — a “Your shoot today” card — before building gear onboarding, a server, and push. Every step is something you can feel.</p>
+    <div class="path">
+      <div class="s"><span class="n">A</span><span class="k">Redesign the home around “today's shoot”</span><span class="d">Hero-led, personal, inspiration-first</span></div>
+      <div class="s"><span class="n">B</span><span class="k">Gear profile</span><span class="d">“What's in your bag?” — light onboarding</span></div>
+      <div class="s"><span class="n">C</span><span class="k">“Your shoot today” card</span><span class="d">The notification brain, in-app: gear + light + event + place → one inspiring line</span></div>
+      <div class="s"><span class="n">D</span><span class="k">Weather + GPS</span><span class="d">Sharpen “great day” and “near you”</span></div>
+      <div class="s"><span class="n">E</span><span class="k">Backend + push</span><span class="d">Decide &amp; deliver while the app sleeps</span></div>
+    </div>
+  </section>
+
+  <p class="close">Give a dormant camera one good reason, and it stops being a drawer object and starts being a habit again.</p>
+
+  <footer>
+    Vantage — North Star. The why beneath the what. Companion to the product brief and the technical record.
+  </footer>
+</div>

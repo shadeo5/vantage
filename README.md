@@ -33,8 +33,9 @@ Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output 
 - `PRODUCT_BRIEF.html` — customer interrogation (assumptions, risks, personas)
 - `COMPETITIVE_LANDSCAPE.html` — who else is out there; our open quadrant
 
-**`docs/design/`** — *what it looks like & how it flows*
+**`docs/design/`** — *what it looks like, how it flows, how it sounds*
 - `handoff_v2/` — **the current design** (nudge-first, the app was built from this)
+- `VOICE.md` — **voice & tone guide** — how everything Vantage says should sound (kept in sync with the pipeline's baked-in voice)
 
 **`docs/engineering/`** — *how it's built*
 - `TECH_DECISIONS.html` — living record of technical choices

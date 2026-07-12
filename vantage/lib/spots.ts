@@ -41,7 +41,7 @@ export const SPOTS: Spot[] = [
       "The old marquee signs catch the last warm light near 8:20.",
     ],
     img: "1449824913935-59a10b8d2000", gallery: ["1506905925346-21bda4d32df4", "1470770841072-f978cf4d019e", "1444723121867-7a241cacace9"],
-    getting: "6 min drive · street parking on Edgewood after 7 PM · MARTA King Memorial, a 5-min walk.",
+    getting: "6 min drive · evening street parking on Edgewood · MARTA King Memorial, a short walk.",
     lat: 33.7550, lon: -84.3720,
   },
   {
@@ -97,7 +97,7 @@ export const SPOTS: Spot[] = [
       "Steady the camera on the rail for the long blue-hour frames.",
     ],
     img: "1480714378408-67cf0d13bc1b", gallery: ["1480714378408-67cf0d13bc1b", "1444723121867-7a241cacace9", "1506905925346-21bda4d32df4"],
-    getting: "11 min drive · rooftop entry via the elevator · last entry 9 PM.",
+    getting: "11 min drive · rooftop entry via the elevator · check posted rooftop hours.",
     lat: 33.7720, lon: -84.3650,
   },
 ];

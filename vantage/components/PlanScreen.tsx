@@ -5,12 +5,12 @@ import { getSpot, img, windowMeta } from "../lib/spots";
 
 type PlanMeta = { id: string; label: string; tag: string; reason: string; fit: string };
 const PLAN: PlanMeta[] = [
-  { id: "sweetauburn", label: "Tonight · Sat", tag: "Light-driven", reason: "Golden light straight down Auburn Ave.", fit: "fits 35mm" },
-  { id: "krog", label: "Sun", tag: "Activity-driven", reason: "The Sunday market crowd fills the strip.", fit: "fits 35mm" },
-  { id: "jackson", label: "Wed", tag: "Light-driven", reason: "Clear skies line up behind the towers.", fit: "grab a tele" },
-  { id: "ponce", label: "Fri", tag: "Event-driven", reason: "BeltLine art walk after work.", fit: "fits 35mm" },
+  { id: "sweetauburn", label: "Tonight · Sat", tag: "The light", reason: "Golden light straight down Auburn Ave.", fit: "fits 35mm" },
+  { id: "krog", label: "Sun", tag: "The crowd", reason: "The Sunday market crowd fills the strip.", fit: "fits 35mm" },
+  { id: "jackson", label: "Wed", tag: "The light", reason: "Clear skies line up behind the towers.", fit: "grab a tele" },
+  { id: "ponce", label: "Fri", tag: "Happening", reason: "BeltLine art walk after work.", fit: "fits 35mm" },
 ];
-const tagColor = (t: string) => (t === "Event-driven" ? colors.crowdHigh : t === "Activity-driven" ? colors.flat : colors.golden);
+const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);
 
 export function PlanScreen({ going, windowTimeFor, onOpen, onToggleGoing }: {
   going: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;

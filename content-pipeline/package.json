@@ -1,0 +1,13 @@
+{
+  "name": "vantage-content-pipeline",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Per-city content pipeline: real places -> Claude drafts spot content -> JSON the app can use.",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0"
+  }
+}

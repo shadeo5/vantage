@@ -32,7 +32,7 @@ The app currently runs on 5 hand-curated Atlanta spots + Unsplash placeholders. 
 ## E2 · Personalization & Gear  ⬜
 Make "your kit" real and load-bearing (it's currently a static "35mm").
 - ⬜ **G1 — Persist the gear profile** (cameras + lenses/style) locally, then synced.
-- ▶ **G2 — Gear → subject matching.** Telephoto→distance/sports; fast prime→low-light street; wide→architecture; macro→details. Drives the "why … your kit" line and per-spot "fits/grab a tele". CATALOG + MATCHING ENGINE BUILT: `vantage/lib/gear.ts` (19 cameras, 24 lenses w/ real specs; `equivalentFocal`/`genresForLens`/`genresForKit`, crop-factor aware) + `__tests__/gear.test.ts`. NOT yet wired into BagScreen (still hardcoded X100VI). Known simplifications: phones filed as "1-inch" (crop math still lands ~24mm); `genresForKit` assumes any lens fits any body (over-generous — future: match lenses to compatible mounts).
+- ▶ **G2 — Gear → subject matching.** Telephoto→distance/sports; fast prime→low-light street; wide→architecture; macro→details. Drives the "why … your kit" line and per-spot "fits/grab a tele". CATALOG + MATCHING ENGINE BUILT: `vantage/lib/gear.ts` (19 cameras, 24 lenses w/ real specs; `equivalentFocal`/`genresForLens`/`genresForKit`, crop-factor aware) + `__tests__/gear.test.ts`. NOT yet wired into BagScreen (still hardcoded X100VI). Known simplifications: phones filed as "1-inch" (crop math still lands ~24mm); `genresForKit` assumes any lens fits any body (over-generous — future: match lenses to compatible mounts). **ADR: `docs/engineering/GEAR_MATCHING.html`** (rules + the open filter/re-rank/annotate decision).
 - ⬜ **G3 — Gear banner re-prompt logic.** Dismiss = 30-day floor; re-ask event-based (after "I'm going" / on 2nd–3rd return), not a blind timer.
 
 ---

@@ -1,0 +1,219 @@
+<title>Vantage — Gear &amp; Subject Matching</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:58px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .spot{color:var(--gold);font-weight:600;} .event{color:var(--blue);font-weight:600;}
+
+  /* code / data shape */
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  /* tables */
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  .th-spot{color:var(--gold);} .th-event{color:var(--blue);}
+
+  /* pipeline diagram */
+  .flow-wrap{overflow-x:auto;margin:18px 0;}
+  .flow{min-width:660px;display:grid;grid-template-columns:1.1fr auto .9fr auto 1fr;align-items:center;gap:0;}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:13px;color:var(--ink);padding:2px 0;}
+  .stage .item.s{color:var(--gold);} .stage .item.e{color:var(--blue);}
+  .arrow{color:var(--faint);text-align:center;font-size:20px;padding:0 10px;}
+  .stack{display:flex;flex-direction:column;gap:10px;}
+
+  /* eclipse illustration */
+  .eclipse{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+  @media(max-width:600px){.eclipse{grid-template-columns:1fr;}}
+  .ecard{background:var(--surface);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+  .ecard .hd{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:11px 16px;border-bottom:1px solid var(--hair);background:var(--raised);}
+  .ecard .bd{padding:16px;}
+  .headline{font-family:var(--serif);font-size:20px;}
+  .headline.gold{color:var(--gold);} .headline.blue{color:var(--blue);}
+  .venue{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .venue b{color:var(--ink);}
+  .demoted{font-size:12.5px;color:var(--faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--hair);}
+
+  /* callouts */
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:16px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Architecture · Engineering</div>
+    <h1>Gear → Subject Matching</h1>
+    <p class="lede">How a photographer's <b>kit</b> — their cameras and lenses — becomes a signal the app can act on: telling them which shoots their gear can actually nail, powering the <b>"why this pick — perfect for your fast 35"</b> line, and, later, shaping the nudge.</p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — gear layer</b></span>
+      <span class="tag">Status <b>Engine built · not wired</b></span>
+      <span class="tag">Updated <b>Jul 12, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Why gear is load-bearing</h2></div>
+    <p>Today the app assumes everyone shoots a 35mm. But <b>a kit shapes what you can shoot well.</b> A 600mm telephoto is built for sports and wildlife at a distance; a fast 35mm prime is a street shooter's lens; a macro is for tiny detail. Point a wide-only shooter at a wildlife-telephoto shot and the nudge feels wrong.</p>
+    <p>This is a north-star lever, not just polish. The app's job is to give a <b>personal</b> reason to go shoot tonight — and "this fits <i>your</i> bag" is one of the least generic things it can say. It also lowers the data bar: gear + light can carry a nudge even where activity data is thin.</p>
+    <div class="call">
+      <div class="k">Scope</div>
+      <p>Gear personalization is for <b>experience quality &amp; engagement</b>, not a differentiation claim — a rival (Fotocast) already ships gear-by-type scoring. Our edge is <b>fusing</b> gear with the street / activity dimension, not owning "gear matching" itself.</p>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>The matching engine</h2></div>
+    <p>Built and tested in <code>vantage/lib/gear.ts</code> — a catalog of 19 cameras + 24 lenses plus the matcher. The whole idea in one line:</p>
+    <pre><code><span class="c-com">// every lens has a reach (focal length) and a light / subject-isolation</span>
+<span class="c-com">// ability (aperture) — map those to genres, then union across the bag:</span>
+genresForKit(cameras, lenses) <span class="c-com">→</span> <span class="c-str">Genre[]</span>   <span class="c-com">// e.g. ["Street","Sports","Details"]</span></code></pre>
+    <p>Two real-world wrinkles the engine already handles:</p>
+    <ul class="list">
+      <li><b>Crop factor.</b> The same 35mm lens "sees" differently on a small sensor vs. a large one. The engine converts every focal length to a <b>full-frame equivalent</b> before judging it — so a 33mm on an APS-C body correctly reads as ~50mm.</li>
+      <li><b>Aperture gating.</b> A "fast" lens (f/2.8 or brighter) unlocks low-light and subject-isolation genres — Street, Portraits — that a slow lens does not.</li>
+    </ul>
+    <p>The genre rules, keyed on the full-frame-equivalent focal length:</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Equivalent focal</th><th>Genres</th><th>Feel</th></tr></thead>
+        <tbody>
+          <tr><td><b>≤ 20mm</b></td><td>Landscape · Architecture · Nature</td><td>Ultra-wide vistas</td></tr>
+          <tr><td><b>20–28mm</b></td><td>Street · Architecture · Landscape</td><td>Wide reportage</td></tr>
+          <tr><td><b>28–40mm</b></td><td>Street · Architecture</td><td>Classic street (35mm)</td></tr>
+          <tr><td><b>40–60mm</b></td><td>Street <span style="color:var(--faint)">(+ Portraits if fast)</span></td><td>Normal (50mm)</td></tr>
+          <tr><td><b>60–105mm</b></td><td>Portraits <span style="color:var(--faint)">(if fast)</span></td><td>Head-and-shoulders (85mm)</td></tr>
+          <tr><td><b>105–135mm</b></td><td>Sports <span style="color:var(--faint)">(+ Portraits if fast)</span></td><td>Short reach</td></tr>
+          <tr><td><b>135–300mm</b></td><td>Sports · Wildlife · Nature</td><td>Action / distance</td></tr>
+          <tr><td><b>&gt; 300mm</b></td><td>Wildlife · Nature</td><td>Super-tele reach</td></tr>
+          <tr><td><b>Macro lens</b></td><td>Details <span style="color:var(--faint)">(always)</span></td><td>Plus its focal rules</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;margin-top:12px">"Fast" = f/2.8 or brighter. <code>genresForKit()</code> runs these over every lens (and every fixed-lens body), unions the results, and dedupes — the answer is <b>the set of genres your bag covers.</b></p>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>The decisions</h2></div>
+    <p>Three forks sit inside this feature — which is why it earns an ADR. One is settled; two are deliberately <b>left open</b> until we wire the feature into the app, because that's when they actually get made.</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Decision</th><th>Status</th><th>Reasoning / alternatives</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>A · How a match is computed</b></td>
+            <td><span class="pill proto">Chosen</span></td>
+            <td><b>Deterministic focal + aperture rules.</b> Alternatives: a hand-tuned lookup table, or an LLM judging the kit. Rules win for now — transparent, unit-testable, free, good-enough. Revisit if they get unwieldy or a match feels wrong too often.</td>
+          </tr>
+          <tr>
+            <td><b>B · Where gear data comes from</b></td>
+            <td><span class="pill plan">Open</span></td>
+            <td>Curated catalog (built — ~40 items, doesn't scale) vs. an open camera-database API vs. user free-text (flexible but messy to parse). Leaning: <b>curated for launch, free-text + normalization later.</b></td>
+          </tr>
+          <tr>
+            <td><b>C · How matching meets the feed</b></td>
+            <td><span class="pill plan">Open</span></td>
+            <td><b>The load-bearing one.</b> <i>Filter</i> (hide spots your kit can't shoot — punishing), <i>re-rank</i> (nudge fitting spots up), or <i>annotate only</i> ("fits your 35 / grab a tele"). Leaning: <b>annotate first → soft re-rank; never hard-filter.</b> Overlaps the events / ranking scorer.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call blue">
+      <div class="k">Cross-reference</div>
+      <p>Decision C touches the same scorer described in the <b>Events &amp; Opportunities</b> ADR. Gear should influence <i>ranking</i>, not become a separate parallel system — the "opportunity brain" stays one ranker.</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Known simplifications</h2></div>
+    <p>Honest shortcuts in the current engine, documented so they're not mistaken for intent:</p>
+    <ul class="list">
+      <li><b>Phones filed as "1-inch."</b> The sensor-format list has no "phone" class, so flagship phones borrow the nearest one. The <i>equivalent-focal math</i> still resolves correctly to ~24mm via a chosen crop factor — only the sensor <i>label</i> is approximate.</li>
+      <li><b>Any lens fits any body.</b> <code>genresForKit</code> evaluates every lens on every camera in the kit, ignoring lens mounts — so a phone + a 600mm would over-claim "Wildlife." Over-generous, not wrong for a coverage union; a future pass matches lenses to compatible bodies.</li>
+    </ul>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Open questions</h2></div>
+    <ul class="list open">
+      <li>Does gear <b>re-rank</b> the feed or only <b>annotate</b> it? (Decision C — needs the ranking model settled first.)</li>
+      <li>Free-text gear entry: how do we parse <i>"I shoot a Fuji with the nifty fifty"</i> into catalog entries?</li>
+      <li>Should the app ever suggest a genre the user's gear <i>can't</i> do (aspirational "grab a tele"), or only what they own?</li>
+      <li>When the user's declared favorite (Bag style chips) disagrees with what their gear implies, which wins?</li>
+      <li>Match confidence: how sure before we surface "fits your kit," so we're never confidently wrong?</li>
+    </ul>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Consequences — what wiring will touch</h2></div>
+    <ul class="list">
+      <li><b>BagScreen</b> — replace the hardcoded X100VI with a real picker reading <code>CATALOG</code> (this is story G1's UI).</li>
+      <li><b>A persisted gear profile</b> (G1) — the kit has to live somewhere before matching can run for real.</li>
+      <li><b>The "why this pick" line + per-spot fit label</b> already exist in the UI; they become the first consumers of <code>genresForKit</code>.</li>
+      <li><b>The ranking scorer</b> (Decision C) and, downstream, the <b>nudge</b> (E3 · N3) — gear-aware copy.</li>
+    </ul>
+  </section>
+
+  <footer>Vantage · ADR — gear layer · engine in <code>vantage/lib/gear.ts</code> · backlog E2/G2</footer>
+</div>

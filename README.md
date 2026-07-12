@@ -41,6 +41,7 @@ Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output 
 **`docs/engineering/`** — *how it's built*
 - `TECH_DECISIONS.html` — living record of technical choices
 - `EVENTS_ARCHITECTURE.html` — ADR: how events + spots reconcile (Opportunity model, photo-lens gate, eclipse rule) — for the deferred events epic (E4)
+- `GEAR_MATCHING.html` — ADR: how a photographer's kit maps to shootable genres (the matching engine, + the open "filter vs. re-rank vs. annotate" decision) — epic E2/G2
 
 **`docs/BACKLOG.md`** — the **epic-organized backlog** (epics → just-in-time stories). **Start here for "what's next."**
 

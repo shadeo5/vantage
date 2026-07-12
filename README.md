@@ -56,11 +56,14 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 - `Photographer Location Scout App.zip` — original design zip (extracted into `docs/design_handoff_vantage/`); safe to delete anytime
 
 ## Where we are (Jul 12, 2026)
-Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on web. Codebase cleaned + unit-tested. Content pipeline built + committed (running deferred). Events architecture designed (ADR) incl. the photo-lens gate.
+Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on web. Codebase cleaned + unit-tested.
+- **E1 Content — done.** Illustrated placeholder imagery wired into all 5 spots (`assets/spots/`); voice guide + copy audit (C3); content pipeline built but running deferred.
+- **E2 Gear — in progress.** Camera/lens catalog + matching engine built (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`), **not yet wired into the app** (Bag still hardcodes the X100VI).
+- Events architecture designed (ADR) incl. the photo-lens gate — for the deferred E4.
 
-**Pick up here next:**
-1. **Content (E1)** — cheapest no-spend wins: extract the voice/tone guide (C3) or the imagery/licensing path (C2). The pipeline itself is parked.
-2. **Event decisions** (see `EVENTS_ARCHITECTURE.html` open questions) — is timeliness the *point*? pay for PredictHQ?
-3. Housekeeping — deferred: attribute commits to the agent collaborator (repo-local git identity).
+**Pick up here next → E2 gear wiring (the active thread):**
+1. **G1 — real Bag screen**: replace the hardcoded X100VI with a picker reading `CATALOG`, and persist the profile on-device.
+2. **G2 in the UI**: feed `genresForKit` into the "why this pick" line + per-spot fit label (annotate only — no filter/re-rank yet; see GEAR_MATCHING ADR Decision C).
+3. Later: **P1 dev build** (unblock real-phone testing) · **event decisions** (EVENTS_ARCHITECTURE open questions) · commit-attribution housekeeping.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

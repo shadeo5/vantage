@@ -12,7 +12,7 @@ export function LockScreen({ onEnter, goldenStart, heroName, lens, heroImg }: {
   const date = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   return (
-    <ImageBackground source={{ uri: img(heroImg) }} style={styles.root}>
+    <ImageBackground source={img(heroImg)} style={styles.root}>
       <LinearGradient colors={["rgba(246,185,94,0.85)", "rgba(214,138,60,0.7)", "rgba(74,70,104,0.85)"]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
       <LinearGradient colors={["rgba(10,9,12,0.5)", "rgba(20,12,8,0.1)", "rgba(10,9,12,0.95)"]} locations={[0, 0.4, 1]} style={StyleSheet.absoluteFill} />
 

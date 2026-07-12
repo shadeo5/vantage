@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, ImageBackground, Image, Pressable, Animated } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
 import { Spot, img, windowMeta } from "../lib/spots";
@@ -23,7 +23,7 @@ export function SpotDetail({
   return (
     <Animated.View style={[styles.root, { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <ImageBackground source={{ uri: img(spot.img) }} style={styles.hero}>
+        <ImageBackground source={img(spot.img)} style={styles.hero}>
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
@@ -55,15 +55,6 @@ export function SpotDetail({
                 <Text style={styles.lookText}>{t}</Text>
               </View>
             ))}
-          </View>
-
-          <Text style={styles.secTitle}>What people shoot here</Text>
-          <Text style={styles.secSub}>Recent frames from this spot</Text>
-          <View style={{ marginBottom: 30, gap: 10 }}>
-            <Image source={{ uri: img(spot.gallery[0]) }} style={styles.galTall} />
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              {spot.gallery.slice(1, 3).map((g, i) => <Image key={i} source={{ uri: img(g) }} style={styles.galSmall} />)}
-            </View>
           </View>
 
           <View style={styles.getting}>

@@ -7,7 +7,7 @@ export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank:
   const wm = windowMeta(spot.windowType);
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && { opacity: 0.85 }]}>
-      <ImageBackground source={{ uri: img(spot.img) }} style={styles.thumb} imageStyle={styles.thumbImg}>
+      <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={styles.thumbImg}>
         <Text style={styles.rank}>{rank}</Text>
       </ImageBackground>
       <View style={styles.body}>

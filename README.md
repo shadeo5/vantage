@@ -36,6 +36,7 @@ Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output 
 **`docs/design/`** — *what it looks like, how it flows, how it sounds*
 - `handoff_v2/` — **the current design** (nudge-first, the app was built from this)
 - `VOICE.md` — **voice & tone guide** — how everything Vantage says should sound (kept in sync with the pipeline's baked-in voice)
+- `ILLUSTRATION_STYLE.md` — **interim spot imagery** — the illustrated-placeholder look + copy-paste prompt recipe (placeholder, not final)
 
 **`docs/engineering/`** — *how it's built*
 - `TECH_DECISIONS.html` — living record of technical choices

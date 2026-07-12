@@ -8,7 +8,6 @@ describe("spots data", () => {
       expect(s.name).toBeTruthy();
       expect(s.why.length).toBeGreaterThan(20);
       expect(s.look.length).toBeGreaterThan(0);
-      expect(s.gallery.length).toBeGreaterThanOrEqual(3);
       expect(typeof s.lat).toBe("number");
       expect(typeof s.lon).toBe("number");
     }
@@ -42,7 +41,10 @@ describe("windowMeta", () => {
 });
 
 describe("img", () => {
-  test("builds an Unsplash url from an id", () => {
-    expect(img("abc123")).toContain("images.unsplash.com/photo-abc123");
+  test("resolves a spot's bundled illustration", () => {
+    expect(img("sweetauburn")).toBeDefined();
+  });
+  test("falls back to the hero image for an unknown id", () => {
+    expect(img("does-not-exist")).toBe(img(HERO_ID));
   });
 });

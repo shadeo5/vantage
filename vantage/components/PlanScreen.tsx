@@ -33,7 +33,7 @@ export function PlanScreen({ going, windowTimeFor, onOpen, onToggleGoing }: {
               </View>
               <View style={styles.card}>
                 <Pressable style={styles.cardTop} onPress={() => onOpen(m.id)}>
-                  <ImageBackground source={{ uri: img(spot.img) }} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
+                  <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.tag, { color: tagColor(m.tag) }]}>{m.tag.toUpperCase()}</Text>
                     <Text style={styles.name} numberOfLines={1}>{spot.name}</Text>

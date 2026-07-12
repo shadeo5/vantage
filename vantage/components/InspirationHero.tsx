@@ -22,7 +22,7 @@ export function InspirationHero({
   return (
     <View style={styles.card}>
       <Pressable onPress={onOpen}>
-        <ImageBackground source={{ uri: img(spot.img) }} style={styles.banner}>
+        <ImageBackground source={img(spot.img)} style={styles.banner}>
           {/* warm golden wash + bottom scrim */}
           <LinearGradient colors={["rgba(246,185,94,0.55)", "rgba(214,138,60,0.5)", "rgba(138,90,82,0.55)"]}
             start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />

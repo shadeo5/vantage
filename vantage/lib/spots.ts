@@ -15,16 +15,27 @@ export type Spot = {
   tagline: string;     // under the detail title
   why: string;
   look: string[];      // "what to look for here"
-  img: string;         // hero/thumb Unsplash id
-  gallery: string[];   // "what people shoot here" Unsplash ids
+  img: string;         // key into SPOT_IMAGES (matches the spot id)
   getting: string;
   lat: number;
   lon: number;
 };
 
-// Unsplash placeholder IDs (from the design). Replace with licensed/real imagery later.
-export function img(id: string): string {
-  return `https://images.unsplash.com/photo-${id}?w=900&q=80&auto=format&fit=crop`;
+// Local illustrated placeholder imagery — interim AI-generated illustrations
+// (stylized art, NOT documentary photos of the real place). See
+// docs/design/ILLUSTRATION_STYLE.md. Keys match spot ids; require() paths must be
+// static string literals for Metro to bundle them.
+const SPOT_IMAGES: Record<string, number> = {
+  sweetauburn: require("../assets/spots/sweetauburn.png"),
+  krog: require("../assets/spots/krog.png"),
+  jackson: require("../assets/spots/jackson.png"),
+  piedmont: require("../assets/spots/piedmont.png"),
+  ponce: require("../assets/spots/ponce.png"),
+};
+
+// Resolve a spot's bundled illustration by id (falls back to the hero image).
+export function img(id: string): number {
+  return SPOT_IMAGES[id] ?? SPOT_IMAGES.sweetauburn;
 }
 
 export const HERO_ID = "sweetauburn";
@@ -40,7 +51,7 @@ export const SPOTS: Spot[] = [
       "The Municipal Market crowd — candid portraits as people spill out.",
       "The old marquee signs catch the last warm light near 8:20.",
     ],
-    img: "1449824913935-59a10b8d2000", gallery: ["1506905925346-21bda4d32df4", "1470770841072-f978cf4d019e", "1444723121867-7a241cacace9"],
+    img: "sweetauburn",
     getting: "6 min drive · evening street parking on Edgewood · MARTA King Memorial, a short walk.",
     lat: 33.7550, lon: -84.3720,
   },
@@ -54,7 +65,7 @@ export const SPOTS: Spot[] = [
       "Long exposures blur passing cyclists into ribbons of light.",
       "Puddles after rain double the color underfoot.",
     ],
-    img: "1533106418989-88406c7cc8ca", gallery: ["1533106418989-88406c7cc8ca", "1444723121867-7a241cacace9", "1470770841072-f978cf4d019e"],
+    img: "krog",
     getting: "9 min drive · park at Krog Street Market · tunnel is a 2-min walk north.",
     lat: 33.7540, lon: -84.3620,
   },
@@ -68,7 +79,7 @@ export const SPOTS: Spot[] = [
       "Traffic trails on the freeway build after 8:15.",
       "Step to the north rail for a cleaner foreground.",
     ],
-    img: "1477959858617-67f85cf4f1df", gallery: ["1477959858617-67f85cf4f1df", "1506905925346-21bda4d32df4", "1444723121867-7a241cacace9"],
+    img: "jackson",
     getting: "12 min drive · limited street parking — arrive early · sidewalk shooting only, mind traffic.",
     lat: 33.7545, lon: -84.3710,
   },
@@ -82,7 +93,7 @@ export const SPOTS: Spot[] = [
       "Silhouettes of dog-walkers read clean against the sky.",
       "The lake mirrors the skyline once the wind drops.",
     ],
-    img: "1441974231531-c6227db76b6e", gallery: ["1441974231531-c6227db76b6e", "1470770841072-f978cf4d019e", "1506905925346-21bda4d32df4"],
+    img: "piedmont",
     getting: "8 min drive · park at 12th & Piedmont · Oak Hill is a 6-min walk in.",
     lat: 33.7850, lon: -84.3730,
   },
@@ -96,7 +107,7 @@ export const SPOTS: Spot[] = [
       "The BeltLine ribbon glows amber below.",
       "Steady the camera on the rail for the long blue-hour frames.",
     ],
-    img: "1480714378408-67cf0d13bc1b", gallery: ["1480714378408-67cf0d13bc1b", "1444723121867-7a241cacace9", "1506905925346-21bda4d32df4"],
+    img: "ponce",
     getting: "11 min drive · rooftop entry via the elevator · check posted rooftop hours.",
     lat: 33.7720, lon: -84.3650,
   },

@@ -1,4 +1,4 @@
-// Vantage design tokens — from design_handoff_vantage/README.md
+// Vantage design tokens — from the current design (docs/design/handoff_v2/)
 export const colors = {
   canvas: "#0F0F11",
   surface: "#161618",

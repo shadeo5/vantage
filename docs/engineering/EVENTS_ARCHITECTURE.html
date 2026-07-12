@@ -1,0 +1,320 @@
+<title>Vantage — Events Architecture</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:58px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .spot{color:var(--gold);font-weight:600;} .event{color:var(--blue);font-weight:600;}
+
+  /* code / data shape */
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  /* tables */
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  .th-spot{color:var(--gold);} .th-event{color:var(--blue);}
+
+  /* pipeline diagram */
+  .flow-wrap{overflow-x:auto;margin:18px 0;}
+  .flow{min-width:660px;display:grid;grid-template-columns:1.1fr auto .9fr auto 1fr;align-items:center;gap:0;}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:13px;color:var(--ink);padding:2px 0;}
+  .stage .item.s{color:var(--gold);} .stage .item.e{color:var(--blue);}
+  .arrow{color:var(--faint);text-align:center;font-size:20px;padding:0 10px;}
+  .stack{display:flex;flex-direction:column;gap:10px;}
+
+  /* eclipse illustration */
+  .eclipse{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+  @media(max-width:600px){.eclipse{grid-template-columns:1fr;}}
+  .ecard{background:var(--surface);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+  .ecard .hd{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:11px 16px;border-bottom:1px solid var(--hair);background:var(--raised);}
+  .ecard .bd{padding:16px;}
+  .headline{font-family:var(--serif);font-size:20px;}
+  .headline.gold{color:var(--gold);} .headline.blue{color:var(--blue);}
+  .venue{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .venue b{color:var(--ink);}
+  .demoted{font-size:12.5px;color:var(--faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--hair);}
+
+  /* callouts */
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:16px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Architecture · Engineering</div>
+    <h1>Events &amp; Opportunities</h1>
+    <p class="lede">How time-bound events (a festival, a state fair, a carnival) live alongside evergreen spots — and how the system reconciles them into one ranked answer to <b>"what should I shoot right now?"</b></p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — events layer</b></span>
+      <span class="tag">Status <b>Design (prototyped)</b></span>
+      <span class="tag">Updated <b>Jul 11, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>The core tension</h2></div>
+    <p><span class="spot">Spots</span> and <span class="event">events</span> are architecturally opposite. Model that difference up front or it gets painful later.</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th></th><th class="th-spot">Spots (built)</th><th class="th-event">Events</th></tr></thead>
+        <tbody>
+          <tr><td><b>Lifespan</b></td><td>Evergreen — always there</td><td>Time-bound — a window, then gone</td></tr>
+          <tr><td><b>Change rate</b></td><td>Slow (curate once, cache)</td><td>Fast (appear / expire daily)</td></tr>
+          <tr><td><b>Source</b></td><td>OSM + content pipeline</td><td>External feeds + editorial</td></tr>
+          <tr><td><b>Eligible when?</b></td><td>Always</td><td>Only inside its window</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call"><div class="k">The decision</div><p>Keep them <b>separate at storage</b> (different tables, different refresh cadence) and <b>unified at ranking</b> (one scorer, one list). Never jam events into the spots table.</p></div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>The unifying abstraction: <code style="font-size:20px">Opportunity</code></h2></div>
+    <p>To the ranker and the UI, a spot and an event are both "a reason to shoot." Normalize both into one shape:</p>
+<pre><code><span class="c-key">Opportunity</span> {
+  kind:       <span class="c-str">'spot'</span> | <span class="c-str">'event'</span>
+  name, lat, lon, category
+  timeWindow: <span class="c-key">null</span>              <span class="c-com">// spot — always eligible</span>
+            | { start, end }  <span class="c-com">// event — eligible only in-window</span>
+  photoValue                  <span class="c-com">// THE gate — is there a real photo here? (too low → dropped)</span>
+  magnitude                   <span class="c-com">// draw / attendance — amplifies, does NOT qualify</span>
+  content:    { why, look[], getting }   <span class="c-com">// the "why" IS the photoValue test</span>
+  source
+}</code></pre>
+    <p>A <span class="spot">spot</span> has <code>timeWindow: null</code>. An <span class="event">event</span> carries its window and a <code>magnitude</code>. Now <b>one scorer ranks them together</b> — that's "understanding events against the rest of the data."</p>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">02.5</span><h2>End-to-end flow</h2></div>
+    <div class="flow-wrap">
+      <div class="flow" style="grid-template-columns:1fr auto 1.15fr auto 1fr auto 1fr;min-width:900px">
+        <div class="stage">
+          <div class="lbl">Ingestion</div>
+          <div class="item e">Ticketmaster</div>
+          <div class="item e">ESPN</div>
+          <div class="item e">PredictHQ</div>
+          <div class="item e">Editorial</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="stage" style="border-color:color-mix(in srgb,var(--gold) 40%,var(--hair))">
+          <div class="lbl" style="color:var(--gold)">Photo-lens gate</div>
+          <div class="item">score shootability</div>
+          <div class="item">write the reason</div>
+          <div class="item" style="color:var(--clay)">drop the unphotographic</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="stack">
+          <div class="stage"><div class="lbl">Events feed</div><div class="item e">time-bound</div></div>
+          <div class="stage"><div class="lbl">Spots table</div><div class="item s">evergreen</div></div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="stage">
+          <div class="lbl">Scorer</div>
+          <div class="item">time-gate</div>
+          <div class="item">boost timeliness</div>
+          <div class="item">resolve co-location</div>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:6px">Ingestion normalizes every source into a common <span class="event">Event</span>, dedupes, and geo-filters to the city. The <b style="color:var(--gold)">photo-lens gate</b> then scores each event's shootability and <b>drops the ones with no real photo in them</b> — so the feed only holds events worth a photographer's time. The scorer merges what survives with the nearby spots and emits the ranked list / the nudge.</p>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Sourcing — the hard part</h2></div>
+    <p>No single API has everything (we already hit this: the World Cup wasn't in Ticketmaster). Layer the sources:</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Layer</th><th>Covers</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td><b>Ticketmaster / SeatGeek</b></td><td>Concerts, big sports, some festivals</td><td>Free-ish keys</td></tr>
+          <tr><td><b>ESPN (unofficial)</b></td><td>Sports schedules</td><td>Free, complete — proven</td></tr>
+          <tr><td><b>PredictHQ</b></td><td>Community events, festivals, <b>fairs</b></td><td>Paid — but gives a predicted <b>attendance/rank</b> = your <code>magnitude</code>, solved</td></tr>
+          <tr><td><b>Editorial / tentpole</b></td><td>Marquee known-ahead (state fair, Dragon Con) &amp; what APIs miss</td><td>Hand-pinned</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call clay" style="border-left-color:var(--clay)"><div class="k" style="color:var(--clay)">Honest flag</div><p>The <b>long tail</b> — state fairs, pop-up carnivals, street festivals — is exactly what ticketing APIs miss. It probably needs <b>PredictHQ + editorial</b>, not free APIs alone. This is the single hardest data problem in the product.</p></div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>How an event competes with a spot</h2></div>
+    <p>Two mechanics make events rank correctly in the shared scorer:</p>
+    <ul class="list">
+      <li><b>Time-gating (a filter).</b> An event only enters the pool when <code>now</code> is inside its window (or the week ahead, for planning). Spots always qualify. So a state fair simply <em>isn't in the running</em> except during its run.</li>
+      <li><b>Urgency + magnitude boost.</b> An evergreen spot is "always there." An event is <em>"here now, gone next week"</em> — and that scarcity is exactly what makes a great nudge. Events get a boost <em>because</em> they're transient.</li>
+    </ul>
+    <div class="call blue"><div class="k">Key idea</div><p>Events are where the app's <b>timeliness</b> comes from. A big event should out-rank an evergreen spot <em>this weekend</em> and vanish from the list the following Monday.</p></div>
+  </section>
+
+  <!-- 04.5 -->
+  <section>
+    <div class="sec-head"><span class="n">04·5</span><h2>The photography lens — the gate</h2></div>
+    <p class="lead-ink"><b>Everything is scored through a photography lens.</b> Not every event earns a slot — some just aren't worth shooting, no matter the crowd.</p>
+    <p><b>Photo value ≠ attendance.</b> PredictHQ tells you the <em>draw</em>; it says nothing about whether there's a <em>photo</em> in it. That's a separate call — and it's the one that matters.</p>
+    <div class="eclipse" style="margin-top:12px">
+      <div class="ecard"><div class="hd" style="color:var(--green)">Top marks — shoot it</div><div class="bd"><ul class="list" style="margin:0"><li>Dragon Con parade — costumes, spectacle</li><li>Renaissance fair — color, characters, craft</li><li>Fair / carnival — neon, crowds, rides after dark</li><li>Lantern &amp; light festivals, markets, cultural parades</li></ul></div></div>
+      <div class="ecard"><div class="hd" style="color:var(--clay)">Not worth it — drop</div><div class="bd"><ul class="list" style="margin:0"><li>Corporate conference / trade show</li><li>Ticketed indoor lecture or talk</li><li>Photo-restricted, with a dead exterior</li></ul></div></div>
+    </div>
+    <p style="margin-top:16px">Two layers do the filtering:</p>
+    <ul class="list">
+      <li><b>Category priors</b> — a cheap first pass. Auto-drop the inherently un-photographic (conferences, lectures, expos) before spending an LLM call.</li>
+      <li><b>Per-event assessment</b> — the LLM judges within a category: a marquee costume parade vs. a sleepy craft fair.</li>
+    </ul>
+    <div class="call"><div class="k">The operational test</div><p>The LLM's ability to write a <b>genuine, specific</b> "why shoot this" <b>is</b> the score. If the best it can manage is "there'll be people there," the event is dropped. This is the "just knows where to shoot" instinct made concrete — the same pipeline that drafts <em>what to look for</em> doubles as the filter for <em>whether to bother.</em></p></div>
+    <ul class="list" style="margin-top:18px">
+      <li><b>Photo value is the gate; magnitude only amplifies.</b> A giant conference scores ~0 and drops out; a modest lantern festival scores high. Draw is a multiplier <em>among the shootable</em>, never a qualifier.</li>
+      <li><b>Where it sits:</b> an enrichment step <em>between ingestion and the feed</em> — the scorer only ever sees photographically-viable opportunities.</li>
+      <li><b>It applies to spots too</b> (the lens is universal) — but it bites hardest on events, since external feeds rank by attendance, not by whether there's a frame in it.</li>
+    </ul>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Co-location: the eclipse rule</h2></div>
+    <p class="lead-ink">When an event and a spot share a location, you don't show both. <b>Whichever scores higher becomes the headline; the other folds in as context.</b></p>
+    <p>For the Dogwood Festival at Piedmont Park, nobody's going for the meadow that weekend — they're going to <span class="event">Dogwood</span>, which happens to be <em>at</em> Piedmont. The event is the attraction; the spot demotes to <b>venue</b>.</p>
+
+    <div class="eclipse">
+      <div class="ecard">
+        <div class="hd">Normally</div>
+        <div class="bd">
+          <div class="headline gold">Piedmont Park</div>
+          <div class="venue">Nature · golden hour · Midtown skyline</div>
+          <div class="demoted">Piedmont is the <b>attraction</b>.</div>
+        </div>
+      </div>
+      <div class="ecard">
+        <div class="hd">During Dogwood (Apr)</div>
+        <div class="bd">
+          <div class="headline blue">Dogwood Festival</div>
+          <div class="venue">at <b>Piedmont Park</b> · flower crowns, artist stalls</div>
+          <div class="demoted">Event = <b>attraction</b>; Piedmont = <b>venue</b>. Reverts Monday.</div>
+        </div>
+      </div>
+    </div>
+
+    <p>This isn't a hardcoded "events beat spots" rule — it <em>falls out</em> of the same scorer, because a big event just outscores the spot-as-attraction. A tiny meetup at Piedmont would <b>lose</b> — the park still headlines and the event is a footnote. One rule handles both.</p>
+
+    <h3 style="font-family:var(--serif);font-weight:500;font-size:19px;margin:26px 0 12px">Inherit vs. override — the clean seam</h3>
+    <p>When the event headlines and absorbs the spot as venue, it splits the spot's data in two:</p>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th class="th-spot">Place-intrinsic → inherit from spot</th><th class="th-event">Event-intrinsic → override with event</th></tr></thead>
+        <tbody>
+          <tr><td>Coordinates</td><td>The subject (festival, not meadow)</td></tr>
+          <tr><td>Getting there / parking / transit</td><td>What to look for</td></tr>
+          <tr><td>Light geometry ("skyline west, golden ~8:15")</td><td>Crowd / energy / timing</td></tr>
+          <tr><td>Photo history of the place</td><td>The headline &amp; the window</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px">Logistics and light don't change just because there's a festival — those are facts about the <em>place</em>, so the event borrows them for free. Only the <em>subject</em> flips.</p>
+
+    <ul class="list" style="margin-top:20px">
+      <li><b>A location's role is contextual, not fixed.</b> Piedmont is an attraction by default and a venue while Dogwood runs. Role is <b>computed at ranking time</b> from what's active there — don't type a place as permanently spot-or-host.</li>
+      <li><b>It's temporal.</b> When the window closes, the eclipse lifts and the spot headlines on its own again.</li>
+      <li><b>Standalone events have nothing to inherit.</b> A carnival in a parking lot isn't a known spot → it stands alone with its <b>own</b> coordinates + generated logistics. Spot-inheritance is a bonus when the geo-link exists, not a requirement.</li>
+    </ul>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Content for events</h2></div>
+    <p>An event has no curated "what to look for." The <b>content pipeline extends</b> here — but keyed by <b>category</b> instead of a fixed place:</p>
+    <ul class="list">
+      <li><b>Fair</b> → ferris wheel at blue hour, candid portraits at the food stalls, midway lights after dark</li>
+      <li><b>Carnival</b> → motion blur on the rides, neon reflections, ticket-booth characters</li>
+      <li><b>Concert / festival</b> → crowd energy, stage light spill, the queue before doors</li>
+    </ul>
+    <p style="margin-top:13px">Same LLM recipe as the spot pipeline (voice guide + structured output), different input: an event <em>type</em>, optionally fused with the venue spot's place-facts.</p>
+  </section>
+
+  <!-- 08 -->
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Already prototyped</h2></div>
+    <p>This isn't greenfield — the pieces exist as working sketches:</p>
+    <ul class="list">
+      <li><span class="pill proto">POC</span> &nbsp; <code>archive/poc/scout.mjs</code> — multi-source ingestion (ESPN + Ticketmaster + editorial tentpole), geo-filtering, dedupe, and a <b>unified scorer that already merged events and OSM places into one ranked list.</b> A direct sketch of this architecture.</li>
+      <li><span class="pill plan">UI</span> &nbsp; The Plan screen already tags opportunities <b>Light- / Activity- / Event-driven</b> — the presentation concept is in place.</li>
+    </ul>
+  </section>
+
+  <!-- 09 -->
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Open decisions</h2></div>
+    <ul class="list open">
+      <li><b>Is timeliness the point, or a feature?</b> If "there's a fair <em>tonight</em>, go" is a huge part of the value, events are co-equal with spots and the time-boost is central. If events are occasional seasoning on an evergreen base, the ranker leans differently.</li>
+      <li><b>Pay for PredictHQ</b> to get the fair/carnival long tail (and free <code>magnitude</code> scores), or start editorial-only and stay narrow?</li>
+      <li><b>How trustworthy is the LLM's photographic-value call?</b> It's a taste judgment — validate it the way we validated the drafted content, and set the <b>drop threshold</b> (how weak a "why" gets an event cut).</li>
+      <li><b>Magnitude normalization</b> — among the shootable events, how do you compare "state fair" to "gallery opening" without PredictHQ's attendance score? Editorial tiers?</li>
+      <li><b>Dedup strategy</b> across overlapping sources (the same festival from Ticketmaster and PredictHQ).</li>
+      <li><b>Eclipse threshold</b> — how much must an event outscore a spot before it takes the headline vs. sits as a footnote?</li>
+    </ul>
+  </section>
+
+  <footer>
+    Vantage — events architecture (ADR). Companion to the technical decision record. Everything scored through a photography lens (no photo, no slot); two data types, one scorer; events earn a timeliness boost; co-located, the higher score headlines and the other becomes context.
+  </footer>
+</div>

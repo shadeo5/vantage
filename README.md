@@ -61,7 +61,7 @@ Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on w
 - **E2 Gear — essentially done.** Camera/lens catalog + matching engine (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`) fully **wired**: Bag has a catalog camera picker (19 bodies) + lens chips + live "Your kit shoots"; Today/Lock/Plan copy names the lens that fits tonight's spot (annotate-only, honest); the profile **persists on-device** (`lib/gearProfile.ts` + `lib/gearStorage.ts`). Only **G3** (gear-banner re-prompt logic) remains.
 - Events architecture designed (ADR) incl. the photo-lens gate — for the deferred E4.
 
-**E3 Nudge — started:** ✅ **N1 nudge brain** (`lib/nudge.ts`) is built + wired — it decides tonight's pick, confidence, and the "why" from light-timing × gear-fit (activity = placeholder for events). The in-app hero *is* the nudge now.
+**E3 Nudge — mostly done (only real push delivery, N2, is left):** ✅ **N1 nudge brain** (`lib/nudge.ts`) decides tonight's pick + confidence + "why" (light-timing × gear-fit; activity = placeholder). ✅ **N3 richer copy** (`lib/nudgeCopy.ts`) — fresh, personal, confidence-tiered push lines, deterministically varied per day. ✅ **N4 return-loop** (`lib/journal.ts`) — "I'm going" → on return "did you make it?" → shooting journal + return metric. The in-app hero *is* the nudge; the loop (nudge → shoot → return → check-in) is closed.
 
 **Pick up here next → to make the nudge actually PUSH, we need a backend (not more app code):**
 1. **E4 Backend + E3 push (N2)** — deliver the nudge as a real notification. First concrete step: **create a Supabase project** (B1), then a dev build (P1) for push. These need accounts/credentials only Desha can set up.

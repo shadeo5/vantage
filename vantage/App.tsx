@@ -116,7 +116,7 @@ export default function App() {
       )}
 
       {screen === "plan" && (
-        <PlanScreen going={going} windowTimeFor={windowTimeFor} onOpen={(id) => openDetail(id, "plan")} onToggleGoing={toggleGoing} />
+        <PlanScreen going={going} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={(id) => openDetail(id, "plan")} onToggleGoing={toggleGoing} />
       )}
 
       {screen === "bag" && (

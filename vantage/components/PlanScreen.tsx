@@ -2,18 +2,19 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable } from "react-native";
 import { colors, fonts, screen } from "../theme";
 import { getSpot, img, windowMeta } from "../lib/spots";
+import { fitLabel, DEFAULT_CAMERA_ID } from "../lib/gearProfile";
 
-type PlanMeta = { id: string; label: string; tag: string; reason: string; fit: string };
+type PlanMeta = { id: string; label: string; tag: string; reason: string };
 const PLAN: PlanMeta[] = [
-  { id: "sweetauburn", label: "Tonight · Sat", tag: "The light", reason: "Golden light straight down Auburn Ave.", fit: "fits 35mm" },
-  { id: "krog", label: "Sun", tag: "The crowd", reason: "The Sunday market crowd fills the strip.", fit: "fits 35mm" },
-  { id: "jackson", label: "Wed", tag: "The light", reason: "Clear skies line up behind the towers.", fit: "grab a tele" },
-  { id: "ponce", label: "Fri", tag: "Happening", reason: "BeltLine art walk after work.", fit: "fits 35mm" },
+  { id: "sweetauburn", label: "Tonight · Sat", tag: "The light", reason: "Golden light straight down Auburn Ave." },
+  { id: "krog", label: "Sun", tag: "The crowd", reason: "The Sunday market crowd fills the strip." },
+  { id: "jackson", label: "Wed", tag: "The light", reason: "Clear skies line up behind the towers." },
+  { id: "ponce", label: "Fri", tag: "Happening", reason: "BeltLine art walk after work." },
 ];
 const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);
 
-export function PlanScreen({ going, windowTimeFor, onOpen, onToggleGoing }: {
-  going: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
+export function PlanScreen({ going, lensIds, windowTimeFor, onOpen, onToggleGoing }: {
+  going: string[]; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -40,7 +41,7 @@ export function PlanScreen({ going, windowTimeFor, onOpen, onToggleGoing }: {
                     <Text style={styles.reason} numberOfLines={1}>{m.reason}</Text>
                     <View style={styles.meta}>
                       <Text style={[styles.window, { color: wm.color }]}>{wm.icon} {wm.label} · {windowTimeFor(spot.windowType)}</Text>
-                      <Text style={styles.fit}>{m.fit}</Text>
+                      <Text style={styles.fit}>{fitLabel(DEFAULT_CAMERA_ID, lensIds, spot.genre)}</Text>
                     </View>
                   </View>
                 </Pressable>

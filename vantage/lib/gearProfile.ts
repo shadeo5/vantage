@@ -33,6 +33,13 @@ export function primaryLensLabel(lensIds: string[]): string {
   return chip ? chip.short : "35mm";
 }
 
+// A short, honest fit label for a spot's genre, e.g. "fits your 35mm" — or, when the
+// kit doesn't cover that genre, "a stretch for your kit" (never a false claim).
+export function fitLabel(cameraId: string, lensIds: string[], genre: Genre): string {
+  const best = bestLensForGenre(cameraId, lensIds, genre);
+  return best ? `fits your ${best}` : "a stretch for your kit";
+}
+
 // From the kit, the label of a lens (or the fixed-lens camera) that actually suits a
 // genre — so the app never claims a telephoto is "perfect for street." Null if nothing
 // in the kit fits, which the caller turns into honest "your kit's a stretch" copy.

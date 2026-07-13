@@ -1,4 +1,4 @@
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "../lib/gearProfile";
+import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel } from "../lib/gearProfile";
 import { getLens, getCamera } from "../lib/gear";
 
 describe("gear profile", () => {
@@ -44,6 +44,16 @@ describe("gear profile", () => {
     });
     test("the telephoto IS the pick for Sports", () => {
       expect(bestLensForGenre(DEFAULT_CAMERA_ID, ["sony-fe-70-200-28gm2"], "Sports")).toBe("70–200mm");
+    });
+  });
+
+  describe("fitLabel", () => {
+    test("names the fitting lens for a covered genre", () => {
+      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBe("fits your 35mm");
+    });
+    test("honestly flags a genre the kit can't cover", () => {
+      // The X100VI body + only a macro lens covers neither Sports nor Wildlife.
+      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a stretch for your kit");
     });
   });
 });

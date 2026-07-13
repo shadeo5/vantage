@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar } from "react-native";
 import { useFonts } from "expo-font";
 import { Newsreader_400Regular, Newsreader_500Medium } from "@expo-google-fonts/newsreader";
@@ -19,6 +19,7 @@ import { LockScreen } from "./components/LockScreen";
 import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
+import { loadLensIds, saveLensIds } from "./lib/gearStorage";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -39,6 +40,18 @@ export default function App() {
   const [lenses, setLenses] = useState<string[]>(DEFAULT_LENS_IDS);
   const [styleOpen, setStyleOpen] = useState(false);
   const [stylePick, setStylePick] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load the saved gear profile once on launch, then persist on every change (G1).
+  useEffect(() => {
+    loadLensIds().then((ids) => {
+      if (ids) setLenses(ids);
+      setHydrated(true);
+    });
+  }, []);
+  useEffect(() => {
+    if (hydrated) saveLensIds(lenses);
+  }, [lenses, hydrated]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 

@@ -39,7 +39,7 @@ Make "your kit" real and load-bearing (it's currently a static "35mm").
 
 ## E3 · The nudge & notifications  ⬜
 Turn the in-app hero into an actual proactive nudge — the north star.
-- ⬜ **N1 — "Is today great?" threshold.** A quality bar that decides whether to nudge at all (inspire, don't nag).
+- ▶ **N1 — "Is today great?" threshold.** A quality bar that decides whether to nudge at all (inspire, don't nag). BRAIN BUILT: `lib/nudge.ts` — `tonightNudge(now, camera, lenses)` scores every spot (light-timing × gear-fit; activity = weight-0 placeholder for events), picks the best, returns go/no-go + confidence + Why-signals. Pure/testable (13 tests). NOT yet wired into the app UI (next slice: drive the Today hero pick + Lock nudge + "Why this pick?" from the verdict). Honest: with no weather/events yet, "light" scores WHEN the good light is, not cloud cover.
 - ⬜ **N2 — Push delivery** (`expo-notifications` + backend trigger). Requires E4 + a dev/prod build.
 - ⬜ **N3 — Nudge copy generation** — personal, non-spammy, gear-aware.
 - ⬜ **N4 — Shooting check-in / journal.** "Did you get out?" → doubles as the engagement/return metric *and* a shooting log (opt-in photo match later).

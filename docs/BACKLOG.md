@@ -46,8 +46,9 @@ Turn the in-app hero into an actual proactive nudge — the north star.
 
 ---
 
-## E4 · Backend & data  ⬜
-- ⬜ **B1 — Supabase** — DB + auth + storage foundation.
+## E4 · Backend & data  ▶ (starting — for the push nudge, N2)
+**Design:** `docs/engineering/PUSH_ARCHITECTURE.html` (ADR) — Supabase cron → the ported nudge brain → Expo Push. Blocked on the user creating a free Supabase project (URL + anon key) + a free Expo account; then I scaffold DB + edge function + app-side push registration.
+- 🎯 **B1 — Supabase** — DB (users + gear + push token + nudge_log) + the scheduled edge function running `nudge.ts`/`nudgeCopy.ts` server-side. *(First step toward N2 push.)*
 - ⬜ **B2 — Precompute + serve** — scheduled job generates districts per city into Postgres; app reads a ready list (near-instant loads; no phone hits Overpass). *(Layer 1 of the "loads instant" plan.)*
 - ⬜ **B3 — On-device cache** — stale-while-revalidate; instant relaunch even before a backend. *(Layer 2 — cheap early win.)*
 - ⬜ **B4 — Real events integration** — ESPN (sports, proven) + tentpole editorial (+ Ticketmaster later), geo-filtered. (Prototyped in `archive/poc`.)

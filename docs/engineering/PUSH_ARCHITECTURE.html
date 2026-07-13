@@ -1,0 +1,191 @@
+<title>Vantage — The Push Nudge</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:58px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .spot{color:var(--gold);font-weight:600;} .event{color:var(--blue);font-weight:600;}
+
+  /* code / data shape */
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  /* tables */
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  .th-spot{color:var(--gold);} .th-event{color:var(--blue);}
+
+  /* pipeline diagram */
+  .flow-wrap{overflow-x:auto;margin:18px 0;}
+  .flow{min-width:660px;display:grid;grid-template-columns:1.1fr auto .9fr auto 1fr;align-items:center;gap:0;}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:13px;color:var(--ink);padding:2px 0;}
+  .stage .item.s{color:var(--gold);} .stage .item.e{color:var(--blue);}
+  .arrow{color:var(--faint);text-align:center;font-size:20px;padding:0 10px;}
+  .stack{display:flex;flex-direction:column;gap:10px;}
+
+  /* eclipse illustration */
+  .eclipse{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+  @media(max-width:600px){.eclipse{grid-template-columns:1fr;}}
+  .ecard{background:var(--surface);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+  .ecard .hd{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);padding:11px 16px;border-bottom:1px solid var(--hair);background:var(--raised);}
+  .ecard .bd{padding:16px;}
+  .headline{font-family:var(--serif);font-size:20px;}
+  .headline.gold{color:var(--gold);} .headline.blue{color:var(--blue);}
+  .venue{font-size:12.5px;color:var(--muted);margin-top:4px;}
+  .venue b{color:var(--ink);}
+  .demoted{font-size:12.5px;color:var(--faint);margin-top:10px;padding-top:10px;border-top:1px solid var(--hair);}
+
+  /* callouts */
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:16px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Architecture · Engineering</div>
+    <h1>The Push Nudge</h1>
+    <p class="lede">How the in-app nudge becomes a <b>real notification</b> — your phone buzzing "great evening to shoot" even with the app closed. The north star, and the last missing piece (N2).</p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — push / backend</b></span>
+      <span class="tag">Status <b>Design · pre-build</b></span>
+      <span class="tag">Updated <b>Jul 13, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Why a backend at all</h2></div>
+    <p>The nudge brain (<code>lib/nudge.ts</code>) runs <b>inside the app</b> today — so it only decides when the app is open. To push when the app is <b>closed</b>, the decision has to move to the cloud and run on a <b>schedule</b>. That's the whole reason for a backend.</p>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="stage"><div class="lbl">App · your phone</div><div class="item">register push token</div><div class="item">save your gear</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">Supabase · the cloud</div><div class="item">daily cron fires</div><div class="item s">run the nudge brain</div><div class="item">generate the copy</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">Your phone</div><div class="item e">📲 it buzzes</div><div class="item">"…worth a look tonight"</div></div>
+      </div>
+    </div>
+    <div class="call"><div class="k">The reuse win</div><p>The brain and copy are pure TypeScript with no UI. Supabase Edge Functions run Deno/TS — so <b>the same <code>nudge.ts</code> + <code>nudgeCopy.ts</code> port to the server</b>. The push reuses what we already built and tested.</p></div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>What runs where</h2></div>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Piece</th><th>Runs on</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><b>Nudge brain</b> (<code>nudge.ts</code>)</td><td>Supabase Edge Function</td><td>ported to Deno/TS — same logic, server-side</td></tr>
+          <tr><td><b>Copy</b> (<code>nudgeCopy.ts</code>)</td><td>same function</td><td>the fresh push line</td></tr>
+          <tr><td><b>Gear + push token</b></td><td>Supabase Postgres</td><td>per user, so the cloud knows the kit</td></tr>
+          <tr><td><b>Delivery</b></td><td>Expo Push API</td><td>free; hides Apple APNs + Google FCM behind one call</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Data model (minimal)</h2></div>
+    <pre><code><span class="c-key">users</span>(id, push_token, timezone, created_at)
+<span class="c-key">gear_profiles</span>(user_id, camera_id, lens_ids[])
+<span class="c-key">nudge_log</span>(user_id, spot_id, sent_at)   <span class="c-com">// dedupe + history</span></code></pre>
+    <p>Start anonymous — a device id is enough to store a push token + gear and send a nudge. Real accounts (email/social) come later, only if we need cross-device sync.</p>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>The decisions</h2></div>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Decision</th><th>Choice</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td><b>Where the brain runs</b></td><td><span class="pill proto">Chosen</span> Supabase Edge Function on <code>pg_cron</code></td><td>reuses our TS; no separate server to host</td></tr>
+          <tr><td><b>Backend</b></td><td><span class="pill proto">Chosen</span> Supabase</td><td>SQL fit · free, no card · not locked in (see TECH_DECISIONS)</td></tr>
+          <tr><td><b>Push service</b></td><td><span class="pill proto">Chosen</span> Expo Push</td><td>free · one API for both phones</td></tr>
+          <tr><td><b>When to send</b></td><td><span class="pill plan">Open</span> ~once daily, late afternoon</td><td>needs per-user timezone; exact time TBD</td></tr>
+          <tr><td><b>Whether to send</b></td><td><span class="pill proto">Chosen</span> only on go + confidence ≥ medium</td><td>reuse N1's bar — inspire, never nag</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Open questions</h2></div>
+    <ul class="list open">
+      <li>What local time to fire, and how do we handle each user's <b>timezone</b>?</li>
+      <li><b>Quiet hours / frequency cap</b> — nudging every single night reads as spam. Skip low nights (N1 already can) and cap frequency?</li>
+      <li><b>Dedupe</b> — don't headline the same spot two nights running (that's what <code>nudge_log</code> is for).</li>
+      <li><b>Auth</b> — anonymous device id now; real accounts only when sync/discovery needs them.</li>
+      <li><b>Journal</b> — keep the return-metric local, or sync it up so we can actually measure engagement across users?</li>
+    </ul>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>What this needs from Desha</h2></div>
+    <ul class="list">
+      <li>A <b>free Supabase project</b> → send me the Project URL + <code>anon</code> public key (the <code>service_role</code> secret stays with you).</li>
+      <li>A <b>free Expo account</b> for the dev build + push.</li>
+      <li><b>$0 to prove it on the Pixel</b> (sideloaded dev build). Apple's <b>$99/yr</b> only if/when we want it on an iPhone.</li>
+    </ul>
+  </section>
+
+  <footer>Vantage · ADR — push / backend layer · epics E4 (backend) + E3/N2 (push) · brain in <code>vantage/lib/nudge.ts</code></footer>
+</div>

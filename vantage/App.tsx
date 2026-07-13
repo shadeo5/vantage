@@ -18,9 +18,9 @@ import { BottomNav } from "./components/BottomNav";
 import { LockScreen } from "./components/LockScreen";
 import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
+import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
-const GEAR_LENS = "35mm";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -36,7 +36,7 @@ export default function App() {
   const [saved, setSaved] = useState<string[]>(["piedmont"]);
   const [gearBanner, setGearBanner] = useState(true);
   const [whyOpen, setWhyOpen] = useState(false);
-  const [lenses, setLenses] = useState<string[]>(["35mm f/2"]);
+  const [lenses, setLenses] = useState<string[]>(DEFAULT_LENS_IDS);
   const [styleOpen, setStyleOpen] = useState(false);
   const [stylePick, setStylePick] = useState<string | null>(null);
 
@@ -49,6 +49,14 @@ export default function App() {
   const goldenStart = fmtTime(windows.goldenEvening.start);
   const blueStart = fmtTime(windows.blueEvening.start);
   const windowTimeFor = (t: string) => (t === "blue" ? blueStart : goldenStart);
+
+  // Gear-aware copy for tonight's hero: name the lens that actually fits its genre.
+  const heroWord = hero.type.toLowerCase();
+  const bestFit = bestLensForGenre(DEFAULT_CAMERA_ID, lenses, hero.genre);
+  const gearLens = bestFit ?? primaryLensLabel(lenses);
+  const kitWhy = bestFit
+    ? `Your ${bestFit} is a natural fit for ${heroWord} like this.`
+    : `Your kit's a stretch for ${heroWord} tonight — bring your widest and get close.`;
 
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (id: string) =>
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
@@ -64,7 +72,7 @@ export default function App() {
       <StatusBar barStyle="light-content" />
 
       {screen === "lock" && (
-        <LockScreen onEnter={() => setScreen("today")} goldenStart={goldenStart} heroName={hero.name} lens={GEAR_LENS} heroImg={hero.img} />
+        <LockScreen onEnter={() => setScreen("today")} goldenStart={goldenStart} heroName={hero.name} lens={gearLens} heroImg={hero.img} />
       )}
 
       {screen === "today" && (
@@ -78,7 +86,7 @@ export default function App() {
             <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
           </View>
           <InspirationHero
-            spot={hero} goldenRange={goldenRange} gearLens={GEAR_LENS}
+            spot={hero} goldenRange={goldenRange} gearLens={gearLens} kitWhy={kitWhy}
             isGoing={going.includes(hero.id)} whyOpen={whyOpen}
             onOpen={() => openDetail(hero.id, "today")} onGo={() => toggleGoing(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
           />
@@ -100,7 +108,8 @@ export default function App() {
 
       {screen === "bag" && (
         <BagScreen
-          lenses={lenses} styleOpen={styleOpen} stylePick={stylePick}
+          lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(DEFAULT_CAMERA_ID, lenses)}
+          styleOpen={styleOpen} stylePick={stylePick}
           onToggleLens={toggleLens} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={setStylePick}
           onContinue={() => setScreen("today")}
         />

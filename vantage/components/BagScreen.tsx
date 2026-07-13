@@ -2,15 +2,16 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import Svg, { Rect, Circle, Path } from "react-native-svg";
 import { colors, fonts, screen } from "../theme";
+import { type Genre } from "../lib/gear";
 
-const LENSES = ["23mm", "35mm f/2", "50mm", "200mm"];
 const STYLES = ["Street", "Portraits", "Landscape", "Architecture", "Nature"];
 
 export function BagScreen({
-  lenses, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
+  lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
 }: {
-  lenses: string[]; styleOpen: boolean; stylePick: string | null;
-  onToggleLens: (l: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void; onContinue: () => void;
+  lensChips: { id: string; label: string }[]; selectedLensIds: string[]; kitGenres: Genre[];
+  styleOpen: boolean; stylePick: string | null;
+  onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void; onContinue: () => void;
 }) {
   return (
     <ScrollView contentContainerStyle={styles.content}>
@@ -35,14 +36,22 @@ export function BagScreen({
 
       <Text style={styles.section}>LENSES / FOCAL LENGTHS</Text>
       <View style={styles.chips}>
-        {LENSES.map((l) => {
-          const on = lenses.includes(l);
+        {lensChips.map((l) => {
+          const on = selectedLensIds.includes(l.id);
           return (
-            <Pressable key={l} onPress={() => onToggleLens(l)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
-              <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{l}</Text>
+            <Pressable key={l.id} onPress={() => onToggleLens(l.id)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+              <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{l.label}</Text>
             </Pressable>
           );
         })}
+      </View>
+
+      <Text style={styles.section}>YOUR KIT SHOOTS</Text>
+      <Text style={styles.kitSub}>Matched from your gear — updates as you add lenses.</Text>
+      <View style={styles.chips}>
+        {kitGenres.map((g) => (
+          <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
+        ))}
       </View>
 
       <Pressable onPress={onToggleStyle} style={styles.dashed2}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
@@ -86,6 +95,9 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: "rgba(233,184,114,0.16)", borderColor: "rgba(233,184,114,0.5)" },
   chipOff: { backgroundColor: colors.surface, borderColor: colors.hairline },
   chipText: { fontFamily: fonts.sansSemi, fontSize: 13.5 },
+  kitSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: -4, marginBottom: 12 },
+  genrePill: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 22, backgroundColor: "rgba(233,184,114,0.12)", borderWidth: 1, borderColor: "rgba(233,184,114,0.35)" },
+  genreText: { color: "#F0D9AE", fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed2: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 14, marginTop: 22 },
   dashed2Text: { color: colors.muted3, fontFamily: fonts.sansMed, fontSize: 14 },
   continue: { alignItems: "center", paddingVertical: 16, borderRadius: 16, backgroundColor: colors.golden },

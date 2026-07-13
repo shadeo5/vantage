@@ -5,10 +5,10 @@ import { colors, fonts } from "../theme";
 import { Spot, img } from "../lib/spots";
 
 export function InspirationHero({
-  spot, goldenRange, isGoing, whyOpen, gearLens,
+  spot, goldenRange, isGoing, whyOpen, gearLens, kitWhy,
   onOpen, onGo, onToggleWhy,
 }: {
-  spot: Spot; goldenRange: string; isGoing: boolean; whyOpen: boolean; gearLens: string;
+  spot: Spot; goldenRange: string; isGoing: boolean; whyOpen: boolean; gearLens: string; kitWhy: string;
   onOpen: () => void; onGo: () => void; onToggleWhy: () => void;
 }) {
   const pulse = useRef(new Animated.Value(0.5)).current;
@@ -38,8 +38,8 @@ export function InspirationHero({
 
       <View style={styles.body}>
         <Text style={styles.lede}>
-          Golden hour hits <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> — perfect for the fast{" "}
-          <Text style={styles.gold}>{gearLens}</Text> in your bag.
+          Golden hour hits <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> — grab your{" "}
+          <Text style={styles.gold}>{gearLens}</Text> and go.
         </Text>
 
         <View style={styles.chips}>
@@ -65,7 +65,7 @@ export function InspirationHero({
           <View style={styles.whyBody}>
             <WhyLine color={colors.golden} k="Light." v={`Golden hour ${goldenRange} — the warmest light of the evening, raking down Auburn Ave.`} />
             <WhyLine color={colors.crowdHigh} k="Activity." v={`${spot.reason} — plenty of candid life in the frame.`} />
-            <WhyLine color={colors.blueHour} k="Your kit." v={`The ${gearLens} is the exact lens for tight, low-light street.`} />
+            <WhyLine color={colors.blueHour} k="Your kit." v={kitWhy} />
           </View>
         )}
       </View>

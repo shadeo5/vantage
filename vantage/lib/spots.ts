@@ -3,12 +3,15 @@
 // design; sourcing this at scale is the upcoming "content strategy" workstream.
 // Light timing stays LIVE via lib/light.ts + each spot's real coordinates.
 
+import { type Genre } from "./gear";
+
 export type WindowType = "golden" | "blue" | "flat";
 
 export type Spot = {
   id: string;
   name: string;
-  type: string;
+  type: string;       // display label, e.g. "Cityscape", "Street art"
+  genre: Genre;       // the matching genre, for gear-fit checks
   windowType: WindowType;
   distance: string;
   reason: string;      // one-line for list rows
@@ -42,7 +45,7 @@ export const HERO_ID = "sweetauburn";
 
 export const SPOTS: Spot[] = [
   {
-    id: "sweetauburn", name: "Sweet Auburn", type: "Street", windowType: "golden",
+    id: "sweetauburn", name: "Sweet Auburn", type: "Street", genre: "Street", windowType: "golden",
     distance: "6 min", reason: "Historic district, alive at dusk",
     tagline: "Historic district · street & portraits",
     why: "The heart of Atlanta's historic Black business district hums on a warm evening — market stalls, front-porch talk, and low sun raking down Auburn Avenue. It's a street room where everyone's a little more open.",
@@ -56,7 +59,7 @@ export const SPOTS: Spot[] = [
     lat: 33.7550, lon: -84.3720,
   },
   {
-    id: "krog", name: "Krog Street Tunnel", type: "Street art", windowType: "blue",
+    id: "krog", name: "Krog Street Tunnel", type: "Street art", genre: "Street", windowType: "blue",
     distance: "9 min", reason: "Neon and spray paint after dark",
     tagline: "Ever-changing murals · night color",
     why: "A quarter-mile of layered graffiti that repaints itself weekly. As blue hour settles, the tunnel lights turn the walls electric and the color balance falls right into place.",
@@ -70,7 +73,7 @@ export const SPOTS: Spot[] = [
     lat: 33.7540, lon: -84.3620,
   },
   {
-    id: "jackson", name: "Jackson Street Bridge", type: "Cityscape", windowType: "golden",
+    id: "jackson", name: "Jackson Street Bridge", type: "Cityscape", genre: "Architecture", windowType: "golden",
     distance: "12 min", reason: "The skyline shot, glowing",
     tagline: "The classic downtown view",
     why: "Atlanta's postcard: the full downtown skyline stacked behind the interstate, warm light on glass and taillights streaking below. Simple, and it never misses.",
@@ -84,7 +87,7 @@ export const SPOTS: Spot[] = [
     lat: 33.7545, lon: -84.3710,
   },
   {
-    id: "piedmont", name: "Piedmont Park", type: "Nature", windowType: "golden",
+    id: "piedmont", name: "Piedmont Park", type: "Nature", genre: "Nature", windowType: "golden",
     distance: "8 min", reason: "Open sky over Midtown",
     tagline: "Meadow foreground · Midtown backdrop",
     why: "Oak Hill's open lawn gives you an unobstructed western sky with the Midtown towers as a backdrop — golden grass in front, glowing glass behind.",
@@ -98,7 +101,7 @@ export const SPOTS: Spot[] = [
     lat: 33.7850, lon: -84.3730,
   },
   {
-    id: "ponce", name: "Ponce City Market Roof", type: "Cityscape", windowType: "blue",
+    id: "ponce", name: "Ponce City Market Roof", type: "Cityscape", genre: "Architecture", windowType: "blue",
     distance: "11 min", reason: "Rooftops and bridges light up",
     tagline: "Elevated blue-hour panorama",
     why: "From the roof the whole east side spreads out — the BeltLine, distant downtown, and a sky that deepens to cobalt as the city switches its lights on.",

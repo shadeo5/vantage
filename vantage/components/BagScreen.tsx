@@ -1,38 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 import Svg, { Rect, Circle, Path } from "react-native-svg";
 import { colors, fonts, screen } from "../theme";
-import { type Genre } from "../lib/gear";
+import { type Genre, getCamera, CAMERAS } from "../lib/gear";
+import { cameraLabel, cameraMeta } from "../lib/gearProfile";
 
 const STYLES = ["Street", "Portraits", "Landscape", "Architecture", "Nature"];
 
 export function BagScreen({
-  lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
+  cameraId, onPickCamera, lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
 }: {
+  cameraId: string; onPickCamera: (id: string) => void;
   lensChips: { id: string; label: string }[]; selectedLensIds: string[]; kitGenres: Genre[];
   styleOpen: boolean; stylePick: string | null;
   onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void; onContinue: () => void;
 }) {
+  const [camOpen, setCamOpen] = useState(false);
+  const cam = getCamera(cameraId);
   return (
     <ScrollView contentContainerStyle={styles.content}>
       <Text style={styles.eyebrow}>SETUP · 2 OF 3</Text>
       <Text style={styles.title}>What's in{"\n"}your bag?</Text>
       <Text style={styles.sub}>So we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
 
-      <Text style={styles.section}>CAMERAS</Text>
-      <View style={styles.camCard}>
+      <Text style={styles.section}>CAMERA</Text>
+      <Pressable style={styles.camCard} onPress={() => setCamOpen((v) => !v)}>
         <View style={styles.camIcon}>
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.golden} strokeWidth={1.6}>
             <Rect x={3} y={7} width={18} height={13} rx={3} /><Circle cx={12} cy={13.5} r={3.4} /><Path d="M8.5 7l1.4-2.4h4.2L15.5 7" />
           </Svg>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.camName}>Fujifilm X100VI</Text>
-          <Text style={styles.camMeta}>Fixed 35mm-equiv · f/2</Text>
+          <Text style={styles.camName}>{cameraLabel(cam)}</Text>
+          <Text style={styles.camMeta}>{cameraMeta(cam)}</Text>
         </View>
-        <Text style={styles.edit}>✎</Text>
-      </View>
-      <View style={styles.dashed}><Text style={styles.dashedText}>+ Add a camera</Text></View>
+        <Text style={styles.change}>{camOpen ? "▲" : "Change"}</Text>
+      </Pressable>
+      {camOpen && (
+        <View style={[styles.chips, { marginTop: 10 }]}>
+          {CAMERAS.map((c) => {
+            const on = c.id === cameraId;
+            return (
+              <Pressable key={c.id} onPress={() => { onPickCamera(c.id); setCamOpen(false); }} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+                <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{cameraLabel(c)}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
 
       <Text style={styles.section}>LENSES / FOCAL LENGTHS</Text>
       <View style={styles.chips}>
@@ -47,11 +62,13 @@ export function BagScreen({
       </View>
 
       <Text style={styles.section}>YOUR KIT SHOOTS</Text>
-      <Text style={styles.kitSub}>Matched from your gear — updates as you add lenses.</Text>
+      <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
       <View style={styles.chips}>
-        {kitGenres.map((g) => (
-          <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
-        ))}
+        {kitGenres.length === 0
+          ? <Text style={styles.kitSub}>Add a lens to see what this body can shoot.</Text>
+          : kitGenres.map((g) => (
+              <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
+            ))}
       </View>
 
       <Pressable onPress={onToggleStyle} style={styles.dashed2}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
@@ -88,6 +105,7 @@ const styles = StyleSheet.create({
   camName: { color: colors.ink, fontFamily: fonts.sansSemi, fontSize: 15 },
   camMeta: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12.5, marginTop: 1 },
   edit: { color: colors.muted, fontSize: 14 },
+  change: { color: colors.golden, fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 13, marginTop: 10 },
   dashedText: { color: colors.muted, fontFamily: fonts.sansMed, fontSize: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 9 },

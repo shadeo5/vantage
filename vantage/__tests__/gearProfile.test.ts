@@ -1,4 +1,4 @@
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel } from "../lib/gearProfile";
+import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
 import { getLens, getCamera } from "../lib/gear";
 
 describe("gear profile", () => {
@@ -44,6 +44,26 @@ describe("gear profile", () => {
     });
     test("the telephoto IS the pick for Sports", () => {
       expect(bestLensForGenre(DEFAULT_CAMERA_ID, ["sony-fe-70-200-28gm2"], "Sports")).toBe("70–200mm");
+    });
+  });
+
+  describe("camera display helpers", () => {
+    test("cameraLabel is brand + model", () => {
+      expect(cameraLabel(getCamera("fuji-x100vi"))).toBe("Fujifilm X100VI");
+    });
+    test("cameraMeta shows the fixed-lens equivalent for a compact", () => {
+      // X100VI: 23mm × 1.5 crop ≈ 35mm equivalent, f/2.
+      expect(cameraMeta(getCamera("fuji-x100vi"))).toBe("Fixed 35mm-equiv · f/2");
+    });
+    test("cameraMeta shows sensor + interchangeable for an ILC", () => {
+      expect(cameraMeta(getCamera("sony-a7-iv"))).toBe("Full-frame · interchangeable");
+    });
+    test("changing the body changes the kit's genres", () => {
+      // A 50mm reads ~75mm (Portraits) on APS-C but stays 50mm (Street) on full-frame.
+      const apsc = kitGenres("fuji-xt5", ["sony-fe50-18"]);
+      const ff = kitGenres("sony-a7-iv", ["sony-fe50-18"]);
+      expect(ff).toContain("Street");
+      expect(apsc).not.toContain("Street");
     });
   });
 

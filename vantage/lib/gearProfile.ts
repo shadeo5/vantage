@@ -2,7 +2,27 @@
 // Slice 1: catalog-backed selection + live genre matching. Slice 3: the Today/Lock
 // copy reads the kit (naming the lens that actually fits tonight's spot). Persistence
 // (on-device storage) is a later slice; for now the profile lives in App state.
-import { getCamera, getLens, genresForKit, genresForLens, genresForCamera, type Genre } from "./gear";
+import { getCamera, getLens, genresForKit, genresForLens, genresForCamera, type Genre, type Camera } from "./gear";
+
+const SENSOR_LABEL: Record<string, string> = {
+  "full-frame": "Full-frame",
+  "aps-c": "APS-C",
+  "micro-4-3": "Micro 4/3",
+  "1-inch": "Compact",
+  "medium-format": "Medium format",
+};
+
+// Display helpers for the camera picker.
+export function cameraLabel(cam: Camera): string {
+  return `${cam.brand} ${cam.model}`;
+}
+export function cameraMeta(cam: Camera): string {
+  if (cam.fixedLens) {
+    const equiv = Math.round(cam.fixedLens.minFocal * cam.cropFactor);
+    return `Fixed ${equiv}mm-equiv · f/${cam.fixedLens.maxAperture}`;
+  }
+  return `${SENSOR_LABEL[cam.sensorFormat] ?? cam.sensorFormat} · interchangeable`;
+}
 
 // The onboarding default camera (matches the body shown in the Bag screen).
 export const DEFAULT_CAMERA_ID = "fuji-x100vi";

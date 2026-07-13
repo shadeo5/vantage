@@ -19,7 +19,7 @@ import { LockScreen } from "./components/LockScreen";
 import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
-import { loadLensIds, saveLensIds } from "./lib/gearStorage";
+import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -38,20 +38,25 @@ export default function App() {
   const [gearBanner, setGearBanner] = useState(true);
   const [whyOpen, setWhyOpen] = useState(false);
   const [lenses, setLenses] = useState<string[]>(DEFAULT_LENS_IDS);
+  const [cameraId, setCameraId] = useState<string>(DEFAULT_CAMERA_ID);
   const [styleOpen, setStyleOpen] = useState(false);
   const [stylePick, setStylePick] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   // Load the saved gear profile once on launch, then persist on every change (G1).
   useEffect(() => {
-    loadLensIds().then((ids) => {
+    Promise.all([loadLensIds(), loadCameraId()]).then(([ids, cam]) => {
       if (ids) setLenses(ids);
+      if (cam) setCameraId(cam);
       setHydrated(true);
     });
   }, []);
   useEffect(() => {
-    if (hydrated) saveLensIds(lenses);
-  }, [lenses, hydrated]);
+    if (hydrated) {
+      saveLensIds(lenses);
+      saveCameraId(cameraId);
+    }
+  }, [lenses, cameraId, hydrated]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 
@@ -65,7 +70,7 @@ export default function App() {
 
   // Gear-aware copy for tonight's hero: name the lens that actually fits its genre.
   const heroWord = hero.type.toLowerCase();
-  const bestFit = bestLensForGenre(DEFAULT_CAMERA_ID, lenses, hero.genre);
+  const bestFit = bestLensForGenre(cameraId, lenses, hero.genre);
   const gearLens = bestFit ?? primaryLensLabel(lenses);
   const kitWhy = bestFit
     ? `Your ${bestFit} is a natural fit for ${heroWord} like this.`
@@ -116,12 +121,13 @@ export default function App() {
       )}
 
       {screen === "plan" && (
-        <PlanScreen going={going} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={(id) => openDetail(id, "plan")} onToggleGoing={toggleGoing} />
+        <PlanScreen going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={(id) => openDetail(id, "plan")} onToggleGoing={toggleGoing} />
       )}
 
       {screen === "bag" && (
         <BagScreen
-          lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(DEFAULT_CAMERA_ID, lenses)}
+          cameraId={cameraId} onPickCamera={setCameraId}
+          lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
           styleOpen={styleOpen} stylePick={stylePick}
           onToggleLens={toggleLens} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={setStylePick}
           onContinue={() => setScreen("today")}

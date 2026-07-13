@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { loadLensIds, saveLensIds } from "../lib/gearStorage";
+import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "../lib/gearStorage";
 
 // Use the package's in-memory jest mock so getItem/setItem behave realistically.
 jest.mock("@react-native-async-storage/async-storage", () =>
@@ -33,5 +33,11 @@ describe("gear storage", () => {
   test("returns null for unparseable data", async () => {
     await AsyncStorage.setItem("vantage.gear.lensIds.v1", "not json{");
     expect(await loadLensIds()).toBeNull();
+  });
+
+  test("camera id round-trips, null when unset", async () => {
+    expect(await loadCameraId()).toBeNull();
+    await saveCameraId("sony-a7-iv");
+    expect(await loadCameraId()).toBe("sony-a7-iv");
   });
 });

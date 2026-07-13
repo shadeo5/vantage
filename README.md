@@ -64,8 +64,11 @@ Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on w
 
 **E3 Nudge — mostly done (only real push delivery, N2, is left):** ✅ **N1 nudge brain** (`lib/nudge.ts`) decides tonight's pick + confidence + "why" (light-timing × gear-fit; activity = placeholder). ✅ **N3 richer copy** (`lib/nudgeCopy.ts`) — fresh, personal, confidence-tiered push lines, deterministically varied per day. ✅ **N4 return-loop** (`lib/journal.ts`) — "I'm going" → on return "did you make it?" → shooting journal + return metric. The in-app hero *is* the nudge; the loop (nudge → shoot → return → check-in) is closed.
 
-**Pick up here next → to make the nudge actually PUSH, we need a backend (not more app code):**
-1. **E4 Backend + E3 push (N2)** — deliver the nudge as a real notification. First concrete step: **create a Supabase project** (B1), then a dev build (P1) for push. These need accounts/credentials only Desha can set up.
+**E4 Backend — starting (for the push nudge, N2):** design is set in `docs/engineering/PUSH_ARCHITECTURE.html` (Supabase cron → the ported nudge brain → Expo Push). **In flight:** Desha is creating a free Supabase project + Expo account.
+
+**Pick up here next → build the backend once accounts exist:**
+1. Desha sends the Supabase **Project URL + `anon` key** (secret `service_role` stays with Desha) → I scaffold the DB (users / gear_profiles / nudge_log), port `nudge.ts`/`nudgeCopy.ts` into a scheduled Edge Function, and add app-side push registration.
+2. Then a **Pixel dev build** (free) to receive the first real push end-to-end. Apple's $99/yr only if/when we want it on an iPhone.
 2. Small solo items anytime: **G3** (smarter gear-banner re-prompting) · **event decisions** (EVENTS_ARCHITECTURE open questions) · content-pipeline run (deferred spend) · commit-attribution housekeeping.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

@@ -24,6 +24,7 @@ import { tonightNudge } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
+import { saveProfile } from "./lib/sync";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -69,6 +70,10 @@ export default function App() {
       saveJournal(journal);
     }
   }, [lenses, cameraId, pending, journal, hydrated]);
+  // Mirror the gear profile to the cloud (anon sign-in + upsert) so the server can nudge.
+  useEffect(() => {
+    if (hydrated) saveProfile(cameraId, lenses);
+  }, [cameraId, lenses, hydrated]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 

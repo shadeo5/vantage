@@ -64,12 +64,12 @@ Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on w
 
 **E3 Nudge — mostly done (only real push delivery, N2, is left):** ✅ **N1 nudge brain** (`lib/nudge.ts`) decides tonight's pick + confidence + "why" (light-timing × gear-fit; activity = placeholder). ✅ **N3 richer copy** (`lib/nudgeCopy.ts`) — fresh, personal, confidence-tiered push lines, deterministically varied per day. ✅ **N4 return-loop** (`lib/journal.ts`) — "I'm going" → on return "did you make it?" → shooting journal + return metric. The in-app hero *is* the nudge; the loop (nudge → shoot → return → check-in) is closed.
 
-**E4 Backend — building (for the push nudge, N2):** design in `docs/engineering/PUSH_ARCHITECTURE.html`. Supabase project live + creds validated. **Done:** app client (`vantage/lib/supabase.ts`, anon key in gitignored `.env`) + DB schema (`vantage/supabase/schema.sql`, RLS + anonymous-auth model).
+**E4 Backend — building (for the push nudge, N2):** design in `docs/engineering/PUSH_ARCHITECTURE.html`. Supabase project live; schema + RLS + anonymous-auth all set up. **App↔cloud sync is LIVE** (`vantage/lib/sync.ts`): the app anonymously signs in on launch and mirrors the gear profile to the `profiles` table (verified — row visible in Table Editor).
 
-**Pick up here next:**
-1. **Desha (dashboard, ~2 min):** run `vantage/supabase/schema.sql` in the SQL Editor + enable **Anonymous sign-ins** (Auth → Providers).
-2. **Me:** app-side anonymous sign-in + save profile/push-token to Supabase; then the scheduled **Edge Function** (ported `nudge.ts`/`nudgeCopy.ts` + Expo Push) on `pg_cron`.
-3. Then a **Pixel dev build** (free) to receive the first real push end-to-end. Apple's $99/yr only if/when we want it on an iPhone.
+**Pick up here next → two pieces left for a real push:**
+1. **Push token** — add `expo-notifications`, register for a token, save it on the profile. Needs a **Pixel dev build** (free) to actually get/receive a token.
+2. **The Edge Function** — port `nudge.ts`/`nudgeCopy.ts` server-side, run it on `pg_cron` daily, send via Expo Push using each profile's token. (Needs Desha to `supabase login` / deploy, or run via dashboard.)
+3. Apple's $99/yr only if/when we want it on an iPhone; the Pixel path is $0.
 2. Small solo items anytime: **G3** (smarter gear-banner re-prompting) · **event decisions** (EVENTS_ARCHITECTURE open questions) · content-pipeline run (deferred spend) · commit-attribution housekeeping.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

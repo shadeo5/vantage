@@ -4,8 +4,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts } from "../theme";
 import { img } from "../lib/spots";
 
-export function LockScreen({ onEnter, goldenStart, heroName, lens, heroImg }: {
-  onEnter: () => void; goldenStart: string; heroName: string; lens: string; heroImg: string;
+export function LockScreen({ onEnter, title, body, heroImg }: {
+  onEnter: () => void; title: string; body: string; heroImg: string;
 }) {
   const now = new Date();
   const time = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).replace(/\s?[AP]M/, "");
@@ -27,8 +27,8 @@ export function LockScreen({ onEnter, goldenStart, heroName, lens, heroImg }: {
           <Text style={styles.appName}>VANTAGE</Text>
           <Text style={styles.ago}>now</Text>
         </View>
-        <Text style={styles.notifTitle}>Great evening to shoot — grab the {lens}.</Text>
-        <Text style={styles.notifBody}>Golden hour hits {goldenStart} and {heroName} is buzzing. 6 min away.</Text>
+        <Text style={styles.notifTitle}>{title}</Text>
+        <Text style={styles.notifBody}>{body}</Text>
       </Pressable>
 
       <Text style={styles.tagline}>OWN THE LIFE, NOT THE LIGHT</Text>

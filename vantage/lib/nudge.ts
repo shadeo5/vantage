@@ -20,8 +20,8 @@ export type NudgeVerdict = {
   score: number;            // 0..1 — the winning spot's combined score
   confidence: Confidence;
   spot: Spot;               // the pick (best spot even on a quiet night)
-  headline: string;         // the nudge line (or the honest "quiet night" line)
   signals: NudgeSignal[];   // the winning spot's breakdown — feeds "Why this pick?"
+  window: { label: string; start: Date; type: Spot["windowType"] }; // tonight's window, for copy
 };
 
 // Weights: light leads, gear personalizes, activity is not yet factored.
@@ -59,7 +59,7 @@ export function gearFitScore(cameraId: string, lensIds: string[], genre: Genre):
   return LENS_CHIPS.some((c) => c.short === best) ? 1.0 : 0.7;
 }
 
-type ScoredSpot = { spot: Spot; score: number; signals: NudgeSignal[] };
+type ScoredSpot = { spot: Spot; score: number; signals: NudgeSignal[]; win: { start: Date; end: Date } };
 
 function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[]): ScoredSpot {
   const w = getLightWindows(now, spot.lat, spot.lon);
@@ -76,7 +76,7 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[]): 
     { key: "activity", label: "Activity", score: 0.5, detail: "Live event signal — coming soon." },
     { key: "gear", label: "Your kit", score: gear, detail: `${fitLabel(cameraId, lensIds, spot.genre)}.` },
   ];
-  return { spot, score, signals };
+  return { spot, score, signals, win };
 }
 
 function confidenceFor(score: number): Confidence {
@@ -90,15 +90,16 @@ export function tonightNudge(now: Date, cameraId: string, lensIds: string[]): Nu
   const scored = SPOTS.map((s) => scoreSpot(s, now, cameraId, lensIds)).sort((a, b) => b.score - a.score);
   const top = scored[0];
   const go = top.score >= GO_THRESHOLD;
-  const headline = go
-    ? `Great evening to shoot — ${top.spot.name} is calling.`
-    : `Quiet one tonight — the best light's behind us. Rest the shutter, or scout for tomorrow.`;
   return {
     go,
     score: top.score,
     confidence: confidenceFor(top.score),
     spot: top.spot,
-    headline,
     signals: top.signals,
+    window: {
+      label: `${fmtTime(top.win.start)}–${fmtTime(top.win.end)}`,
+      start: top.win.start,
+      type: top.spot.windowType,
+    },
   };
 }

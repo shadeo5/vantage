@@ -21,6 +21,7 @@ import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { tonightNudge } from "./lib/nudge";
+import { nudgeCopy } from "./lib/nudgeCopy";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -73,6 +74,8 @@ export default function App() {
 
   // Lens to name in the lede — the one that actually fits the hero's genre.
   const gearLens = bestLensForGenre(cameraId, lenses, hero.genre) ?? primaryLensLabel(lenses);
+  // Fresh, personal push copy for the lock screen (N3).
+  const lockCopy = nudgeCopy(verdict, gearLens, now);
 
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (id: string) =>
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
@@ -88,7 +91,7 @@ export default function App() {
       <StatusBar barStyle="light-content" />
 
       {screen === "lock" && (
-        <LockScreen onEnter={() => setScreen("today")} goldenStart={goldenStart} heroName={hero.name} lens={gearLens} heroImg={hero.img} />
+        <LockScreen onEnter={() => setScreen("today")} title={lockCopy.title} body={lockCopy.body} heroImg={hero.img} />
       )}
 
       {screen === "today" && (

@@ -53,9 +53,9 @@ describe("tonightNudge", () => {
     const expected = v.score >= 0.75 ? "high" : v.score >= 0.55 ? "medium" : "low";
     expect(v.confidence).toBe(expected);
   });
-  test("the headline reflects the go/no-go decision", () => {
-    if (v.go) expect(v.headline).toContain(v.spot.name);
-    else expect(v.headline.toLowerCase()).toContain("quiet");
+  test("exposes tonight's window for the copy layer", () => {
+    expect(v.window.label).toMatch(/\d/);
+    expect(["golden", "blue", "flat"]).toContain(v.window.type);
   });
   test("picks the highest-scoring spot (deterministic for a fixed input)", () => {
     // Re-running with the same inputs yields the same pick — no hidden randomness.

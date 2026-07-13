@@ -102,7 +102,7 @@
     <p class="lede">How the in-app nudge becomes a <b>real notification</b> — your phone buzzing "great evening to shoot" even with the app closed. The north star, and the last missing piece (N2).</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — push / backend</b></span>
-      <span class="tag">Status <b>Design · pre-build</b></span>
+      <span class="tag">Status <b>Building · backend + sync live, push pending</b></span>
       <span class="tag">Updated <b>Jul 13, 2026</b></span>
     </div>
   </header>
@@ -181,8 +181,8 @@
   <section>
     <div class="sec-head"><span class="n">06</span><h2>What this needs from Desha</h2></div>
     <ul class="list">
-      <li>A <b>free Supabase project</b> → send me the Project URL + <code>anon</code> public key (the <code>service_role</code> secret stays with you).</li>
-      <li>A <b>free Expo account</b> for the dev build + push.</li>
+      <li>✅ <b>Supabase project</b> — live; schema + RLS + anon-auth set up; app↔cloud gear sync working (<code>lib/sync.ts</code>). The <code>service_role</code> secret still goes into the Edge Function config when we build it.</li>
+      <li><b>Expo account</b> (have it) → still to do: <code>eas login</code> + a dev build for the push token.</li>
       <li><b>$0 to prove it on the Pixel</b> (sideloaded dev build). Apple's <b>$99/yr</b> only if/when we want it on an iPhone.</li>
     </ul>
   </section>

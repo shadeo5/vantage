@@ -56,14 +56,13 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 - `Photographer Location Scout App.zip` — original design zip (extracted into `docs/design_handoff_vantage/`); safe to delete anytime
 
 ## Where we are (Jul 12, 2026)
-Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on web. Codebase cleaned + unit-tested.
+Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on web. Codebase cleaned + unit-tested (53 tests).
 - **E1 Content — done.** Illustrated placeholder imagery wired into all 5 spots (`assets/spots/`); voice guide + copy audit (C3); content pipeline built but running deferred.
-- **E2 Gear — in progress.** Camera/lens catalog + matching engine built (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`), **not yet wired into the app** (Bag still hardcodes the X100VI).
+- **E2 Gear — essentially done.** Camera/lens catalog + matching engine (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`) fully **wired**: Bag has a catalog camera picker (19 bodies) + lens chips + live "Your kit shoots"; Today/Lock/Plan copy names the lens that fits tonight's spot (annotate-only, honest); the profile **persists on-device** (`lib/gearProfile.ts` + `lib/gearStorage.ts`). Only **G3** (gear-banner re-prompt logic) remains.
 - Events architecture designed (ADR) incl. the photo-lens gate — for the deferred E4.
 
-**Pick up here next → E2 gear wiring (the active thread):**
-1. **G1 — real Bag screen**: replace the hardcoded X100VI with a picker reading `CATALOG`, and persist the profile on-device.
-2. **G2 in the UI**: feed `genresForKit` into the "why this pick" line + per-spot fit label (annotate only — no filter/re-rank yet; see GEAR_MATCHING ADR Decision C).
-3. Later: **P1 dev build** (unblock real-phone testing) · **event decisions** (EVENTS_ARCHITECTURE open questions) · commit-attribution housekeeping.
+**Pick up here next → the north star needs a backend (not more app code):**
+1. **E4 Backend + E3 Nudge** — the real push nudge. First concrete step: **create a Supabase project** (B1), then a dev build (P1) for push. These need accounts/credentials only Desha can set up.
+2. Small solo items anytime: **G3** (smarter gear-banner re-prompting) · **event decisions** (EVENTS_ARCHITECTURE open questions) · content-pipeline run (deferred spend) · commit-attribution housekeeping.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

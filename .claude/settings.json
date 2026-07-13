@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C=$(jq -r '.tool_input.command // empty'); printf '%s' \"$C\" | grep -q 'git commit' && printf '%s' '{\"systemMessage\":\"📋 Pre-commit: verify docs are updated (BACKLOG · README · ADR · memory).\",\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"DOCS CHECK before this commit — update anything affected: docs/BACKLOG.md story status, README Where-we-are + Pick-up-next, any affected ADR (EVENTS_ARCHITECTURE/GEAR_MATCHING), and auto-memory. If already current, proceed.\"}}' || true",
+            "timeout": 10,
+            "statusMessage": "Doc-update check"
+          }
+        ]
+      }
+    ]
+  }
+}

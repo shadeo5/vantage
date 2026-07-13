@@ -102,7 +102,7 @@
     <p class="lede">How a photographer's <b>kit</b> — their cameras and lenses — becomes a signal the app can act on: telling them which shoots their gear can actually nail, powering the <b>"why this pick — perfect for your fast 35"</b> line, and, later, shaping the nudge.</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — gear layer</b></span>
-      <span class="tag">Status <b>Engine built · not wired</b></span>
+      <span class="tag">Status <b>Built &amp; wired · annotate live</b></span>
       <span class="tag">Updated <b>Jul 12, 2026</b></span>
     </div>
   </header>
@@ -153,7 +153,7 @@ genresForKit(cameras, lenses) <span class="c-com">→</span> <span class="c-str"
   <!-- 03 -->
   <section>
     <div class="sec-head"><span class="n">03</span><h2>The decisions</h2></div>
-    <p>Three forks sit inside this feature — which is why it earns an ADR. One is settled; two are deliberately <b>left open</b> until we wire the feature into the app, because that's when they actually get made.</p>
+    <p>Three forks sit inside this feature — which is why it earns an ADR. The feature is now <b>wired (annotate-only)</b>: A was settled up front, C is resolved for its first step (we shipped annotate), and B remains open.</p>
     <div class="tw" style="margin-top:16px">
       <table>
         <thead><tr><th>Decision</th><th>Status</th><th>Reasoning / alternatives</th></tr></thead>
@@ -170,8 +170,8 @@ genresForKit(cameras, lenses) <span class="c-com">→</span> <span class="c-str"
           </tr>
           <tr>
             <td><b>C · How matching meets the feed</b></td>
-            <td><span class="pill plan">Open</span></td>
-            <td><b>The load-bearing one.</b> <i>Filter</i> (hide spots your kit can't shoot — punishing), <i>re-rank</i> (nudge fitting spots up), or <i>annotate only</i> ("fits your 35 / grab a tele"). Leaning: <b>annotate first → soft re-rank; never hard-filter.</b> Overlaps the events / ranking scorer.</td>
+            <td><span class="pill proto">Annotate shipped</span></td>
+            <td><b>The load-bearing one.</b> <i>Filter</i> (hide spots your kit can't shoot — punishing), <i>re-rank</i> (nudge fitting spots up), or <i>annotate only</i> ("fits your 35 / grab a tele"). <b>Shipped: annotate-only</b> — Bag, Today, Lock &amp; Plan name the fitting lens and never hard-filter. Re-rank stays open until there's a real ranker to hook into; overlaps the events / ranking scorer.</td>
           </tr>
         </tbody>
       </table>
@@ -206,12 +206,12 @@ genresForKit(cameras, lenses) <span class="c-com">→</span> <span class="c-str"
 
   <!-- 06 -->
   <section>
-    <div class="sec-head"><span class="n">06</span><h2>Consequences — what wiring will touch</h2></div>
+    <div class="sec-head"><span class="n">06</span><h2>Consequences — what wiring touched (shipped)</h2></div>
     <ul class="list">
-      <li><b>BagScreen</b> — replace the hardcoded X100VI with a real picker reading <code>CATALOG</code> (this is story G1's UI).</li>
-      <li><b>A persisted gear profile</b> (G1) — the kit has to live somewhere before matching can run for real.</li>
-      <li><b>The "why this pick" line + per-spot fit label</b> already exist in the UI; they become the first consumers of <code>genresForKit</code>.</li>
-      <li><b>The ranking scorer</b> (Decision C) and, downstream, the <b>nudge</b> (E3 · N3) — gear-aware copy.</li>
+      <li>✅ <b>BagScreen</b> — catalog-backed camera picker (all 19 bodies) + lens chips + a live "Your kit shoots" row.</li>
+      <li>✅ <b>Persisted gear profile</b> (G1) — camera + lenses saved on-device (AsyncStorage), survives reload.</li>
+      <li>✅ <b>The "why this pick" line + per-spot fit labels</b> (Today / Lock / Plan) now consume <code>genresForKit</code> / <code>bestLensForGenre</code> — honest, never naming a lens that doesn't fit.</li>
+      <li>◻ <b>The ranking scorer</b> (Decision C re-rank) and the <b>nudge</b> (E3 · N3) — still ahead; gear-aware copy will feed those when the backend/ranker exist.</li>
     </ul>
   </section>
 

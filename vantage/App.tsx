@@ -20,6 +20,7 @@ import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
+import { tonightNudge } from "./lib/nudge";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -33,7 +34,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("lock");
   const [openId, setOpenId] = useState<string>(HERO_ID);
   const [detailFrom, setDetailFrom] = useState<Screen>("today");
-  const [going, setGoing] = useState<string[]>([HERO_ID]);
+  const [going, setGoing] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>(["piedmont"]);
   const [gearBanner, setGearBanner] = useState(true);
   const [whyOpen, setWhyOpen] = useState(false);
@@ -61,20 +62,17 @@ export default function App() {
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 
   const now = new Date();
-  const hero = getSpot(HERO_ID);
+  // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
+  const verdict = tonightNudge(now, cameraId, lenses);
+  const hero = verdict.spot;
   const windows = getLightWindows(now, hero.lat, hero.lon);
   const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);
   const blueStart = fmtTime(windows.blueEvening.start);
   const windowTimeFor = (t: string) => (t === "blue" ? blueStart : goldenStart);
 
-  // Gear-aware copy for tonight's hero: name the lens that actually fits its genre.
-  const heroWord = hero.type.toLowerCase();
-  const bestFit = bestLensForGenre(cameraId, lenses, hero.genre);
-  const gearLens = bestFit ?? primaryLensLabel(lenses);
-  const kitWhy = bestFit
-    ? `Your ${bestFit} is a natural fit for ${heroWord} like this.`
-    : `Your kit's a stretch for ${heroWord} tonight — bring your widest and get close.`;
+  // Lens to name in the lede — the one that actually fits the hero's genre.
+  const gearLens = bestLensForGenre(cameraId, lenses, hero.genre) ?? primaryLensLabel(lenses);
 
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (id: string) =>
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
@@ -104,7 +102,8 @@ export default function App() {
             <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
           </View>
           <InspirationHero
-            spot={hero} goldenRange={goldenRange} gearLens={gearLens} kitWhy={kitWhy}
+            spot={hero} goldenRange={goldenRange} gearLens={gearLens}
+            confidence={verdict.confidence} go={verdict.go} whySignals={verdict.signals}
             isGoing={going.includes(hero.id)} whyOpen={whyOpen}
             onOpen={() => openDetail(hero.id, "today")} onGo={() => toggleGoing(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
           />

@@ -3,12 +3,20 @@ import { View, Text, StyleSheet, ImageBackground, Pressable, Animated } from "re
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts } from "../theme";
 import { Spot, img } from "../lib/spots";
+import { NudgeSignal, Confidence } from "../lib/nudge";
+
+const SIG_COLOR: Record<NudgeSignal["key"], string> = {
+  light: colors.golden,
+  activity: colors.crowdHigh,
+  gear: colors.blueHour,
+};
 
 export function InspirationHero({
-  spot, goldenRange, isGoing, whyOpen, gearLens, kitWhy,
+  spot, goldenRange, isGoing, whyOpen, gearLens, confidence, go, whySignals,
   onOpen, onGo, onToggleWhy,
 }: {
-  spot: Spot; goldenRange: string; isGoing: boolean; whyOpen: boolean; gearLens: string; kitWhy: string;
+  spot: Spot; goldenRange: string; isGoing: boolean; whyOpen: boolean; gearLens: string;
+  confidence: Confidence; go: boolean; whySignals: NudgeSignal[];
   onOpen: () => void; onGo: () => void; onToggleWhy: () => void;
 }) {
   const pulse = useRef(new Animated.Value(0.5)).current;
@@ -30,7 +38,7 @@ export function InspirationHero({
             start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.badge}>
             <Animated.View style={[styles.badgeDot, { opacity: pulse }]} />
-            <Text style={styles.badgeText}>TONIGHT'S PICK</Text>
+            <Text style={styles.badgeText}>{go ? "TONIGHT'S PICK" : "WORTH A LOOK"} · {confidence.toUpperCase()}</Text>
           </View>
           <Text style={styles.heroName}>{spot.name} is{"\n"}alive tonight.</Text>
         </ImageBackground>
@@ -63,9 +71,9 @@ export function InspirationHero({
         </Pressable>
         {whyOpen && (
           <View style={styles.whyBody}>
-            <WhyLine color={colors.golden} k="Light." v={`Golden hour ${goldenRange} — the warmest light of the evening, raking down Auburn Ave.`} />
-            <WhyLine color={colors.crowdHigh} k="Activity." v={`${spot.reason} — plenty of candid life in the frame.`} />
-            <WhyLine color={colors.blueHour} k="Your kit." v={kitWhy} />
+            {whySignals.map((s) => (
+              <WhyLine key={s.key} color={SIG_COLOR[s.key]} k={`${s.label}.`} v={s.detail} />
+            ))}
           </View>
         )}
       </View>

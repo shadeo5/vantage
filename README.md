@@ -61,8 +61,10 @@ Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on w
 - **E2 Gear — essentially done.** Camera/lens catalog + matching engine (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`) fully **wired**: Bag has a catalog camera picker (19 bodies) + lens chips + live "Your kit shoots"; Today/Lock/Plan copy names the lens that fits tonight's spot (annotate-only, honest); the profile **persists on-device** (`lib/gearProfile.ts` + `lib/gearStorage.ts`). Only **G3** (gear-banner re-prompt logic) remains.
 - Events architecture designed (ADR) incl. the photo-lens gate — for the deferred E4.
 
-**Pick up here next → the north star needs a backend (not more app code):**
-1. **E4 Backend + E3 Nudge** — the real push nudge. First concrete step: **create a Supabase project** (B1), then a dev build (P1) for push. These need accounts/credentials only Desha can set up.
+**E3 Nudge — started:** ✅ **N1 nudge brain** (`lib/nudge.ts`) is built + wired — it decides tonight's pick, confidence, and the "why" from light-timing × gear-fit (activity = placeholder for events). The in-app hero *is* the nudge now.
+
+**Pick up here next → to make the nudge actually PUSH, we need a backend (not more app code):**
+1. **E4 Backend + E3 push (N2)** — deliver the nudge as a real notification. First concrete step: **create a Supabase project** (B1), then a dev build (P1) for push. These need accounts/credentials only Desha can set up.
 2. Small solo items anytime: **G3** (smarter gear-banner re-prompting) · **event decisions** (EVENTS_ARCHITECTURE open questions) · content-pipeline run (deferred spend) · commit-attribution housekeeping.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

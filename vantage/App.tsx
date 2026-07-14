@@ -20,6 +20,7 @@ import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
+import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
 import { tonightNudge } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
@@ -75,11 +76,12 @@ export default function App() {
 
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
-    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal()]).then(([ids, cam, pend, log]) => {
+    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds()]).then(([ids, cam, pend, log, savedIds]) => {
       if (ids) setLenses(ids);
       if (cam) setCameraId(cam);
       setPending(pend);
       setJournal(log);
+      if (savedIds) setSaved(savedIds);
       setDueIds(pend.map((c) => c.spotId)); // commitments from a prior session → due to check in
       setHydrated(true);
     });
@@ -90,8 +92,9 @@ export default function App() {
       saveCameraId(cameraId);
       savePending(pending);
       saveJournal(journal);
+      saveSavedIds(saved);
     }
-  }, [lenses, cameraId, pending, journal, hydrated]);
+  }, [lenses, cameraId, pending, journal, saved, hydrated]);
   // Mirror the gear profile to the cloud (anon sign-in + upsert) so the server can nudge.
   useEffect(() => {
     if (hydrated) saveProfile(cameraId, lenses);

@@ -38,3 +38,6 @@ yarn-error.*
 # firebase FCM service account key (secret — never commit)
 *service-account*.json
 google-service-account*.json
+
+# supabase CLI local temp
+**/supabase/.temp/

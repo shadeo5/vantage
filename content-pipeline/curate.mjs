@@ -25,39 +25,57 @@ import { writeFileSync, mkdirSync } from "fs";
 const CITIES = {
   nashville: {
     name: "Nashville", region: "TN", center: { lat: 36.1627, lon: -86.7816 }, radiusM: 6500,
-    genreProfile: { Street: 1.0, Architecture: 0.85, Nature: 0.5, Landscape: 0.45 },
+    genreProfile: { Street: 1.0, Architecture: 0.85, Nature: 0.5, Landscape: 0.45, Details: 0.4 },
   },
   chicago: {
     name: "Chicago", region: "IL", center: { lat: 41.8827, lon: -87.6233 }, radiusM: 7500,
-    genreProfile: { Architecture: 1.0, Street: 0.9, Landscape: 0.55, Nature: 0.4 },
+    genreProfile: { Architecture: 1.0, Street: 0.9, Landscape: 0.55, Nature: 0.4, Details: 0.35 },
   },
   "blue-ridge": {
     name: "Blue Ridge", region: "GA/NC mountains", center: { lat: 34.8698, lon: -84.3241 }, radiusM: 22000,
-    genreProfile: { Landscape: 1.0, Nature: 1.0, Architecture: 0.4, Street: 0.35 },
+    genreProfile: { Landscape: 1.0, Nature: 1.0, Architecture: 0.4, Street: 0.35, Details: 0.3 },
   },
 };
 
-// ---- OSM selectors → app Genre + a display label + base weight --------------
-// Genre must be a valid app Genre (lib/gear.ts): Street | Portraits | Landscape
-// | Architecture | Nature | Sports | Wildlife | Details. It flows into Spot.genre
-// for gear-fit, matching how the existing spots are typed (a skyline reads
-// Architecture, a mural reads Street, an overlook reads Landscape).
-const OSM_CATS = [
-  { q: '["tourism"="viewpoint"]',   label: "viewpoint / skyline", genre: "Architecture", weight: 0.95 },
-  { q: '["man_made"="bridge"]',     label: "bridge",              genre: "Architecture", weight: 0.80 },
-  { q: '["amenity"="marketplace"]', label: "market",              genre: "Street",       weight: 0.95 },
-  { q: '["highway"="pedestrian"]',  label: "pedestrian street",   genre: "Street",       weight: 0.85 },
-  { q: '["place"="square"]',        label: "square / plaza",      genre: "Street",       weight: 0.90 },
-  { q: '["tourism"="artwork"]',     label: "public art / mural",  genre: "Street",       weight: 0.90 },
-  { q: '["amenity"="arts_centre"]', label: "arts centre",         genre: "Street",       weight: 0.60 },
-  { q: '["historic"="district"]',   label: "historic district",   genre: "Street",       weight: 0.85 },
-  { q: '["historic"="building"]',   label: "historic building",   genre: "Architecture", weight: 0.70 },
-  { q: '["tourism"="attraction"]',  label: "attraction",          genre: "Architecture", weight: 0.70 },
-  { q: '["leisure"="park"]',        label: "park",                genre: "Nature",       weight: 0.70 },
-  { q: '["natural"="peak"]',        label: "peak / overlook",     genre: "Landscape",    weight: 1.00 },
-  { q: '["waterway"="waterfall"]',  label: "waterfall",           genre: "Nature",       weight: 1.00 },
-  { q: '["natural"="water"]',       label: "waterfront",          genre: "Landscape",    weight: 0.55 },
+// ---- what we pull from Overpass ---------------------------------------------
+const SELECTORS = [
+  '["tourism"="viewpoint"]', '["man_made"="bridge"]', '["amenity"="marketplace"]',
+  '["highway"="pedestrian"]', '["place"="square"]', '["tourism"="artwork"]',
+  '["amenity"="arts_centre"]', '["historic"="district"]', '["historic"="building"]',
+  '["historic"="monument"]', '["historic"="memorial"]', '["tourism"="attraction"]',
+  '["leisure"="park"]', '["natural"="peak"]', '["waterway"="waterfall"]', '["natural"="water"]',
 ];
+
+// ---- classify a POI from its tags → { bucket, genre, label, weight } ---------
+// `bucket` is the curation category shown in the vet UI (a Landmark statue reads
+// differently than a mural or a street). `genre` must be a valid app Genre
+// (lib/gear.ts: Street | Portraits | Landscape | Architecture | Nature | Sports |
+// Wildlife | Details) — it flows into Spot.genre for gear-fit. Ordered; first hit wins.
+const cat = (bucket, label, genre, weight) => ({ bucket, label, genre, weight });
+function classify(t) {
+  if (t.tourism === "viewpoint")   return cat("Cityscape", "viewpoint / skyline", "Architecture", 0.95);
+  if (t.man_made === "bridge")     return cat("Cityscape", "bridge", "Architecture", 0.80);
+  if (t.amenity === "marketplace") return cat("Street", "market", "Street", 0.95);
+  if (t.highway === "pedestrian")  return cat("Street", "pedestrian street", "Street", 0.85);
+  if (t.place === "square")        return cat("Street", "square / plaza", "Street", 0.90);
+  if (t.tourism === "artwork") {
+    // Split the OSM catch-all: murals are street backdrops; statues are landmarks.
+    const a = (t.artwork_type || "").toLowerCase();
+    if (/mural|graffiti|painting|street_art/.test(a)) return cat("Street art", "mural", "Street", 0.90);
+    if (/statue|sculpture|bust|installation|relief|stone|land_art/.test(a)) return cat("Landmark", "statue", "Details", 0.50);
+    return cat("Landmark", "public art", "Details", 0.55);   // untyped artwork — a landmark lead
+  }
+  if (t.historic === "monument" || t.historic === "memorial") return cat("Landmark", "monument", "Details", 0.55);
+  if (t.amenity === "arts_centre") return cat("Street", "arts centre", "Street", 0.60);
+  if (t.historic === "district")   return cat("Street", "historic district", "Street", 0.85);
+  if (t.historic === "building")   return cat("Architecture", "historic building", "Architecture", 0.70);
+  if (t.tourism === "attraction")  return cat("Architecture", "attraction", "Architecture", 0.70);
+  if (t.leisure === "park")        return cat("Nature", "park", "Nature", 0.70);
+  if (t.natural === "peak")        return cat("Landscape", "peak / overlook", "Landscape", 1.00);
+  if (t.waterway === "waterfall")  return cat("Nature", "waterfall", "Nature", 1.00);
+  if (t.natural === "water")       return cat("Landscape", "waterfront", "Landscape", 0.55);
+  return null;
+}
 
 const TOP_N = 25;              // how many candidates to hand to the human
 const DENSITY_RADIUS_M = 400;  // "how many other shootable things cluster nearby"
@@ -101,7 +119,7 @@ async function overpass(query) {
 // ---- fetch + normalize named POIs ------------------------------------------
 async function fetchPlaces(city) {
   const { lat, lon } = city.center;
-  const parts = OSM_CATS.map((c) => `nwr${c.q}(around:${city.radiusM},${lat},${lon});`).join("");
+  const parts = SELECTORS.map((q) => `nwr${q}(around:${city.radiusM},${lat},${lon});`).join("");
   const query = `[out:json][timeout:30];(${parts});out center tags 800;`;
   const elements = (await overpass(query))?.elements ?? [];
 
@@ -111,20 +129,16 @@ async function fetchPlaces(city) {
     const plat = el.lat ?? el.center?.lat, plon = el.lon ?? el.center?.lon;
     const tags = el.tags ?? {};
     if (plat == null || plon == null || !tags.name) continue;      // need a name + coords
-    // First matching category wins (list is ordered best-first).
-    const cat = OSM_CATS.find((c) => {
-      const key = c.q.match(/"([\w:]+)"/)?.[1];
-      const val = c.q.match(/=\s*"([\w:-]+)"/)?.[1];
-      return key && (val ? tags[key] === val : tags[key] != null);
-    });
-    if (!cat) continue;
+    const c = classify(tags);
+    if (!c) continue;
     const key = `${tags.name.toLowerCase()}`;
     if (seen.has(key)) continue; seen.add(key);
     places.push({
       name: tags.name,
-      genre: cat.genre,
-      label: cat.label,
-      weight: cat.weight,
+      bucket: c.bucket,
+      genre: c.genre,
+      label: c.label,
+      weight: c.weight,
       lat: +plat.toFixed(6),
       lon: +plon.toFixed(6),
       prominent: !!(tags.wikidata || tags.wikipedia),   // a cheap "is this notable?" signal
@@ -163,9 +177,15 @@ function rank(places, city) {
     const profile = city.genreProfile[p.genre] ?? 0.3;   // unlisted genre = lightly kept
     const densityBoost = 1 + 0.5 * clamp01(p.density / maxDensity);
     const prominenceBoost = p.prominent ? 1.25 : 1.0;
-    p.score = +(p.weight * profile * densityBoost * prominenceBoost).toFixed(3);
+    p.raw = p.weight * profile * densityBoost * prominenceBoost;
   }
-  return places.sort((a, b) => b.score - a.score).slice(0, TOP_N);
+  const ranked = places.sort((a, b) => b.raw - a.raw).slice(0, TOP_N);
+  // Normalize to a 0–100 score RELATIVE to this run's top pick, so the number is
+  // legible at a glance (100 = strongest candidate here; it's a rank signal, not
+  // an absolute grade). The row number is the true rank.
+  const top = ranked[0]?.raw || 1;
+  ranked.forEach((p, i) => { p.rank = i + 1; p.score = Math.round((p.raw / top) * 100); delete p.raw; });
+  return ranked;
 }
 
 // ---- the vet surface — a self-contained review page ------------------------
@@ -180,12 +200,12 @@ function reviewHtml(city, cityKey, candidates) {
     const opts = GENRES.map((g) => `<option${g === c.genre ? " selected" : ""}>${g}</option>`).join("");
     return `<tr data-i="${i}">
       <td class="c"><input type="checkbox" checked></td>
-      <td class="r">${i + 1}</td>
+      <td class="r">${c.rank}</td>
       <td><input class="nm" value="${c.name.replace(/"/g, "&quot;")}"></td>
       <td><select class="ge">${opts}</select></td>
-      <td class="lab">${c.label}${c.prominent ? ' <span class="star" title="notable (wiki-linked)">★</span>' : ""}</td>
+      <td class="lab"><span class="bkt">${c.bucket}</span>${c.label}${c.prominent ? ' <span class="star" title="notable (wiki-linked)">★</span>' : ""}</td>
       <td class="num">${c.density}</td>
-      <td class="num">${c.score.toFixed(2)}</td>
+      <td class="num">${c.score}</td>
       <td class="lk"><a href="${gmaps}" target="_blank" rel="noopener">map</a> · <a href="${sv}" target="_blank" rel="noopener">street</a> · <a href="${osm}" target="_blank" rel="noopener">osm</a></td>
     </tr>`;
   }).join("\n");
@@ -216,6 +236,7 @@ function reviewHtml(city, cityKey, candidates) {
   input.nm:hover,select.ge:hover{border-color:var(--hair);} input.nm:focus,select.ge:focus{outline:2px solid var(--gold);outline-offset:1px;}
   select.ge{min-width:120px;} option{background:var(--surface);color:var(--ink);}
   td.lab{color:var(--muted);} .star{color:var(--gold);}
+  .bkt{font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;margin-right:7px;white-space:nowrap;}
   td.lk a{color:var(--gold);text-decoration:none;font-size:12.5px;} td.lk a:hover{text-decoration:underline;}
   .bar{position:fixed;left:0;right:0;bottom:0;background:var(--raised);border-top:1px solid var(--hair);padding:14px 20px;display:flex;gap:16px;align-items:center;justify-content:center;flex-wrap:wrap;}
   .count{font-family:var(--mono);font-size:13px;color:var(--muted);} .count b{color:var(--green);font-size:16px;}
@@ -227,10 +248,10 @@ function reviewHtml(city, cityKey, candidates) {
   <div class="eyebrow">Vantage · Curate → Vet · Stage 2</div>
   <h1>${city.name} — ${candidates.length} candidates</h1>
   <p class="lede">OSM-only curation (${city.region}), ranked by the <b>${cityKey}</b> genre profile. <b>Reject</b> by unchecking; <b>edit</b> a name or genre inline (open <code>map</code>/<code>street</code> to check it's actually worth shooting). Then <b>download</b> the vetted list — it feeds the draft pipeline.</p>
-  <p class="lede">A candidate isn't a promise it's good — it's a lead. Cut generously; the human gate is the quality bar.</p>
+  <p class="lede">A candidate isn't a promise it's good — it's a lead. <b>Score is 0–100 relative to #1</b> (a rank signal, not a grade). <b>Landmark</b> rows are individual statues/monuments (genre Details) — usually thin as a shoot; cut most. The human gate is the quality bar.</p>
   <div class="tw">
     <table>
-      <thead><tr><th>keep</th><th>#</th><th>name</th><th>genre</th><th>why (osm)</th><th title="shootable things within a short walk">density</th><th>score</th><th>check</th></tr></thead>
+      <thead><tr><th>keep</th><th>#</th><th>name</th><th>genre</th><th>category · why (osm)</th><th title="shootable things within a short walk">density</th><th title="0–100, relative to #1">score</th><th>check</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
@@ -278,10 +299,10 @@ async function main() {
   const ranked = rank(places, city);
   console.log(`  → top ${ranked.length} candidates by the ${cityKey} genre profile\n`);
 
-  const byGenre = ranked.reduce((m, p) => ((m[p.genre] = (m[p.genre] || 0) + 1), m), {});
-  ranked.slice(0, 12).forEach((p, i) =>
-    console.log(`  ${String(i + 1).padStart(2)}. ${p.score.toFixed(2)}  ${p.name}  —  ${p.label} (${p.genre})${p.prominent ? " ★" : ""}`));
-  console.log(`\n  genre mix: ${Object.entries(byGenre).map(([g, n]) => `${g} ${n}`).join(" · ")}`);
+  const byBucket = ranked.reduce((m, p) => ((m[p.bucket] = (m[p.bucket] || 0) + 1), m), {});
+  ranked.slice(0, 12).forEach((p) =>
+    console.log(`  ${String(p.rank).padStart(2)}. ${String(p.score).padStart(3)}  ${p.name}  —  ${p.bucket} · ${p.label} (${p.genre})${p.prominent ? " ★" : ""}`));
+  console.log(`\n  score is 0–100 relative to #1 · bucket mix: ${Object.entries(byBucket).map(([b, n]) => `${b} ${n}`).join(" · ")}`);
 
   const outDir = new URL("./out/", import.meta.url);
   mkdirSync(outDir, { recursive: true });

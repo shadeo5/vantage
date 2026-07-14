@@ -166,7 +166,7 @@
   <!-- 04 -->
   <section>
     <div class="sec-head"><span class="n">04</span><h2>The schema — small on purpose</h2></div>
-    <p>Basically the existing <code>Spot</code> type + <code>city_id</code> + <code>image_url</code>. Two tables.</p>
+    <p>Basically the existing <code>Spot</code> type + <code>city_id</code> + <code>image_url</code>. Two tables. Note <code>genres</code> is a <b>multi-genre array (primary first)</b> — a real spot fits more than one (a bridge is Architecture <i>and</i> Street <i>and</i> Landscape), and Vantage's gear-fit gets richer for it. A Postgres <code>text[]</code>, not a join table: ≤3 genres/spot and no indexed genre queries yet. The vetted JSON already carries this; the app keeps reading <code>genres[0]</code> until the gear engine uses the rest (a later slice).</p>
 <pre><code><span class="c-com">-- a place we cover (city, or a nature region like Blue Ridge)</span>
 <span class="c-key">create table</span> cities (
   id            text <span class="c-key">primary key</span>,   <span class="c-com">-- slug: 'nashville', 'blue-ridge'</span>
@@ -182,7 +182,8 @@
 <span class="c-key">create table</span> spots (
   id          text <span class="c-key">primary key</span>,
   city_id     text <span class="c-key">references</span> cities(id),
-  name        text, type text, genre text,
+  name        text, type text,
+  genres      text[],                <span class="c-com">-- multi-genre, primary first (a spot fits more than one)</span>
   window_type text,                  <span class="c-com">-- 'golden' | 'blue' | 'flat'</span>
   reason      text, tagline text, why text,
   look        text[],                <span class="c-com">-- the 3 'what to look for' tips</span>
@@ -220,7 +221,7 @@
   <!-- 06 -->
   <section>
     <div class="sec-head"><span class="n">06</span><h2>Draft &amp; image</h2></div>
-    <p><b>Draft</b> is largely done: <code>generate.mjs</code> takes <code>{name, genre, lat, lon}</code> → Claude with the <code>Spot</code> JSON schema and the voice guide baked in → <code>why / look / getting / tagline / windowType</code>. Validated as good on 8 unseen Atlanta spots (you approved them); it's never been run for real (API spend). The vetted list from stage 2 <i>is</i> its input — clean boundary.</p>
+    <p><b>Draft</b> is largely done: <code>generate.mjs</code> takes <code>{name, genres[], lat, lon}</code> → Claude with the <code>Spot</code> JSON schema and the voice guide baked in → <code>why / look / getting / tagline / windowType</code>. Validated as good on 8 unseen Atlanta spots (you approved them); it's never been run for real (API spend). The vetted list from stage 2 <i>is</i> its input — clean boundary. <b>Genre inference will fold in here</b>: the draft step already reasons about each place, so it can return the multi-genre array itself (prototyped by hand on Nashville — confident on known spots, web-checked the thin ones, per D2).</p>
     <p><b>Image</b> scales the manual C2 step: one stylized illustration per spot via <b>OpenAI GPT Image 1.5</b> (D3) from the master-style block in <code>docs/design/ILLUSTRATION_STYLE.md</code> + the spot's specifics, seeded with a per-city reference image for cohesion. This holds the honesty line — <span class="spot">art, not fake photos of a real place</span> — then downscales + WebP-compresses (&lt;300&nbsp;KB) and lands in Storage as <code>image_url</code>.</p>
     <div class="call"><div class="k">On "possibly an agent"</div><p>The built pipeline is a cheap <b>one-shot</b> structured call. An <b>agent</b> would web-research each place first (real, current detail) then draft and self-check against the voice + honesty rules — meaningfully better for places the model knows thinly (a specific Blue Ridge trail), but slower and costlier. <b>Recommendation:</b> start one-shot (proven), add a research-agent enrichment layer only where copy reads generic. Decision D2 below.</p></div>
   </section>

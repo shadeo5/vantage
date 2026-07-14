@@ -60,13 +60,14 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 - `poc/` — the throwaway script that validated the whole idea (still runnable: `cd archive/poc && npm run scout`)
 - `Photographer Location Scout App.zip` — original design zip (extracted into `docs/design_handoff_vantage/`); safe to delete anytime
 
-## Where we are (Jul 13, 2026)
+## Where we are (Jul 14, 2026)
 Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tests), and now backed by a **live backend that pushes on its own.**
 - **E1 Content — done.** Illustrated placeholder imagery on all 5 spots; voice guide + copy audit; pipeline built (running deferred).
 - **E2 Gear — done.** Catalog + matching engine wired everywhere (Bag camera picker + lens chips + "Your kit shoots"; Today/Lock/Plan name the fitting lens, honest); profile persists on-device. Only **G3** (banner re-prompt) remains.
 - **E3 Nudge — DONE, end-to-end.** N1 brain (`lib/nudge.ts`) · N3 fresh copy (`lib/nudgeCopy.ts`) · N4 return-loop journal (`lib/journal.ts`) · **N2 real push** (`supabase/functions/nudge/`) — a Deno port of the brain, deployed, sending via Expo Push, **scheduled nightly by pg_cron** (`vantage-nightly-nudge`, ~6 pm Atlanta). Verified buzzing a real Pixel.
 - **E4 Backend — foundation live.** Supabase (schema + RLS + anon auth), app↔cloud sync (`lib/sync.ts`), deployed edge function + cron. Plain-English map: `docs/BACKEND_FIELD_GUIDE.html`. (Precompute/cache/real-events B2–B5 still planned.)
 - **E5 Platform — Android shipped.** Dev build (preview APK) installed on the Pixel; Firebase FCM configured.
+- **E7 Experience & polish — in progress.** From the Jul-13 UX review (`docs/UX_REVIEW.html`). Native-feel done: swipe nav (#N1), bottom-tab icons (#N2), press feedback (#N3), overscroll bounce (#N4). The rest is an **ordered checklist** in `docs/BACKLOG.md` E7 (2 P0 · remaining P1/P2) being worked top-to-bottom on branch `e7-ux-review`.
 
 **🎯 The north star is done: the app buzzes your phone each evening, on its own, only when the light + your gear line up.** Everything below is "next," not "blocking."
 

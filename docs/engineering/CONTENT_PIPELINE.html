@@ -1,0 +1,263 @@
+<title>Vantage — Content at Scale</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;margin:0;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:58px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;margin:0;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .spot{color:var(--gold);font-weight:600;}
+
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  p code,li code,td code{font-size:12.5px;background:var(--sunk);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);margin:16px 0;}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+
+  .flow-wrap{overflow-x:auto;margin:20px 0;}
+  .flow{min-width:680px;display:flex;align-items:stretch;gap:0;}
+  .stage{flex:1;background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 15px;box-shadow:var(--shadow);}
+  .stage.gate{border-color:color-mix(in srgb,var(--gold) 45%,transparent);background:color-mix(in srgb,var(--gold) 9%,transparent);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:12.5px;color:var(--ink);padding:2px 0;}
+  .stage .item.s{color:var(--gold);}
+  .arrow{color:var(--faint);display:flex;align-items:center;font-size:18px;padding:0 8px;}
+
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call.clay{border-left-color:var(--clay);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);} .call.clay .k{color:var(--clay);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:16px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+  ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:16px 0 0;display:flex;flex-direction:column;gap:12px;}
+  ol.steps li{counter-increment:s;position:relative;padding-left:40px;color:var(--muted);max-width:68ch;font-size:15px;}
+  ol.steps li b{color:var(--ink);}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1a1408;font-family:var(--mono);font-weight:700;font-size:13px;display:grid;place-items:center;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+  .pill.todo{color:var(--clay);border-color:color-mix(in srgb,var(--clay) 45%,transparent);background:color-mix(in srgb,var(--clay) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Architecture · Engineering</div>
+    <h1>Content at Scale</h1>
+    <p class="lede">How a new place — <b>Nashville, Chicago, Blue Ridge</b> — goes from a name to a vetted, illustrated, served spot list. Mostly automatic, with <b>one human gate where it matters</b>, and a <b>both/and</b> data model: git for review, Postgres for serving.</p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — content pipeline (E1 · C1/C4)</b></span>
+      <span class="tag">Status <b>Proposed · 3 decisions open</b></span>
+      <span class="tag">Updated <b>Jul 14, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Why now — and the smell we already have</h2></div>
+    <p>The app runs on <b>5 hand-authored Atlanta spots</b> (<code>lib/spots.ts</code>). Adding a city by hand doesn't scale, and there's a concrete problem hiding in the code today:</p>
+    <div class="call clay"><div class="k">The duplication</div><p>The spot list is <b>already copied in two places</b> — <code>vantage/lib/spots.ts</code> (the app) and <code>supabase/functions/nudge/index.ts</code> (the server that decides what to push), the latter with a literal <code>// keep the two in sync</code> comment. Two hand-synced copies of five spots is fine. Two hand-synced copies across four cities is not. Scaling content is the moment to collapse this to <b>one source</b>.</p></div>
+    <p>So this ADR answers two coupled questions: <b>how does a city's spot list get produced automatically</b>, and <b>where does that content live</b> so the app and the server read the same truth.</p>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>The assembly line</h2></div>
+    <p>Five stages. The <span class="spot">human gate sits at stage 2</span> — on the cheap candidate list, <b>before</b> any drafting or image generation, which is where the API spend and the honesty risk live. Vetting a 30-row list costs nothing; drafting and illustrating 30 spots does.</p>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="stage"><div class="lbl">1 · Curate</div><div class="item s">OSM + scoring</div><div class="item">→ candidate places</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage gate"><div class="lbl">2 · Vet 👤</div><div class="item s">human approves</div><div class="item">edit / reject</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">3 · Draft</div><div class="item">Claude → Spot copy</div><div class="item">(schema + voice)</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">4 · Image</div><div class="item">illustration/spot</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">5 · Serve</div><div class="item s">git → Postgres</div><div class="item">app + nudge read</div></div>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Stage</th><th>What it does</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><b>1 · Curate</b> (C1)</td><td>OSM Overpass + scoring → ranked candidate places <code>{name, genre, lat, lon, why}</code></td><td><span class="pill todo">not built</span> prototype in <code>archive/poc/scout.mjs</code></td></tr>
+          <tr><td><b>2 · Vet</b> 👤</td><td>Human approves / edits / rejects the candidate list before spend</td><td><span class="pill todo">not built</span></td></tr>
+          <tr><td><b>3 · Draft</b> (C4)</td><td>place → Claude (structured <code>Spot</code> schema, voice baked in) → copy</td><td><span class="pill proto">built, never run</span> <code>content-pipeline/generate.mjs</code></td></tr>
+          <tr><td><b>4 · Image</b> (C2)</td><td>per-spot stylized illustration (art, not fake photos)</td><td><span class="pill todo">manual today</span></td></tr>
+          <tr><td><b>5 · Serve</b></td><td>vetted JSON → Postgres + Storage; app &amp; nudge read one source</td><td><span class="pill plan">this ADR</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>The both/and data model</h2></div>
+    <p>Not file <i>or</i> database — <b>both</b>, each doing the job it's good at. Git reviews content; Postgres serves it; Storage holds the images.</p>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="stage"><div class="lbl">Pipeline</div><div class="item">vetted per-city JSON</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage gate"><div class="lbl">Git PR 👤</div><div class="item s">source of truth</div><div class="item">version-controlled</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">Importer</div><div class="item">loads approved JSON</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">Postgres + Storage</div><div class="item s">serving layer</div><div class="item">JSON + image URLs</div></div>
+        <div class="arrow">▶</div>
+        <div class="stage"><div class="lbl">Readers</div><div class="item">app (city pack)</div><div class="item">nudge fn</div></div>
+      </div>
+    </div>
+    <ul class="list">
+      <li><b>Source of truth = git-committed per-city JSON.</b> The human gate's output, reviewed in PRs — fits the human-in-the-loop and docs-with-every-commit workflow.</li>
+      <li><b>Serving = Postgres</b> (Supabase, already live). An importer loads approved JSON into a <code>spots</code> table. <b>Both the app and the Edge Function read from it</b> → the §01 duplication dies.</li>
+      <li><b>Images = Supabase Storage</b>, referenced by URL. You <i>cannot</i> bundle N cities × ~3&nbsp;MB illustrations in the app binary.</li>
+      <li><b>App keeps a bundled Atlanta fallback</b> for offline / instant first launch — stale-while-revalidate (E4 <b>B3</b>).</li>
+    </ul>
+    <div class="call"><div class="k">Why design the DB now, not later</div><p>(1) the duplication <b>already exists</b>; (2) images <b>force remote storage</b> at any scale, and metadata wants to live next to them; (3) it avoids doing the wire-in <b>twice</b> — an ad-hoc JSON shape read by the app, then re-done for Postgres later, means redoing both the app data layer and the edge function. Define the shape <b>once</b>. The backend is already stood up, so a <code>spots</code> table is a small extension, not new infrastructure.</p></div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>The schema — small on purpose</h2></div>
+    <p>Basically the existing <code>Spot</code> type + <code>city_id</code> + <code>image_url</code>. Two tables.</p>
+<pre><code><span class="c-com">-- a place we cover (city, or a nature region like Blue Ridge)</span>
+<span class="c-key">create table</span> cities (
+  id            text <span class="c-key">primary key</span>,   <span class="c-com">-- slug: 'nashville', 'blue-ridge'</span>
+  name          text <span class="c-key">not null</span>,
+  region        text,                <span class="c-com">-- 'TN', 'GA mountains'</span>
+  genre_profile jsonb <span class="c-key">not null</span>,      <span class="c-com">-- weights that tune curation (§05)</span>
+  center_lat    <span class="c-blue">double precision</span>,
+  center_lon    <span class="c-blue">double precision</span>,
+  published     <span class="c-blue">boolean</span> <span class="c-key">default</span> <span class="c-blue">false</span>
+);
+
+<span class="c-com">-- one shootable spot, matching the app's Spot type</span>
+<span class="c-key">create table</span> spots (
+  id          text <span class="c-key">primary key</span>,
+  city_id     text <span class="c-key">references</span> cities(id),
+  name        text, type text, genre text,
+  window_type text,                  <span class="c-com">-- 'golden' | 'blue' | 'flat'</span>
+  reason      text, tagline text, why text,
+  look        text[],                <span class="c-com">-- the 3 'what to look for' tips</span>
+  getting     text,
+  lat         <span class="c-blue">double precision</span>, lon <span class="c-blue">double precision</span>,
+  image_url   text,                  <span class="c-com">-- → Supabase Storage, not bundled</span>
+  published   <span class="c-blue">boolean</span> <span class="c-key">default</span> <span class="c-blue">false</span>
+);</code></pre>
+    <div class="call blue"><div class="k">What we're NOT adding yet</div><p><b>No PostGIS / geo-indexing.</b> The app filters spots client-side; a flat "give me this city's spots" query is enough. Geo-indexing earns its keep only when "spots near me across cities" matters — which is real-GPS + precompute-and-serve (E4 <b>B2</b>), a later slice. Don't build it on spec.</p></div>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>Curation is the hard part</h2></div>
+    <p>Stages 3–5 are mostly plumbing. <b>Deciding <i>which</i> places make the list</b> is the real open problem — and OSM alone won't fully answer it.</p>
+    <ul class="list">
+      <li><b>OSM Overpass</b> (free, no key; already prototyped in <code>scout.mjs</code>) is the <b>spatial backbone</b> — it reliably finds viewpoints, parks, bridges, markets, historic districts with <i>real coordinates</i>.</li>
+      <li>What it <b>misses</b> is "where photographers actually go" — the mural alley, the overlook locals know. So blend in an <b>LLM "local scout" pass</b> that proposes named spots, then <b>resolve each back to real OSM/Wikidata coordinates</b> — a proposed place with no findable coords gets dropped automatically (kills hallucinations).</li>
+      <li>The <b>human gate</b> (stage 2) catches the rest. It's load-bearing, not a rubber stamp.</li>
+    </ul>
+    <p style="margin-top:20px">Your three examples prove the pipeline must be <b>genre-adaptive</b>, not city-shaped — <span class="spot">Blue Ridge isn't a city at all</span>. The <code>genre_profile</code> tunes the OSM queries and scoring:</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Brief</th><th>Shape</th><th>Curation weights toward</th></tr></thead>
+        <tbody>
+          <tr><td><b>Chicago</b></td><td>Cityscape / street / architecture</td><td>skyline vantage points, river bridges, L platforms, plazas</td></tr>
+          <tr><td><b>Nashville</b></td><td>Street / music / murals</td><td>honky-tonk strips, mural walls, the pedestrian bridge, markets</td></tr>
+          <tr><td><b>Blue Ridge</b></td><td>Nature / landscape (a region)</td><td>overlooks, waterfalls, trailheads, sunrise/sunset vistas</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>One pipeline, different weights — not three bespoke scripts.</p>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Draft &amp; image</h2></div>
+    <p><b>Draft</b> is largely done: <code>generate.mjs</code> takes <code>{name, genre, lat, lon}</code> → Claude with the <code>Spot</code> JSON schema and the voice guide baked in → <code>why / look / getting / tagline / windowType</code>. Validated as good on 8 unseen Atlanta spots (you approved them); it's never been run for real (API spend). The vetted list from stage 2 <i>is</i> its input — clean boundary.</p>
+    <p><b>Image</b> scales the manual C2 step: one stylized illustration per spot from <code>docs/design/ILLUSTRATION_STYLE.md</code> + the spot's specifics. This holds the honesty line — <span class="spot">art, not fake photos of a real place</span> — and the output lands in Storage as <code>image_url</code>.</p>
+    <div class="call"><div class="k">On "possibly an agent"</div><p>The built pipeline is a cheap <b>one-shot</b> structured call. An <b>agent</b> would web-research each place first (real, current detail) then draft and self-check against the voice + honesty rules — meaningfully better for places the model knows thinly (a specific Blue Ridge trail), but slower and costlier. <b>Recommendation:</b> start one-shot (proven), add a research-agent enrichment layer only where copy reads generic. Decision D2 below.</p></div>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>The payoff: one source, no more hand-sync</h2></div>
+    <p>Once stage 5 lands, both readers point at Postgres and the §01 smell is gone for good:</p>
+    <ul class="list">
+      <li><b>App</b> fetches a <b>city pack</b> (spots JSON + image URLs) from the DB, cached on-device (B3), with the bundled Atlanta pack as the offline/first-launch fallback.</li>
+      <li><b>Nudge Edge Function</b> reads spots from the <i>same</i> table instead of its hand-copied <code>SPOTS[]</code> — so the server can nudge for any published city, and there's nothing left to keep in sync.</li>
+    </ul>
+  </section>
+
+  <!-- 08 -->
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Build order</h2></div>
+    <p>Prove the human-gated loop end-to-end on <b>one city</b> before investing in the scout, the agent, auto-imagery, or the backend swap.</p>
+    <ol class="steps">
+      <li><b>Curate → Vet, one city (Nashville), OSM-only.</b> Productionize <code>scout.mjs</code> into "city brief → ranked candidates + a review view you approve." Emits <code>vetted.nashville.json</code>. <i>No spend yet.</i></li>
+      <li><b>Run the existing draft pipeline</b> on the vetted list; eyeball the copy. This is the first real API spend — a few dollars — and the true quality test.</li>
+      <li><b>Stand up the <code>spots</code>/<code>cities</code> tables + importer</b>; load approved JSON. <b>Point the Edge Function at the table</b> → retire the duplication.</li>
+      <li><b>App reads the city pack</b> from the DB with the bundled fallback (B3 cache).</li>
+      <li><b>Then</b>, as volume grows: LLM-scout blend (better curation), auto-imagery, and precompute-and-serve (B2) when the 3rd/4th city makes it pay.</li>
+    </ol>
+  </section>
+
+  <!-- 09 -->
+  <section>
+    <div class="sec-head"><span class="n">09</span><h2>Open decisions</h2></div>
+    <ul class="list open">
+      <li><b>D1 · Curation ambition.</b> Ship <b>OSM-only</b> first (proven, free, human fills gaps) or go straight to the <b>OSM + LLM-scout blend</b> (richer, more to build)? <i>Leaning: OSM-only for city #1, add scout once the gate tells us what it's missing.</i></li>
+      <li><b>D2 · Draft: agent or one-shot.</b> Start with the proven one-shot and add a research-agent only where copy reads generic? <i>Leaning: yes.</i></li>
+      <li><b>D3 · Imagery route.</b> Which image model / service generates the per-spot illustrations, and at what cost/size (the current ~3&nbsp;MB assets need compression regardless)? <i>Open.</i></li>
+    </ul>
+  </section>
+
+  <footer>
+    Vantage · ADR — content at scale (E1 · C1/C4) · both/and: git reviews, Postgres serves · supersedes the "content lives in a file" assumption · decisions are proposals — argue with them
+  </footer>
+</div>

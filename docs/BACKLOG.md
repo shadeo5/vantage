@@ -84,5 +84,12 @@ Now that the app is on a real Pixel, the job is closing "impressive demo → fee
 - 🎯 **UX-P1c — Hide "Activity — coming soon"** placeholder until events exist.
 - 🎯 **UX-P1d — Save (heart) doesn't persist.** Wire to local+cloud storage or remove until a Saved surface exists.
 - ⬜ **UX-P1e — Plan's four full-width gold "I'm going" buttons** flatten hierarchy → demote to secondary; reserve solid gold for the one primary CTA.
+
+**Native feel (from on-device use — ▶ building now):**
+- ▶ **UX-N1 — Swipe navigation between tabs.** Today/Plan/Bag as a horizontal pager; swipe + the bottom bar both drive it, kept in sync.
+- ▶ **UX-N2 — Bottom-tab icons get lost.** Heavier strokes + brighter inactive color, clearer active state (gold fill + indicator), larger icons.
+- ▶ **UX-N3 — Buttons feel web, not mobile.** Add press feedback (opacity/scale + Android ripple) to primary controls + chips.
+- ▶ **UX-N4 — No overscroll bounce.** Enable bounce/stretch on the scroll views.
+- NOTE: these are JS changes — visible on web immediately, but need an `eas build` to appear on the installed Pixel APK.
 - ⬜ **UX-P2 — Refinements:** "M" avatar (wrong initial + dead tap) · Today→Detail black-flash transition · light-chart plain-language hint · show "fits your 35mm" only when it differs · no max-width (web stretch) · surface "Your kit shoots" more.
 - ⬜ **UX — On-device pass** (ties to **Q6**): notification appearance, touch targets/thumb reach, safe areas (sticky CTA vs gesture bar), haptics, contrast in real light, in-context permission timing.

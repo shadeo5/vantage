@@ -87,7 +87,7 @@
     <div class="meta">
       <span class="tag">Reviewed <b>Today · Detail · Plan · Bag</b></span>
       <span class="tag">Surface <b>web preview (phone-scale)</b></span>
-      <span class="tag">Findings <b>2 P0 · 7 P1 · 6 P2</b></span>
+      <span class="tag">Findings <b>2 P0 · 10 P1 · 7 P2</b></span>
       <span class="tag">Date <b>Jul 13, 2026</b></span>
     </div>
   </header>
@@ -112,8 +112,8 @@
     <p class="h2-sub">Severity is about impact on the mission (get people to shoot), not effort.</p>
     <div class="pri">
       <div class="pcard p0c"><div class="n">2</div><div class="lab">P0 · fix first</div><div class="desc">Misleads or contradicts reality; erodes trust in the app.</div></div>
-      <div class="pcard p1c"><div class="n">7</div><div class="lab">P1 · real polish</div><div class="desc">Dampens the "inspire" goal or leaves demo seams showing.</div></div>
-      <div class="pcard p2c"><div class="n">6</div><div class="lab">P2 · refine / verify</div><div class="desc">Nice-to-have, or needs checking on the actual phone.</div></div>
+      <div class="pcard p1c"><div class="n">10</div><div class="lab">P1 · real polish</div><div class="desc">Dampens the "inspire" goal or leaves demo/web seams showing.</div></div>
+      <div class="pcard p2c"><div class="n">7</div><div class="lab">P2 · refine / verify</div><div class="desc">Nice-to-have, or needs checking on the actual phone.</div></div>
     </div>
     <h3 style="margin-top:26px">If you only do five things</h3>
     <ol class="top">
@@ -220,6 +220,35 @@
       <div class="head"><span class="sev p2">P2 · #B3</span><h4>"YOUR KIT SHOOTS" is quietly one of the best moments — surface it more</h4></div>
       <p>Changing the camera/lenses live-updates the genre chips (Street · Architecture). It's a delightful "the app gets my gear" beat that's currently buried below the fold. This is a strength hiding as an afterthought.</p>
       <div class="fix"><b>→ Fix:</b> give it a touch more prominence (it's the payoff of the whole screen), and consider echoing it on Today ("your kit's built for street tonight").</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Native feel &amp; interaction</h2>
+    <p class="h2-sub">Found by Desha using it on the Pixel — the clearest proof that on-device beats screenshots. These are what separate "a website in an app shell" from "a native app."</p>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #N1</span><h4>No swipe navigation between tabs</h4></div>
+      <p>You can only change tabs by tapping the bottom bar. On a phone, <b>swiping left/right between Today · Plan · Bag</b> is a reflex — its absence is one of the biggest "this feels like a website" tells.</p>
+      <div class="fix"><b>→ Fix:</b> make the three tabs a horizontal pager (swipe + the bottom bar both drive it, kept in sync). <i>Building this now.</i></div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #N2</span><h4>Bottom-tab icons get lost</h4></div>
+      <p>The nav icons are thin, low-contrast line-art on a dark ground — they recede, and the active/inactive difference is subtle, so the bar reads as faint text more than a tab bar.</p>
+      <div class="fix"><b>→ Fix:</b> heavier strokes + brighter inactive color, a clearer active state (fill/gold + a small indicator), and slightly larger icons. <i>Building this now.</i></div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #N3</span><h4>Buttons feel web, not mobile</h4></div>
+      <p>Taps have no <b>press feedback</b> — no dim, no scale, no Android ripple. On a phone, a button that doesn't visibly react to your finger feels dead/web-like. This is pervasive (every button), so fixing it lifts the whole app at once.</p>
+      <div class="fix"><b>→ Fix:</b> add a pressed state (opacity/scale) + Android ripple to the primary controls and chips. <i>Building this now.</i></div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #N4</span><h4>No overscroll bounce at the top/bottom</h4></div>
+      <p>Scrolling to the end just stops flat. The rubber-band bounce (iOS) / stretch (Android 12+) is a small thing your hand expects; without it, scrolling feels rigid.</p>
+      <div class="fix"><b>→ Fix:</b> enable bounce/stretch overscroll on the scroll views. <i>Building this now.</i></div>
     </div>
   </section>
 

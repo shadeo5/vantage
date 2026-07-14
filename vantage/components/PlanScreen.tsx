@@ -66,9 +66,13 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
                     </View>
                   </View>
                 </Pressable>
-                <Pressable onPress={() => onToggleGoing(m.id)} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBar, on ? styles.goOn : styles.goOff, pressed && { opacity: 0.92 }]}>
-                  <Text style={[styles.goText, { color: on ? colors.crowdLow : "#1a1408" }]}>{on ? "✓ You're going" : "I'm going"}</Text>
-                </Pressable>
+                {/* Secondary, compact outline pill (#P2) — solid gold is reserved for
+                    the one primary CTA (the Today hero), so four cards don't each shout. */}
+                <View style={styles.goWrap}>
+                  <Pressable onPress={() => onToggleGoing(m.id)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.goPill, on ? styles.goPillOn : styles.goPillOff, pressed && { opacity: 0.7 }]}>
+                    <Text style={[styles.goPillText, { color: on ? colors.crowdLow : colors.golden }]}>{on ? "✓ Going" : "I'm going"}</Text>
+                  </Pressable>
+                </View>
               </View>
             </View>
           );
@@ -94,8 +98,9 @@ const styles = StyleSheet.create({
   meta: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 8 },
   window: { fontFamily: fonts.sansSemi, fontSize: 12 },
   fit: { color: colors.golden, fontFamily: fonts.sansMed, fontSize: 12 },
-  goBar: { alignItems: "center", paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.hairline },
-  goOff: { backgroundColor: colors.golden },
-  goOn: { backgroundColor: "rgba(127,176,122,0.16)" },
-  goText: { fontFamily: fonts.sansBold, fontSize: 14 },
+  goWrap: { paddingHorizontal: 13, paddingVertical: 11, borderTopWidth: 1, borderTopColor: colors.hairline, alignItems: "flex-start" },
+  goPill: { paddingVertical: 7, paddingHorizontal: 15, borderRadius: 20, borderWidth: 1 },
+  goPillOff: { borderColor: "rgba(233,184,114,0.5)", backgroundColor: "rgba(233,184,114,0.08)" },
+  goPillOn: { borderColor: "rgba(127,176,122,0.5)", backgroundColor: "rgba(127,176,122,0.14)" },
+  goPillText: { fontFamily: fonts.sansSemi, fontSize: 13 },
 });

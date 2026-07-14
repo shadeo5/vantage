@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
@@ -17,13 +17,24 @@ export function SpotDetail({
   const wm = windowMeta(spot.windowType);
   const windowTime = spot.windowType === "blue" ? fmtTime(windows.blueEvening.start) : fmtTime(windows.goldenEvening.start);
 
+  // Cross-fade the detail in over the current screen (it's an overlay above the pager,
+  // so opacity 0 reveals Today underneath — never black). Hold the fade until the hero
+  // image is painted so we don't flash a gradient-only header (#T5). Fallback timer so a
+  // cached image that never fires onLoadEnd (common on web) still animates in.
   const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => { Animated.timing(anim, { toValue: 1, duration: 350, useNativeDriver: true }).start(); }, [anim]);
+  const [imgReady, setImgReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setImgReady(true), 250);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (imgReady) Animated.timing(anim, { toValue: 1, duration: 320, useNativeDriver: true }).start();
+  }, [imgReady, anim]);
 
   return (
     <Animated.View style={[styles.root, { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} alwaysBounceVertical overScrollMode="always">
-        <ImageBackground source={img(spot.img)} style={styles.hero}>
+        <ImageBackground source={img(spot.img)} style={styles.hero} onLoadEnd={() => setImgReady(true)}>
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>

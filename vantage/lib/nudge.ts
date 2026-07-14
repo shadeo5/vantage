@@ -73,7 +73,9 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[]): 
   const timingWord = timing === 1.0 ? "happening now" : now < win.start ? "still ahead" : "already gone today";
   const signals: NudgeSignal[] = [
     { key: "light", label: "Light", score: light, detail: `${windowLabel} — ${timingWord}.` },
-    { key: "activity", label: "Activity", score: 0.5, detail: "Live event signal — coming soon." },
+    // Activity (live events) is not built yet — omit the row rather than show a
+    // "coming soon" IOU on the app's most persuasive moment (#T3). Re-add an
+    // { key: "activity", … } entry here once events land (weight is still 0 above).
     { key: "gear", label: "Your kit", score: gear, detail: `${fitLabel(cameraId, lensIds, spot.genre)}.` },
   ];
   return { spot, score, signals, win };

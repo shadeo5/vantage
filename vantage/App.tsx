@@ -156,7 +156,7 @@ export default function App() {
         {/* Today */}
         <ScrollView style={{ width, height }} contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
           {dueSpot && <CheckInCard spotName={dueSpot.name} onWent={() => checkIn(dueSpot.id, true)} onSkipped={() => checkIn(dueSpot.id, false)} />}
-          {gearBanner && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
+          {gearBanner && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>

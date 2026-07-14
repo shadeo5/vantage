@@ -81,7 +81,7 @@ Now that the app is on a real Pixel, the job is closing "impressive demo → fee
 **Ordered checklist (each row = one review finding; build in this order):**
 | # | ID | Sev | Item | Status |
 |---|----|-----|------|--------|
-| 1 | #B1 | P0 | **Bag tab ≠ onboarding** — strip "SETUP · 2 OF 3 / Continue / Skip"; make the Bag *tab* a calm gear manager ("Your bag", changes auto-save, single "Done" or nothing). | ⬜ |
+| 1 | #B1 | P0 | **Bag tab ≠ onboarding** — strip "SETUP · 2 OF 3 / Continue / Skip"; make the Bag *tab* a calm gear manager ("Your bag", changes auto-save, single "Done" or nothing). | ✅ eyebrow→"YOUR GEAR · SAVES AS YOU GO", title→"Your bag", removed Continue/Skip (swipe nav + auto-save make them moot); dropped `onContinue`. |
 | 2 | #P1 | P0 | **Plan week hardcoded / wrong day labels** — "TONIGHT · SAT" on a Monday. Near-term: generate day labels from the real date. Longer-term: drive the week from the nudge brain. | ⬜ |
 | 3 | #T1 | P1 | **Gear banner persists after gear set** (ties **G3**) — only show when gear is empty; else drop or a quiet dismissible "Tuned to your a7 IV · edit." | ⬜ |
 | 4 | #T3 | P1 | **Hide "Activity — coming soon"** in "Why this pick?" until events exist — two strong reasons beat two + an IOU. | ⬜ |

@@ -8,20 +8,20 @@ import { cameraLabel, cameraMeta } from "../lib/gearProfile";
 const STYLES = ["Street", "Portraits", "Landscape", "Architecture", "Nature"];
 
 export function BagScreen({
-  cameraId, onPickCamera, lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
+  cameraId, onPickCamera, lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle,
 }: {
   cameraId: string; onPickCamera: (id: string) => void;
   lensChips: { id: string; label: string }[]; selectedLensIds: string[]; kitGenres: Genre[];
   styleOpen: boolean; stylePick: string | null;
-  onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void; onContinue: () => void;
+  onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void;
 }) {
   const [camOpen, setCamOpen] = useState(false);
   const cam = getCamera(cameraId);
   return (
     <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
-      <Text style={styles.eyebrow}>SETUP · 2 OF 3</Text>
-      <Text style={styles.title}>What's in{"\n"}your bag?</Text>
-      <Text style={styles.sub}>So we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
+      <Text style={styles.eyebrow}>YOUR GEAR · SAVES AS YOU GO</Text>
+      <Text style={styles.title}>Your bag</Text>
+      <Text style={styles.sub}>What you shoot with, so we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
 
       <Text style={styles.section}>CAMERA</Text>
       <Pressable style={({ pressed }) => [styles.camCard, pressed && { opacity: 0.75 }]} onPress={() => setCamOpen((v) => !v)}>
@@ -84,11 +84,6 @@ export function BagScreen({
           })}
         </View>
       )}
-
-      <View style={{ gap: 11, marginTop: 30 }}>
-        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.continue, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}><Text style={styles.continueText}>Continue</Text></Pressable>
-        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.skip, pressed && { opacity: 0.6 }]}><Text style={styles.skipText}>Skip — I'll add later</Text></Pressable>
-      </View>
     </ScrollView>
   );
 }
@@ -119,8 +114,4 @@ const styles = StyleSheet.create({
   genreText: { color: "#F0D9AE", fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed2: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 14, marginTop: 22 },
   dashed2Text: { color: colors.muted3, fontFamily: fonts.sansMed, fontSize: 14 },
-  continue: { alignItems: "center", paddingVertical: 16, borderRadius: 16, backgroundColor: colors.golden },
-  continueText: { color: "#1a1408", fontFamily: fonts.sansBold, fontSize: 15 },
-  skip: { alignItems: "center", paddingVertical: 15, borderRadius: 16, borderWidth: 1, borderColor: colors.hairline },
-  skipText: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 15 },
 });

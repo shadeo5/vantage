@@ -199,7 +199,6 @@ export default function App() {
             lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
             styleOpen={styleOpen} stylePick={stylePick}
             onToggleLens={toggleLens} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={setStylePick}
-            onContinue={() => goToTab("today")}
           />
         </View>
       </ScrollView>

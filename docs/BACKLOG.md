@@ -71,4 +71,18 @@ Turn the in-app hero into an actual proactive nudge — the north star.
 - ⬜ **Q3 — Metrics instrumentation** — engagement (nudge response + return), "I'm going" taps. Truth-checked against real shooting.
 - ⬜ **Q4 — Error / loading / empty states** across screens (network images, data fetches).
 - ◽ **Q5 — Component / e2e tests** once flows stabilize.
-- ◽ **Q6 — Accessibility pass** (labels, contrast, touch targets).
+- ◽ **Q6 — Accessibility pass** (labels, contrast, touch targets). *(See UX on-device pass in E7.)*
+
+---
+
+## E7 · Experience & polish  🎯 (from the Jul-13 UX review — `docs/UX_REVIEW.html`)
+Now that the app is on a real Pixel, the job is closing "impressive demo → feels finished." Full findings + on-device checklist in the review. Priorities:
+- 🎯 **UX-P0a — Bag tab ≠ onboarding.** Strip "SETUP · 2 OF 3 / Continue / Skip — I'll add later" from the Bag *tab*; make it a calm gear manager ("Your bag", changes auto-save). Keep a real first-run flow separate if wanted.
+- 🎯 **UX-P0b — Plan dates wrong/hardcoded.** "TONIGHT · SAT" shows on a Monday; the whole week is static. Near-term: generate day labels from the real date. Longer-term: drive the week from the nudge brain over the next few days' light.
+- 🎯 **UX-P1a — Gear banner persists after gear set** (ties to **G3**). Only show when gear is empty; else quiet/dismissible.
+- 🎯 **UX-P1b — "MEDIUM" confidence reads as "meh."** Reserve a flourish for HIGH only; medium shows nothing extra; genuinely weak night → honest "quiet night."
+- 🎯 **UX-P1c — Hide "Activity — coming soon"** placeholder until events exist.
+- 🎯 **UX-P1d — Save (heart) doesn't persist.** Wire to local+cloud storage or remove until a Saved surface exists.
+- ⬜ **UX-P1e — Plan's four full-width gold "I'm going" buttons** flatten hierarchy → demote to secondary; reserve solid gold for the one primary CTA.
+- ⬜ **UX-P2 — Refinements:** "M" avatar (wrong initial + dead tap) · Today→Detail black-flash transition · light-chart plain-language hint · show "fits your 35mm" only when it differs · no max-width (web stretch) · surface "Your kit shoots" more.
+- ⬜ **UX — On-device pass** (ties to **Q6**): notification appearance, touch targets/thumb reach, safe areas (sticky CTA vs gesture bar), haptics, contrast in real light, in-context permission timing.

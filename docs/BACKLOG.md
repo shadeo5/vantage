@@ -78,6 +78,8 @@ Turn the in-app hero into an actual proactive nudge — the north star.
 ## E7 · Experience & polish  ▶ (from the Jul-13 UX review — `docs/UX_REVIEW.html`)
 Now that the app is on a real Pixel, the job is closing "impressive demo → feels finished." The review logged **2 P0 · 10 P1 · 7 P2**. Below is the **authoritative ordered work-list** — one row per review finding (its `#ID`), in the order to build. This is what the `/loop` run walks top-to-bottom.
 
+**Status (2026-07-14):** the full checklist was worked top-to-bottom on branch `e7-ux-review` — **all rows ✅ in code**. What remains is device-only verification (row 15 flags): haptics feel, notification appearance, safe-area insets, thumb reach, real-light contrast, permission timing — do these after an `eas build` on the Pixel.
+
 **Ordered checklist (each row = one review finding; build in this order):**
 | # | ID | Sev | Item | Status |
 |---|----|-----|------|--------|

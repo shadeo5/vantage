@@ -93,7 +93,7 @@
     <p class="lede">How a new place — <b>Nashville, Chicago, Blue Ridge</b> — goes from a name to a vetted, illustrated, served spot list. Mostly automatic, with <b>one human gate where it matters</b>, and a <b>both/and</b> data model: git for review, Postgres for serving.</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — content pipeline (E1 · C1/C4)</b></span>
-      <span class="tag">Status <b>Proposed · D1 + D2 decided · D3 open</b></span>
+      <span class="tag">Status <b>Accepted · D1–D3 locked · build next</b></span>
       <span class="tag">Updated <b>Jul 14, 2026</b></span>
     </div>
   </header>
@@ -221,7 +221,7 @@
   <section>
     <div class="sec-head"><span class="n">06</span><h2>Draft &amp; image</h2></div>
     <p><b>Draft</b> is largely done: <code>generate.mjs</code> takes <code>{name, genre, lat, lon}</code> → Claude with the <code>Spot</code> JSON schema and the voice guide baked in → <code>why / look / getting / tagline / windowType</code>. Validated as good on 8 unseen Atlanta spots (you approved them); it's never been run for real (API spend). The vetted list from stage 2 <i>is</i> its input — clean boundary.</p>
-    <p><b>Image</b> scales the manual C2 step: one stylized illustration per spot from <code>docs/design/ILLUSTRATION_STYLE.md</code> + the spot's specifics. This holds the honesty line — <span class="spot">art, not fake photos of a real place</span> — and the output lands in Storage as <code>image_url</code>.</p>
+    <p><b>Image</b> scales the manual C2 step: one stylized illustration per spot via <b>OpenAI GPT Image 1.5</b> (D3) from the master-style block in <code>docs/design/ILLUSTRATION_STYLE.md</code> + the spot's specifics, seeded with a per-city reference image for cohesion. This holds the honesty line — <span class="spot">art, not fake photos of a real place</span> — then downscales + WebP-compresses (&lt;300&nbsp;KB) and lands in Storage as <code>image_url</code>.</p>
     <div class="call"><div class="k">On "possibly an agent"</div><p>The built pipeline is a cheap <b>one-shot</b> structured call. An <b>agent</b> would web-research each place first (real, current detail) then draft and self-check against the voice + honesty rules — meaningfully better for places the model knows thinly (a specific Blue Ridge trail), but slower and costlier. <b>Recommendation:</b> start one-shot (proven), add a research-agent enrichment layer only where copy reads generic. Decision D2 below.</p></div>
   </section>
 
@@ -254,7 +254,7 @@
     <ul class="list open">
       <li class="decided"><b>D1 · Curation ambition.</b> <i>Decided: OSM-only for city #1.</i> Curate candidates from OSM Overpass — reusing <code>archive/poc/scout.mjs</code>'s query + scoring, retargeted from "near me now" to "rank a city's photo-worthy places" by <code>genre_profile</code> relevance, prominence, and district clustering — and let the <b>human vet fill the local-knowledge gaps</b>. Escalate to the <b>OSM + LLM-scout blend</b> when vetting shows the gate mostly <i>adding</i> spots OSM never surfaced rather than <i>pruning</i> a good list. OSM-only isn't the cheap option — it's the <b>measurement</b>: city #1's vetting is how we learn whether the scout is worth building.</li>
       <li class="decided"><b>D2 · Draft: agent or one-shot.</b> <i>Decided: one-shot default, agent as a targeted upgrade.</i> The proven one-shot (<code>generate.mjs</code>) drafts every spot; a spot escalates to the <b>research-agent pass</b> (web-grounded, then self-checked against the voice + honesty guide) <b>only when its vet-stage copy is vague or its specifics can't be trusted</b> — typically thin-knowledge places (an obscure Blue Ridge overlook), not major-city landmarks. So the extra cost is spent only where it buys accuracy, and the trigger is the quality review, not an upfront choice. How often the agent is actually needed is a question city #1 answers.</li>
-      <li><b>D3 · Imagery route.</b> Which image model / service generates the per-spot illustrations, and at what cost/size (the current ~3&nbsp;MB assets need compression regardless)? <i>Open.</i></li>
+      <li class="decided"><b>D3 · Imagery route.</b> <i>Decided: OpenAI GPT Image 1.5.</i> Official API, strong at following the detailed master-style block in <code>ILLUSTRATION_STYLE.md</code> (not <code>gpt-image-1</code> — that retires Oct&nbsp;23&nbsp;2026). <b>Cost is negligible</b> — ~$0.07/image at medium quality, so a ~30-spot city ≈ ~$2. <b>Consistency lever:</b> seed each city with a <b>reference image</b> (the first approved illustration) passed as an image input on every subsequent spot — the automation analog of Midjourney's <code>--sref</code>. <b>Compression is mandatory + model-independent:</b> the pipeline downscales to hero size (~1080px, 4:5), converts to <b>WebP</b>, targets <b>&lt;300&nbsp;KB</b> — fixing the current ~3&nbsp;MB PNGs. Escalate to <b>FLUX</b> (Replicate/fal — style refs) or <b>Imagen</b> only if GPT Image 1.5's cross-spot consistency proves weak on city #1. Honesty rule unchanged: stylized art, never fake photos.</li>
     </ul>
   </section>
 

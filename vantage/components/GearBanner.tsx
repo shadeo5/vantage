@@ -7,8 +7,8 @@ export function GearBanner({ onAdd, onDismiss }: { onAdd: () => void; onDismiss:
   return (
     <LinearGradient colors={["rgba(233,184,114,0.14)", "rgba(233,184,114,0.05)"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.banner}>
       <Pressable style={{ flex: 1 }} onPress={onAdd}>
-        <Text style={styles.title}>Add your gear</Text>
-        <Text style={styles.sub}>Picks matched to the lens in your bag.</Text>
+        <Text style={styles.title}>Personalize your picks →</Text>
+        <Text style={styles.sub}>Add your camera + lenses so we match shoots to your kit.</Text>
       </Pressable>
       <Pressable style={styles.x} onPress={onDismiss} hitSlop={8}><Text style={styles.xText}>×</Text></Pressable>
     </LinearGradient>

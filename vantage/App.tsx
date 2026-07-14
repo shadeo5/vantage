@@ -24,7 +24,8 @@ import { tonightNudge } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
-import { saveProfile } from "./lib/sync";
+import { saveProfile, savePushToken } from "./lib/sync";
+import { registerForPush } from "./lib/push";
 
 type Screen = "lock" | "today" | "plan" | "bag" | "detail";
 
@@ -74,6 +75,11 @@ export default function App() {
   useEffect(() => {
     if (hydrated) saveProfile(cameraId, lenses);
   }, [cameraId, lenses, hydrated]);
+  // Register this device for push once, and save its token to the profile (no-op on web).
+  useEffect(() => {
+    if (!hydrated) return;
+    registerForPush().then((token) => { if (token) savePushToken(token); });
+  }, [hydrated]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 

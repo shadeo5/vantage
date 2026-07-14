@@ -37,3 +37,12 @@ export async function saveProfile(cameraId: string, lensIds: string[]): Promise<
   if (error) console.warn("[sync] saveProfile failed:", error.message);
   else console.log("[sync] profile saved:", cameraId, lensIds.join(","));
 }
+
+// Save this device's push token onto its profile row (so the backend can nudge it).
+export async function savePushToken(token: string): Promise<void> {
+  const id = await ensureSession();
+  if (!id) return;
+  const { error } = await supabase.from("profiles").update({ push_token: token }).eq("id", id);
+  if (error) console.warn("[sync] savePushToken failed:", error.message);
+  else console.log("[sync] push token saved");
+}

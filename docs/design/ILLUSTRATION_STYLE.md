@@ -64,4 +64,4 @@ An elevated rooftop view over a city at blue hour, a distant downtown skyline wi
 
 ## Open / deferred
 - **Gallery ("what people shoot here")** — implies *real* photos from that spot, so illustrations don't fit there. For placeholder testing we'll hide or soften that row rather than fake it; real gallery imagery comes with the real-photo path later.
-- **Automation** — generating these via an API (OpenAI `gpt-image-1`) is deferred like the text pipeline; hand-generation is fine at this stage.
+- **Automation** — generating these via an API is designed in the content ADR (`docs/engineering/CONTENT_PIPELINE.html`, decision **D3**): **OpenAI GPT Image 1.5** (note: `gpt-image-1` retires Oct 23 2026), driven by the master-style block above, seeded with a per-city reference image for cohesion, then downscaled + WebP-compressed (<300 KB — the current ~3 MB PNGs are unoptimized). Hand-generation is fine until the pipeline is built.

@@ -17,7 +17,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
   going: string[]; cameraId: string; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
       <Text style={styles.eyebrow}>YOUR PLAN · {going.length} GOING</Text>
       <Text style={styles.title}>This week</Text>
 
@@ -33,7 +33,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
                 <View style={styles.dayLine} />
               </View>
               <View style={styles.card}>
-                <Pressable style={styles.cardTop} onPress={() => onOpen(m.id)}>
+                <Pressable style={({ pressed }) => [styles.cardTop, pressed && { opacity: 0.7 }]} onPress={() => onOpen(m.id)}>
                   <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.tag, { color: tagColor(m.tag) }]}>{m.tag.toUpperCase()}</Text>
@@ -45,7 +45,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
                     </View>
                   </View>
                 </Pressable>
-                <Pressable onPress={() => onToggleGoing(m.id)} style={[styles.goBar, on ? styles.goOn : styles.goOff]}>
+                <Pressable onPress={() => onToggleGoing(m.id)} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBar, on ? styles.goOn : styles.goOff, pressed && { opacity: 0.92 }]}>
                   <Text style={[styles.goText, { color: on ? colors.crowdLow : "#1a1408" }]}>{on ? "✓ You're going" : "I'm going"}</Text>
                 </Pressable>
               </View>

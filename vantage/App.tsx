@@ -130,7 +130,7 @@ export default function App() {
       )}
 
       {screen === "today" && (
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
           {dueSpot && <CheckInCard spotName={dueSpot.name} onWent={() => checkIn(dueSpot.id, true)} onSkipped={() => checkIn(dueSpot.id, false)} />}
           {gearBanner && <GearBanner onAdd={() => setScreen("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>

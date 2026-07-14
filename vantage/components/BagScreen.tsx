@@ -18,13 +18,13 @@ export function BagScreen({
   const [camOpen, setCamOpen] = useState(false);
   const cam = getCamera(cameraId);
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
       <Text style={styles.eyebrow}>SETUP · 2 OF 3</Text>
       <Text style={styles.title}>What's in{"\n"}your bag?</Text>
       <Text style={styles.sub}>So we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
 
       <Text style={styles.section}>CAMERA</Text>
-      <Pressable style={styles.camCard} onPress={() => setCamOpen((v) => !v)}>
+      <Pressable style={({ pressed }) => [styles.camCard, pressed && { opacity: 0.75 }]} onPress={() => setCamOpen((v) => !v)}>
         <View style={styles.camIcon}>
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.golden} strokeWidth={1.6}>
             <Rect x={3} y={7} width={18} height={13} rx={3} /><Circle cx={12} cy={13.5} r={3.4} /><Path d="M8.5 7l1.4-2.4h4.2L15.5 7" />
@@ -86,8 +86,8 @@ export function BagScreen({
       )}
 
       <View style={{ gap: 11, marginTop: 30 }}>
-        <Pressable onPress={onContinue} style={styles.continue}><Text style={styles.continueText}>Continue</Text></Pressable>
-        <Pressable onPress={onContinue} style={styles.skip}><Text style={styles.skipText}>Skip — I'll add later</Text></Pressable>
+        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.continue, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}><Text style={styles.continueText}>Continue</Text></Pressable>
+        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.skip, pressed && { opacity: 0.6 }]}><Text style={styles.skipText}>Skip — I'll add later</Text></Pressable>
       </View>
     </ScrollView>
   );

@@ -11,10 +11,10 @@ export function CheckInCard({ spotName, onWent, onSkipped }: {
       <Text style={styles.eyebrow}>SINCE YOU LAST LOOKED</Text>
       <Text style={styles.q}>Did you make it to {spotName}?</Text>
       <View style={styles.row}>
-        <Pressable onPress={onWent} style={[styles.btn, styles.yes]}>
+        <Pressable onPress={onWent} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.btn, styles.yes, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}>
           <Text style={styles.yesText}>I shot it 📷</Text>
         </Pressable>
-        <Pressable onPress={onSkipped} style={[styles.btn, styles.no]}>
+        <Pressable onPress={onSkipped} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.btn, styles.no, pressed && { opacity: 0.6 }]}>
           <Text style={styles.noText}>Not this time</Text>
         </Pressable>
       </View>

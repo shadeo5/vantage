@@ -129,8 +129,9 @@ export default function App() {
   // Fresh, personal push copy for the lock screen (N3).
   const lockCopy = nudgeCopy(verdict, gearLens, now);
 
-  // Echo the Bag's "your kit shoots" payoff on Today (#B3) — a quiet reminder that
-  // the picks are tuned to the gear. Humanized list of up to three genres.
+  // Echo the Bag's "your kit's ideal for" payoff on Today (#B3) — a quiet reminder that
+  // the picks are tuned to the gear (framed as what the kit's ideal for, never as a
+  // limit on what you can shoot). Humanized list of up to three genres.
   const kitEcho = kitGenres(cameraId, lenses).slice(0, 3).map((g) => g.toLowerCase());
   const kitEchoText = kitEcho.length === 0 ? null
     : kitEcho.length === 1 ? kitEcho[0]
@@ -180,7 +181,7 @@ export default function App() {
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
-              {kitEchoText && <Text style={styles.kitEcho}>Your kit shoots {kitEchoText}.</Text>}
+              {kitEchoText && <Text style={styles.kitEcho}>Your kit's ideal for {kitEchoText}.</Text>}
             </View>
             {/* Neutral gear/profile entry (#T4) — no mock initial (there's no name to
                 derive), and it leads to the Bag tab instead of being a dead tap. */}

@@ -64,11 +64,11 @@ export function BagScreen({
       {/* The payoff of the screen (#B3) — elevated into its own gold panel so it
           reads as the reward for setting gear, not an afterthought below the fold. */}
       <View style={styles.kitPanel}>
-        <Text style={styles.kitPanelLabel}>YOUR KIT SHOOTS</Text>
+        <Text style={styles.kitPanelLabel}>YOUR KIT'S IDEAL FOR</Text>
         <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
         <View style={styles.chips}>
           {kitGenres.length === 0
-            ? <Text style={styles.kitSub}>Add a lens to see what this body can shoot.</Text>
+            ? <Text style={styles.kitSub}>Add a lens to see what this kit's ideal for.</Text>
             : kitGenres.map((g) => (
                 <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
               ))}

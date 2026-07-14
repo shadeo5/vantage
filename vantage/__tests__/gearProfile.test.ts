@@ -1,4 +1,4 @@
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
+import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, fitGapLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
 import { getLens, getCamera } from "../lib/gear";
 
 describe("gear profile", () => {
@@ -71,9 +71,19 @@ describe("gear profile", () => {
     test("names the fitting lens for a covered genre", () => {
       expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBe("fits your 35mm");
     });
-    test("honestly flags a genre the kit can't cover", () => {
-      // The X100VI body + only a macro lens covers neither Sports nor Wildlife.
-      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a stretch for your kit");
+    test("offers a positive optional-upgrade note for a genre the kit isn't ideal for", () => {
+      // The X100VI body + only a macro lens covers neither Sports nor Wildlife —
+      // framed as an upgrade opportunity, never as "you can't shoot this".
+      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a longer lens would shine here");
+    });
+  });
+
+  describe("fitGapLabel", () => {
+    test("is null when the kit already suits the genre (no wallpaper label)", () => {
+      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBeNull();
+    });
+    test("surfaces the upbeat upgrade note only when a different lens would elevate it", () => {
+      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a longer lens would shine here");
     });
   });
 });

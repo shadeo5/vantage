@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
@@ -17,18 +17,29 @@ export function SpotDetail({
   const wm = windowMeta(spot.windowType);
   const windowTime = spot.windowType === "blue" ? fmtTime(windows.blueEvening.start) : fmtTime(windows.goldenEvening.start);
 
+  // Cross-fade the detail in over the current screen (it's an overlay above the pager,
+  // so opacity 0 reveals Today underneath — never black). Hold the fade until the hero
+  // image is painted so we don't flash a gradient-only header (#T5). Fallback timer so a
+  // cached image that never fires onLoadEnd (common on web) still animates in.
   const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => { Animated.timing(anim, { toValue: 1, duration: 350, useNativeDriver: true }).start(); }, [anim]);
+  const [imgReady, setImgReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setImgReady(true), 250);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (imgReady) Animated.timing(anim, { toValue: 1, duration: 320, useNativeDriver: true }).start();
+  }, [imgReady, anim]);
 
   return (
     <Animated.View style={[styles.root, { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }} alwaysBounceVertical overScrollMode="always">
-        <ImageBackground source={img(spot.img)} style={styles.hero}>
+        <ImageBackground source={img(spot.img)} style={styles.hero} onLoadEnd={() => setImgReady(true)}>
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
-            <Pressable onPress={onBack} style={styles.circle} hitSlop={10}><Text style={styles.circleGlyph}>‹</Text></Pressable>
-            <Pressable onPress={onToggleSaved} style={styles.circle} hitSlop={10}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]}>{isSaved ? "♥" : "♡"}</Text></Pressable>
+            <Pressable onPress={onBack} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.14)", borderless: true, radius: 24 }}><Text style={styles.circleGlyph}>‹</Text></Pressable>
+            <Pressable onPress={onToggleSaved} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(224,122,139,0.24)", borderless: true, radius: 24 }}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]}>{isSaved ? "♥" : "♡"}</Text></Pressable>
           </View>
           <View style={styles.heroBottom}>
             <View style={styles.heroChips}>
@@ -68,7 +79,7 @@ export function SpotDetail({
       </ScrollView>
 
       <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={styles.bottomBar}>
-        <Pressable onPress={onToggleGoing} style={[styles.goBtn, isGoing ? styles.goOn : styles.goOff]}>
+        <Pressable onPress={onToggleGoing} android_ripple={{ color: isGoing ? "rgba(127,176,122,0.18)" : "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && { opacity: 0.9, transform: [{ scale: 0.985 }] }]}>
           <Text style={[styles.goLabel, { color: isGoing ? colors.crowdLow : "#1a1408" }]}>{isGoing ? "✓ You're going" : "I'm going"}</Text>
         </Pressable>
       </LinearGradient>
@@ -81,6 +92,7 @@ const styles = StyleSheet.create({
   hero: { height: 340, justifyContent: "space-between", paddingTop: 52, paddingHorizontal: 18, paddingBottom: 18 },
   heroTop: { flexDirection: "row", justifyContent: "space-between" },
   circle: { width: 38, height: 38, borderRadius: 19, backgroundColor: "rgba(10,9,11,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)", justifyContent: "center", alignItems: "center" },
+  circlePressed: { opacity: 0.6, transform: [{ scale: 0.92 }] },
   circleGlyph: { color: colors.ink, fontFamily: fonts.sansMed, fontSize: 19, lineHeight: 21 },
   heroBottom: {},
   heroChips: { flexDirection: "row", gap: 8, marginBottom: 11 },

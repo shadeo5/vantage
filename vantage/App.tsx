@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar, Pressable, useWindowDimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
 import { useFonts } from "expo-font";
 import { Newsreader_400Regular, Newsreader_500Medium } from "@expo-google-fonts/newsreader";
 import {
@@ -20,14 +21,17 @@ import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
+import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
 import { tonightNudge } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
 import { saveProfile, savePushToken } from "./lib/sync";
 import { registerForPush } from "./lib/push";
+import { tapFeedback, commitFeedback } from "./lib/haptics";
 
-type Screen = "lock" | "today" | "plan" | "bag" | "detail";
+type Tab = "today" | "plan" | "bag";
+const TABS: Tab[] = ["today", "plan", "bag"];
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -36,9 +40,10 @@ export default function App() {
     HankenGrotesk_600SemiBold, HankenGrotesk_700Bold,
   });
 
-  const [screen, setScreen] = useState<Screen>("today");
+  const [tab, setTab] = useState<Tab>("today");
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [showLock, setShowLock] = useState(false);
   const [openId, setOpenId] = useState<string>(HERO_ID);
-  const [detailFrom, setDetailFrom] = useState<Screen>("today");
   const [going, setGoing] = useState<string[]>([]);
   const [saved, setSaved] = useState<string[]>(["piedmont"]);
   const [gearBanner, setGearBanner] = useState(true);
@@ -52,13 +57,38 @@ export default function App() {
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [dueIds, setDueIds] = useState<string[]>([]);
 
+  // Horizontal pager (N1): Today/Plan/Bag are three full-width pages; swipe and the
+  // bottom bar both drive it and stay in sync. Detail rides above as an overlay so the
+  // pager keeps its scroll position underneath.
+  const { width: winWidth, height } = useWindowDimensions();
+  // Cap the content to a phone-scale column on wide screens (web) so the UI doesn't
+  // stretch edge-to-edge; on a real phone winWidth is already below the cap. The pager's
+  // paging math uses this same capped width, so swipe + scrollTo stay consistent.
+  const width = Math.min(winWidth, 440);
+  const pagerRef = useRef<ScrollView>(null);
+  const goToTab = (t: Tab) => {
+    tapFeedback();
+    pagerRef.current?.scrollTo({ x: TABS.indexOf(t) * width, animated: true });
+    setTab(t);
+  };
+  // Keep the bottom bar in sync with a swipe. Driven from onScroll (not
+  // onMomentumScrollEnd, which doesn't fire reliably on web) — only commits
+  // once a page is more than halfway in view, and only on an actual change.
+  const onPagerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (width === 0) return;
+    const i = Math.round(e.nativeEvent.contentOffset.x / width);
+    const next = TABS[i];
+    if (next && next !== tab) setTab(next);
+  };
+
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
-    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal()]).then(([ids, cam, pend, log]) => {
+    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds()]).then(([ids, cam, pend, log, savedIds]) => {
       if (ids) setLenses(ids);
       if (cam) setCameraId(cam);
       setPending(pend);
       setJournal(log);
+      if (savedIds) setSaved(savedIds);
       setDueIds(pend.map((c) => c.spotId)); // commitments from a prior session → due to check in
       setHydrated(true);
     });
@@ -69,8 +99,9 @@ export default function App() {
       saveCameraId(cameraId);
       savePending(pending);
       saveJournal(journal);
+      saveSavedIds(saved);
     }
-  }, [lenses, cameraId, pending, journal, hydrated]);
+  }, [lenses, cameraId, pending, journal, saved, hydrated]);
   // Mirror the gear profile to the cloud (anon sign-in + upsert) so the server can nudge.
   useEffect(() => {
     if (hydrated) saveProfile(cameraId, lenses);
@@ -98,16 +129,25 @@ export default function App() {
   // Fresh, personal push copy for the lock screen (N3).
   const lockCopy = nudgeCopy(verdict, gearLens, now);
 
+  // Echo the Bag's "your kit's ideal for" payoff on Today (#B3) — a quiet reminder that
+  // the picks are tuned to the gear (framed as what the kit's ideal for, never as a
+  // limit on what you can shoot). Humanized list of up to three genres.
+  const kitEcho = kitGenres(cameraId, lenses).slice(0, 3).map((g) => g.toLowerCase());
+  const kitEchoText = kitEcho.length === 0 ? null
+    : kitEcho.length === 1 ? kitEcho[0]
+    : `${kitEcho.slice(0, -1).join(", ")} & ${kitEcho[kitEcho.length - 1]}`;
+
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (id: string) =>
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
   const toggleGoing = toggle(setGoing);
   const toggleSaved = toggle(setSaved);
   const toggleLens = toggle(setLenses);
-  const openDetail = (id: string, from: Screen) => { setOpenId(id); setDetailFrom(from); setScreen("detail"); };
+  const openDetail = (id: string) => { setOpenId(id); setDetailOpen(true); };
 
   // Return loop (N4): "I'm going" records a commitment; a check-in resolves it into the journal.
   const commit = (spotId: string) => {
     const turningOn = !going.includes(spotId);
+    commitFeedback();
     toggleGoing(spotId);
     if (turningOn) setPending((p) => (p.some((c) => c.spotId === spotId) ? p : [...p, { spotId, at: now.toISOString() }]));
   };
@@ -119,32 +159,44 @@ export default function App() {
   const dueCommitment = pending.find((c) => dueIds.includes(c.spotId));
   const dueSpot = dueCommitment ? getSpot(dueCommitment.spotId) : null;
 
-  const navVisible = screen === "today" || screen === "plan" || screen === "bag";
-
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" />
 
-      {screen === "lock" && (
-        <LockScreen onEnter={() => setScreen("today")} title={lockCopy.title} body={lockCopy.body} heroImg={hero.img} />
-      )}
-
-      {screen === "today" && (
-        <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
+      <View style={[styles.column, { width }]}>
+      <ScrollView
+        ref={pagerRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={onPagerScroll}
+        scrollEventThrottle={16}
+        style={styles.pager}
+      >
+        {/* Today */}
+        <ScrollView style={{ width, height }} contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
           {dueSpot && <CheckInCard spotName={dueSpot.name} onWent={() => checkIn(dueSpot.id, true)} onSkipped={() => checkIn(dueSpot.id, false)} />}
-          {gearBanner && <GearBanner onAdd={() => setScreen("bag")} onDismiss={() => setGearBanner(false)} />}
+          {gearBanner && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
+              {kitEchoText && <Text style={styles.kitEcho}>Your kit's ideal for {kitEchoText}.</Text>}
             </View>
-            <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
+            {/* Neutral gear/profile entry (#T4) — no mock initial (there's no name to
+                derive), and it leads to the Bag tab instead of being a dead tap. */}
+            <Pressable onPress={() => goToTab("bag")} accessibilityLabel="Your gear" accessibilityRole="button" hitSlop={8} android_ripple={{ color: "rgba(255,255,255,0.1)", borderless: true, radius: 24 }} style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.6 }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.muted3} strokeWidth={1.8}>
+                <Circle cx={12} cy={8} r={3.4} />
+                <Path d="M5.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+              </Svg>
+            </Pressable>
           </View>
           <InspirationHero
             spot={hero} goldenRange={goldenRange} gearLens={gearLens}
             confidence={verdict.confidence} go={verdict.go} whySignals={verdict.signals}
             isGoing={going.includes(hero.id)} whyOpen={whyOpen}
-            onOpen={() => openDetail(hero.id, "today")} onGo={() => commit(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
+            onOpen={() => openDetail(hero.id)} onGo={() => commit(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
           />
           <View style={styles.secHead}>
             <Text style={styles.secTitle}>Best near you</Text>
@@ -152,7 +204,7 @@ export default function App() {
           </View>
           <View style={{ gap: 12 }}>
             {SPOTS.filter((s) => s.id !== hero.id).map((spot, i) => (
-              <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id, "today")} />
+              <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
             ))}
           </View>
           {shotCount(journal) > 0 && (
@@ -162,43 +214,56 @@ export default function App() {
             </View>
           )}
         </ScrollView>
+
+        {/* Plan */}
+        <View style={{ width, height }}>
+          <PlanScreen going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={openDetail} onToggleGoing={commit} />
+        </View>
+
+        {/* Bag */}
+        <View style={{ width, height }}>
+          <BagScreen
+            cameraId={cameraId} onPickCamera={(id) => { tapFeedback(); setCameraId(id); }}
+            lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
+            styleOpen={styleOpen} stylePick={stylePick}
+            onToggleLens={(id) => { tapFeedback(); toggleLens(id); }} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={(s) => { tapFeedback(); setStylePick(s); }}
+          />
+        </View>
+      </ScrollView>
+
+      {!detailOpen && !showLock && <BottomNav active={tab} onNavigate={goToTab} />}
+
+      {/* Detail rides above the pager so the pager keeps its scroll position (N1). */}
+      {detailOpen && (
+        <View style={StyleSheet.absoluteFill}>
+          <SpotDetail
+            spot={getSpot(openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
+            onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
+          />
+        </View>
       )}
 
-      {screen === "plan" && (
-        <PlanScreen going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={(id) => openDetail(id, "plan")} onToggleGoing={commit} />
+      {showLock && (
+        <View style={StyleSheet.absoluteFill}>
+          <LockScreen onEnter={() => { setShowLock(false); goToTab("today"); }} title={lockCopy.title} body={lockCopy.body} heroImg={hero.img} />
+        </View>
       )}
-
-      {screen === "bag" && (
-        <BagScreen
-          cameraId={cameraId} onPickCamera={setCameraId}
-          lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
-          styleOpen={styleOpen} stylePick={stylePick}
-          onToggleLens={toggleLens} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={setStylePick}
-          onContinue={() => setScreen("today")}
-        />
-      )}
-
-      {screen === "detail" && (
-        <SpotDetail
-          spot={getSpot(openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
-          onBack={() => setScreen(detailFrom)} onToggleGoing={() => toggleGoing(openId)} onToggleSaved={() => toggleSaved(openId)}
-        />
-      )}
-
-      {navVisible && <BottomNav active={screen as "today" | "plan" | "bag"} onNavigate={setScreen} />}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.canvas },
+  root: { flex: 1, backgroundColor: colors.canvas, alignItems: "center" },
+  column: { flex: 1 }, // phone-scale column, width capped + centered on wide (web) screens
+  pager: { flex: 1 },
   center: { justifyContent: "center", alignItems: "center" },
   content: { paddingTop: scr.padTop, paddingHorizontal: scr.padSide, paddingBottom: 118 },
   header: { flexDirection: "row", alignItems: "flex-start", marginBottom: 22 },
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, lineHeight: 32, marginTop: 6 },
+  kitEcho: { color: colors.muted2, fontFamily: fonts.sans, fontSize: 13, marginTop: 8 },
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: "#2a2a30", borderWidth: 1, borderColor: colors.hairline, justifyContent: "center", alignItems: "center" },
-  avatarText: { color: colors.ink, fontFamily: fonts.sansSemi, fontSize: 15 },
   secHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 },
   secTitle: { color: colors.ink, fontFamily: fonts.serif, fontSize: 22 },
   secCount: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 13 },

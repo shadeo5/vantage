@@ -54,10 +54,18 @@ export function primaryLensLabel(lensIds: string[]): string {
 }
 
 // A short, honest fit label for a spot's genre, e.g. "fits your 35mm" — or, when the
-// kit doesn't cover that genre, "a stretch for your kit" (never a false claim).
+// kit isn't the ideal tool, a positive optional-upgrade note (never "you can't shoot
+// this": the app never implies your gear can't handle a spot, only what would elevate it).
 export function fitLabel(cameraId: string, lensIds: string[], genre: Genre): string {
   const best = bestLensForGenre(cameraId, lensIds, genre);
-  return best ? `fits your ${best}` : "a stretch for your kit";
+  return best ? `fits your ${best}` : "a longer lens would shine here";
+}
+
+// Only the *actionable* half of fitLabel: null when the kit already suits the genre
+// (the common case — no need to repeat "fits your 35mm" on every card), and only an
+// upbeat optional-upgrade note when a different lens would genuinely elevate it (#P3).
+export function fitGapLabel(cameraId: string, lensIds: string[], genre: Genre): string | null {
+  return bestLensForGenre(cameraId, lensIds, genre) ? null : "a longer lens would shine here";
 }
 
 // From the kit, the label of a lens (or the fixed-lens camera) that actually suits a

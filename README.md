@@ -60,21 +60,23 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 - `poc/` — the throwaway script that validated the whole idea (still runnable: `cd archive/poc && npm run scout`)
 - `Photographer Location Scout App.zip` — original design zip (extracted into `docs/design_handoff_vantage/`); safe to delete anytime
 
-## Where we are (Jul 13, 2026)
+## Where we are (Jul 14, 2026)
 Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tests), and now backed by a **live backend that pushes on its own.**
 - **E1 Content — done.** Illustrated placeholder imagery on all 5 spots; voice guide + copy audit; pipeline built (running deferred).
 - **E2 Gear — done.** Catalog + matching engine wired everywhere (Bag camera picker + lens chips + "Your kit shoots"; Today/Lock/Plan name the fitting lens, honest); profile persists on-device. Only **G3** (banner re-prompt) remains.
 - **E3 Nudge — DONE, end-to-end.** N1 brain (`lib/nudge.ts`) · N3 fresh copy (`lib/nudgeCopy.ts`) · N4 return-loop journal (`lib/journal.ts`) · **N2 real push** (`supabase/functions/nudge/`) — a Deno port of the brain, deployed, sending via Expo Push, **scheduled nightly by pg_cron** (`vantage-nightly-nudge`, ~6 pm Atlanta). Verified buzzing a real Pixel.
 - **E4 Backend — foundation live.** Supabase (schema + RLS + anon auth), app↔cloud sync (`lib/sync.ts`), deployed edge function + cron. Plain-English map: `docs/BACKEND_FIELD_GUIDE.html`. (Precompute/cache/real-events B2–B5 still planned.)
 - **E5 Platform — Android shipped.** Dev build (preview APK) installed on the Pixel; Firebase FCM configured.
+- **E7 Experience & polish — all findings addressed (code); device verify pending.** From the Jul-13 UX review (`docs/UX_REVIEW.html`). Every P0/P1/P2 finding worked top-to-bottom on branch `e7-ux-review` (see the ordered checklist in `docs/BACKLOG.md` E7): Bag-as-gear-manager (#B1/#B2), real Plan dates (#P1), gear-banner gating (#T1), no "coming soon" (#T3), confidence flourish not "MEDIUM" (#T2), persisted saves (#D1), demoted Plan CTAs (#P2), real avatar (#T4), explained light chart (#D2), fit-label only on a gap (#P3), surfaced "your kit shoots" (#B3), cross-fade detail (#T5), web max-width, and haptics. **Still needs the Pixel:** notification look, thumb reach, safe areas, contrast, permission timing (flagged in E7 row 15).
 
 **🎯 The north star is done: the app buzzes your phone each evening, on its own, only when the light + your gear line up.** Everything below is "next," not "blocking."
 
 **Pick up here next (nothing urgent):**
-1. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
-2. **Real data over placeholders** — the Plan week is still hardcoded; spots + events want real sourcing (E4 B2/B4, E1 content).
-3. **P2 — device GPS** instead of hardcoded downtown Atlanta.
-4. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
+1. **Verify E7 on the Pixel** — merge branch `e7-ux-review`, run an `eas build`, and eyeball the on-device-only items (row 15): haptics feel, notification look, safe areas (sticky CTA vs gesture bar), thumb reach, contrast, permission timing.
+2. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
+3. **Real data over placeholders** — the Plan week's day labels are now real-dated (#P1), but its spot list + reasons are still placeholder; spots + events want real sourcing (E4 B2/B4, E1 content), and the week should eventually come from the nudge brain.
+4. **P2 — device GPS** instead of hardcoded downtown Atlanta.
+5. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
 
 > ENV NOTE: `vantage/.env` is gitignored (recreate from `.env.example` + Supabase keys on a fresh clone). The **cloud build** gets Supabase creds from **EAS env vars**, not `.env`.
 

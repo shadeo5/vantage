@@ -40,9 +40,9 @@ describe("gearFitScore", () => {
 describe("tonightNudge", () => {
   const v = tonightNudge(new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
 
-  test("returns a real spot and the three Why-signals in order", () => {
+  test("returns a real spot and the Why-signals in order (no unbuilt Activity row)", () => {
     expect(SPOTS.some((s) => s.id === v.spot.id)).toBe(true);
-    expect(v.signals.map((s) => s.key)).toEqual(["light", "activity", "gear"]);
+    expect(v.signals.map((s) => s.key)).toEqual(["light", "gear"]);
   });
   test("score is a 0..1 value and go tracks the threshold", () => {
     expect(v.score).toBeGreaterThanOrEqual(0);

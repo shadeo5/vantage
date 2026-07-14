@@ -8,20 +8,20 @@ import { cameraLabel, cameraMeta } from "../lib/gearProfile";
 const STYLES = ["Street", "Portraits", "Landscape", "Architecture", "Nature"];
 
 export function BagScreen({
-  cameraId, onPickCamera, lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle, onContinue,
+  cameraId, onPickCamera, lensChips, selectedLensIds, kitGenres, styleOpen, stylePick, onToggleLens, onToggleStyle, onPickStyle,
 }: {
   cameraId: string; onPickCamera: (id: string) => void;
   lensChips: { id: string; label: string }[]; selectedLensIds: string[]; kitGenres: Genre[];
   styleOpen: boolean; stylePick: string | null;
-  onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void; onContinue: () => void;
+  onToggleLens: (id: string) => void; onToggleStyle: () => void; onPickStyle: (s: string) => void;
 }) {
   const [camOpen, setCamOpen] = useState(false);
   const cam = getCamera(cameraId);
   return (
     <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
-      <Text style={styles.eyebrow}>SETUP · 2 OF 3</Text>
-      <Text style={styles.title}>What's in{"\n"}your bag?</Text>
-      <Text style={styles.sub}>So we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
+      <Text style={styles.eyebrow}>YOUR GEAR · SAVES AS YOU GO</Text>
+      <Text style={styles.title}>Your bag</Text>
+      <Text style={styles.sub}>What you shoot with, so we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
 
       <Text style={styles.section}>CAMERA</Text>
       <Pressable style={({ pressed }) => [styles.camCard, pressed && { opacity: 0.75 }]} onPress={() => setCamOpen((v) => !v)}>
@@ -41,7 +41,7 @@ export function BagScreen({
           {CAMERAS.map((c) => {
             const on = c.id === cameraId;
             return (
-              <Pressable key={c.id} onPress={() => { onPickCamera(c.id); setCamOpen(false); }} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+              <Pressable key={c.id} onPress={() => { onPickCamera(c.id); setCamOpen(false); }} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                 <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{cameraLabel(c)}</Text>
               </Pressable>
             );
@@ -54,41 +54,40 @@ export function BagScreen({
         {lensChips.map((l) => {
           const on = selectedLensIds.includes(l.id);
           return (
-            <Pressable key={l.id} onPress={() => onToggleLens(l.id)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+            <Pressable key={l.id} onPress={() => onToggleLens(l.id)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
               <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{l.label}</Text>
             </Pressable>
           );
         })}
       </View>
 
-      <Text style={styles.section}>YOUR KIT SHOOTS</Text>
-      <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
-      <View style={styles.chips}>
-        {kitGenres.length === 0
-          ? <Text style={styles.kitSub}>Add a lens to see what this body can shoot.</Text>
-          : kitGenres.map((g) => (
-              <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
-            ))}
+      {/* The payoff of the screen (#B3) — elevated into its own gold panel so it
+          reads as the reward for setting gear, not an afterthought below the fold. */}
+      <View style={styles.kitPanel}>
+        <Text style={styles.kitPanelLabel}>YOUR KIT'S IDEAL FOR</Text>
+        <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
+        <View style={styles.chips}>
+          {kitGenres.length === 0
+            ? <Text style={styles.kitSub}>Add a lens to see what this kit's ideal for.</Text>
+            : kitGenres.map((g) => (
+                <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
+              ))}
+        </View>
       </View>
 
-      <Pressable onPress={onToggleStyle} style={styles.dashed2}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
+      <Pressable onPress={onToggleStyle} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.dashed2, pressed && { opacity: 0.7 }]}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
       {styleOpen && (
         <View style={styles.chips}>
           {STYLES.map((s) => {
             const on = stylePick === s;
             return (
-              <Pressable key={s} onPress={() => onPickStyle(s)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+              <Pressable key={s} onPress={() => onPickStyle(s)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                 <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{s}</Text>
               </Pressable>
             );
           })}
         </View>
       )}
-
-      <View style={{ gap: 11, marginTop: 30 }}>
-        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.continue, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}><Text style={styles.continueText}>Continue</Text></Pressable>
-        <Pressable onPress={onContinue} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.skip, pressed && { opacity: 0.6 }]}><Text style={styles.skipText}>Skip — I'll add later</Text></Pressable>
-      </View>
     </ScrollView>
   );
 }
@@ -109,17 +108,16 @@ const styles = StyleSheet.create({
   dashed: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 13, marginTop: 10 },
   dashedText: { color: colors.muted, fontFamily: fonts.sansMed, fontSize: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
-  chip: { paddingVertical: 9, paddingHorizontal: 15, borderRadius: 22, borderWidth: 1 },
+  chip: { paddingVertical: 9, paddingHorizontal: 15, borderRadius: 22, borderWidth: 1, overflow: "hidden" },
+  chipPressed: { opacity: 0.7, transform: [{ scale: 0.96 }] },
   chipOn: { backgroundColor: "rgba(233,184,114,0.16)", borderColor: "rgba(233,184,114,0.5)" },
   chipOff: { backgroundColor: colors.surface, borderColor: colors.hairline },
   chipText: { fontFamily: fonts.sansSemi, fontSize: 13.5 },
-  kitSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: -4, marginBottom: 12 },
+  kitPanel: { marginTop: 24, backgroundColor: "rgba(233,184,114,0.07)", borderWidth: 1, borderColor: "rgba(233,184,114,0.22)", borderRadius: 16, padding: 16 },
+  kitPanelLabel: { color: colors.golden, fontFamily: fonts.sansSemi, fontSize: 12.5, letterSpacing: 0.6, marginBottom: 8 },
+  kitSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginBottom: 12 },
   genrePill: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 22, backgroundColor: "rgba(233,184,114,0.12)", borderWidth: 1, borderColor: "rgba(233,184,114,0.35)" },
   genreText: { color: "#F0D9AE", fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed2: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 14, marginTop: 22 },
   dashed2Text: { color: colors.muted3, fontFamily: fonts.sansMed, fontSize: 14 },
-  continue: { alignItems: "center", paddingVertical: 16, borderRadius: 16, backgroundColor: colors.golden },
-  continueText: { color: "#1a1408", fontFamily: fonts.sansBold, fontSize: 15 },
-  skip: { alignItems: "center", paddingVertical: 15, borderRadius: 16, borderWidth: 1, borderColor: colors.hairline },
-  skipText: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 15 },
 });

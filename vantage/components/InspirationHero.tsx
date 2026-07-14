@@ -37,17 +37,23 @@ export function InspirationHero({
           <LinearGradient colors={["rgba(24,20,18,0.25)", "rgba(22,22,24,0.02)", colors.surface]}
             start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.badge}>
-            <Animated.View style={[styles.badgeDot, { opacity: pulse }]} />
-            <Text style={styles.badgeText}>{go ? "TONIGHT'S PICK" : "WORTH A LOOK"} · {confidence.toUpperCase()}</Text>
+            <Animated.View style={[styles.badgeDot, { opacity: go ? pulse : 0.4 }]} />
+            {/* Confidence never shown as a raw grade (#T2): a ✦ flourish is reserved
+                for HIGH, MEDIUM reads as a plain confident label, and a genuinely
+                weak night becomes an honest "quiet night" — never a "MEDIUM". */}
+            <Text style={styles.badgeText}>{go ? (confidence === "high" ? "TONIGHT'S PICK  ✦" : "TONIGHT'S PICK") : "A QUIET NIGHT"}</Text>
           </View>
-          <Text style={styles.heroName}>{spot.name} is{"\n"}alive tonight.</Text>
+          <Text style={styles.heroName}>{go ? <>{spot.name} is{"\n"}alive tonight.</> : <>{spot.name},{"\n"}if you head out.</>}</Text>
         </ImageBackground>
       </Pressable>
 
       <View style={styles.body}>
         <Text style={styles.lede}>
-          Golden hour hits <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> — grab your{" "}
-          <Text style={styles.gold}>{gearLens}</Text> and go.
+          {go ? (
+            <>Golden hour hits <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> — grab your <Text style={styles.gold}>{gearLens}</Text> and go.</>
+          ) : (
+            <>Nothing loud tonight — but the light opens <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> if you want a slow walk with your <Text style={styles.gold}>{gearLens}</Text>.</>
+          )}
         </Text>
 
         <View style={styles.chips}>

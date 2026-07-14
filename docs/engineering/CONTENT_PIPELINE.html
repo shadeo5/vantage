@@ -71,6 +71,7 @@
   ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
   ul.list li b{color:var(--ink);font-weight:600;}
   ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+  ul.open li.decided::before{content:"✓";color:var(--green);font-family:var(--sans);}
   ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:16px 0 0;display:flex;flex-direction:column;gap:12px;}
   ol.steps li{counter-increment:s;position:relative;padding-left:40px;color:var(--muted);max-width:68ch;font-size:15px;}
   ol.steps li b{color:var(--ink);}
@@ -92,7 +93,7 @@
     <p class="lede">How a new place — <b>Nashville, Chicago, Blue Ridge</b> — goes from a name to a vetted, illustrated, served spot list. Mostly automatic, with <b>one human gate where it matters</b>, and a <b>both/and</b> data model: git for review, Postgres for serving.</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — content pipeline (E1 · C1/C4)</b></span>
-      <span class="tag">Status <b>Proposed · D2 decided · 2 open</b></span>
+      <span class="tag">Status <b>Proposed · D1 + D2 decided · D3 open</b></span>
       <span class="tag">Updated <b>Jul 14, 2026</b></span>
     </div>
   </header>
@@ -249,10 +250,10 @@
 
   <!-- 09 -->
   <section>
-    <div class="sec-head"><span class="n">09</span><h2>Open decisions</h2></div>
+    <div class="sec-head"><span class="n">09</span><h2>Decisions</h2></div>
     <ul class="list open">
-      <li><b>D1 · Curation ambition.</b> Ship <b>OSM-only</b> first (proven, free, human fills gaps) or go straight to the <b>OSM + LLM-scout blend</b> (richer, more to build)? <i>Leaning: OSM-only for city #1, add scout once the gate tells us what it's missing.</i></li>
-      <li><b>D2 · Draft: agent or one-shot.</b> <i>Decided: one-shot default, agent as a targeted upgrade.</i> The proven one-shot (<code>generate.mjs</code>) drafts every spot; a spot escalates to the <b>research-agent pass</b> (web-grounded, then self-checked against the voice + honesty guide) <b>only when its vet-stage copy is vague or its specifics can't be trusted</b> — typically thin-knowledge places (an obscure Blue Ridge overlook), not major-city landmarks. So the extra cost is spent only where it buys accuracy, and the trigger is the quality review, not an upfront choice. How often the agent is actually needed is a question city #1 answers.</li>
+      <li class="decided"><b>D1 · Curation ambition.</b> <i>Decided: OSM-only for city #1.</i> Curate candidates from OSM Overpass — reusing <code>archive/poc/scout.mjs</code>'s query + scoring, retargeted from "near me now" to "rank a city's photo-worthy places" by <code>genre_profile</code> relevance, prominence, and district clustering — and let the <b>human vet fill the local-knowledge gaps</b>. Escalate to the <b>OSM + LLM-scout blend</b> when vetting shows the gate mostly <i>adding</i> spots OSM never surfaced rather than <i>pruning</i> a good list. OSM-only isn't the cheap option — it's the <b>measurement</b>: city #1's vetting is how we learn whether the scout is worth building.</li>
+      <li class="decided"><b>D2 · Draft: agent or one-shot.</b> <i>Decided: one-shot default, agent as a targeted upgrade.</i> The proven one-shot (<code>generate.mjs</code>) drafts every spot; a spot escalates to the <b>research-agent pass</b> (web-grounded, then self-checked against the voice + honesty guide) <b>only when its vet-stage copy is vague or its specifics can't be trusted</b> — typically thin-knowledge places (an obscure Blue Ridge overlook), not major-city landmarks. So the extra cost is spent only where it buys accuracy, and the trigger is the quality review, not an upfront choice. How often the agent is actually needed is a question city #1 answers.</li>
       <li><b>D3 · Imagery route.</b> Which image model / service generates the per-spot illustrations, and at what cost/size (the current ~3&nbsp;MB assets need compression regardless)? <i>Open.</i></li>
     </ul>
   </section>

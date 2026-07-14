@@ -62,7 +62,7 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 
 ## Where we are (Jul 14, 2026)
 Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tests), and now backed by a **live backend that pushes on its own.**
-- **E1 Content — done.** Illustrated placeholder imagery on all 5 spots; voice guide + copy audit; pipeline built (running deferred).
+- **E1 Content — pipeline LIVE (scaling now).** Illustrated imagery on the 5 spots; voice guide + copy audit. Content-at-scale pipeline (`docs/engineering/CONTENT_PIPELINE.html`) **built and run**: `content-pipeline/curate.mjs` (OSM → genre-scored, diversity-capped candidates + a self-contained vet page) → human vet → `generate.mjs` (Claude draft, multi-genre). **Nashville: 13 spots curated → vetted → drafted for $0.17 → committed `content-pipeline/content/nashville.json`.** Atlanta expansion in vetting (excludes the 5 live spots). NEXT: Image + Serve (importer → Postgres).
 - **E2 Gear — done.** Catalog + matching engine wired everywhere (Bag camera picker + lens chips + "Your kit shoots"; Today/Lock/Plan name the fitting lens, honest); profile persists on-device. Only **G3** (banner re-prompt) remains.
 - **E3 Nudge — DONE, end-to-end.** N1 brain (`lib/nudge.ts`) · N3 fresh copy (`lib/nudgeCopy.ts`) · N4 return-loop journal (`lib/journal.ts`) · **N2 real push** (`supabase/functions/nudge/`) — a Deno port of the brain, deployed, sending via Expo Push, **scheduled nightly by pg_cron** (`vantage-nightly-nudge`, ~6 pm Atlanta). Verified buzzing a real Pixel.
 - **E4 Backend — foundation live.** Supabase (schema + RLS + anon auth), app↔cloud sync (`lib/sync.ts`), deployed edge function + cron. Plain-English map: `docs/BACKEND_FIELD_GUIDE.html`. (Precompute/cache/real-events B2–B5 still planned.)
@@ -74,7 +74,7 @@ Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tes
 **Pick up here next (nothing urgent):**
 1. **Verify E7 on the Pixel** — merge branch `e7-ux-review`, run an `eas build`, and eyeball the on-device-only items (row 15): haptics feel, notification look, safe areas (sticky CTA vs gesture bar), thumb reach, contrast, permission timing.
 2. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
-3. **Real data over placeholders (E1 — the biggest workstream)** — content at scale is designed in **`docs/engineering/CONTENT_PIPELINE.html`** (Curate → Vet 👤 → Draft → Image → Serve; both/and data model = git reviews, Postgres serves, Storage holds images; retires the `lib/spots.ts` ↔ nudge-fn duplication). First slice: Curate→Vet one city (Nashville, OSM-only) → run the built draft pipeline → eyeball quality. The Plan week's day labels are now real-dated (#P1) but its spots are still placeholder.
+3. **Content at scale (E1 — the biggest workstream)** — pipeline built + run (`docs/engineering/CONTENT_PIPELINE.html`). Nashville content is drafted + committed; Atlanta expansion is in vetting. **NEXT stages: Image** (GPT Image 1.5 per spot, per-city ref for cohesion, WebP <300 KB) **+ Serve** (importer loads `content/<city>.json` → Postgres `spots`/`cities` `genres text[]`; app reads a city pack; point the nudge fn at the table → retires the `lib/spots.ts` ↔ nudge-fn duplication). The Plan week's day labels are real-dated (#P1) but its spots are still placeholder.
 4. **P2 — device GPS** instead of hardcoded downtown Atlanta.
 5. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
 

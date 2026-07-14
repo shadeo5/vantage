@@ -25,6 +25,12 @@
     "plugins": [
       "expo-font",
       "expo-notifications"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "487f03db-c943-4095-b3cd-037568e5c9bb"
+      }
+    },
+    "owner": "shadeo5"
   }
 }

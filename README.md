@@ -46,6 +46,8 @@ Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output 
 
 **`docs/BACKEND_FIELD_GUIDE.html`** — plain-English visual walkthrough of the whole push backend (Supabase · Expo · Firebase, what each does + why). Great starting point if the backend feels like a lot.
 
+**`docs/UX_REVIEW.html`** — full prioritized UX audit (Jul 13): 2 P0 · 7 P1 · 6 P2, screen-by-screen + on-device checklist. Top fixes: Bag-tab onboarding chrome, Plan's wrong/hardcoded dates.
+
 **`docs/BACKLOG.md`** — the **epic-organized backlog** (epics → just-in-time stories). **Start here for "what's next."**
 
 ## `archive/` — history, NOT the plan

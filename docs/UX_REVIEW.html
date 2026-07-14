@@ -1,0 +1,257 @@
+<title>Vantage — Full UX Review</title>
+<style>
+  :root{
+    --ground:#0F0F11;--surface:#17161a;--sunk:#121114;--raised:#201e24;
+    --ink:#F4F1EA;--muted:#a5a1ac;--faint:#6f6b76;
+    --gold:#E9B872;--gold-deep:#F2A93B;--clay:#e0876f;--blue:#8aa2d6;--green:#7FB07A;
+    --hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 14px 34px rgba(0,0,0,.4);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){:root{
+    --ground:#F5F1E9;--surface:#fffdf8;--sunk:#ece7db;--raised:#fff;
+    --ink:#231f18;--muted:#5f5a4f;--faint:#8b8577;
+    --gold:#9a6e1e;--gold-deep:#b07f1a;--clay:#b4522f;--blue:#3f5c86;--green:#4f7a48;
+    --hair:rgba(40,30,10,.12);--hair-strong:rgba(40,30,10,.22);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 14px 32px rgba(30,22,10,.07);
+  }}
+  :root[data-theme="light"]{--ground:#F5F1E9;--surface:#fffdf8;--sunk:#ece7db;--raised:#fff;--ink:#231f18;--muted:#5f5a4f;--faint:#8b8577;--gold:#9a6e1e;--gold-deep:#b07f1a;--clay:#b4522f;--blue:#3f5c86;--green:#4f7a48;--hair:rgba(40,30,10,.12);--hair-strong:rgba(40,30,10,.22);--shadow:0 1px 2px rgba(30,22,10,.05),0 14px 32px rgba(30,22,10,.07);}
+  :root[data-theme="dark"]{--ground:#0F0F11;--surface:#17161a;--sunk:#121114;--raised:#201e24;--ink:#F4F1EA;--muted:#a5a1ac;--faint:#6f6b76;--gold:#E9B872;--gold-deep:#F2A93B;--clay:#e0876f;--blue:#8aa2d6;--green:#7FB07A;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 14px 34px rgba(0,0,0,.4);}
+
+  *{box-sizing:border-box;}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;margin:0;-webkit-font-smoothing:antialiased;}
+  .page{max-width:940px;margin:0 auto;padding:58px 22px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,6vw,54px);line-height:1.04;letter-spacing:-.01em;margin:14px 0 14px;text-wrap:balance;}
+  .lede{font-size:18.5px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px;}
+  .tag{font-family:var(--mono);font-size:11.5px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:54px;}
+  h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;margin:0 0 4px;}
+  .h2-sub{color:var(--faint);font-size:14px;margin:0 0 22px;}
+  h3{font-family:var(--serif);font-weight:500;font-size:20px;margin:26px 0 4px;color:var(--ink);}
+  .screen-tag{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);}
+  p{color:var(--muted);max-width:66ch;} p b{color:var(--ink);font-weight:600;}
+
+  /* callout — what's working */
+  .win{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--green);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);}
+  .win .k{font-family:var(--mono);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);margin-bottom:9px;}
+  .win ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;} .win li{color:var(--muted);font-size:15px;} .win li b{color:var(--ink);}
+
+  /* priority summary */
+  .pri{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0;}
+  @media(max-width:560px){.pri{grid-template-columns:1fr;}}
+  .pcard{background:var(--surface);border:1px solid var(--hair);border-top:3px solid var(--pc);border-radius:14px;padding:15px 16px;box-shadow:var(--shadow);}
+  .pcard .n{font-family:var(--serif);font-size:30px;color:var(--pc);line-height:1;}
+  .pcard .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-top:6px;}
+  .pcard .desc{font-size:13px;color:var(--muted);margin-top:6px;}
+  .p0c{--pc:var(--clay);} .p1c{--pc:var(--gold);} .p2c{--pc:var(--blue);}
+
+  ol.top{list-style:none;counter-reset:t;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:11px;}
+  ol.top li{counter-increment:t;position:relative;padding-left:40px;color:var(--ink);font-size:15.5px;max-width:70ch;}
+  ol.top li::before{content:counter(t);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1a1408;font-family:var(--mono);font-weight:700;font-size:13px;display:grid;place-items:center;}
+  ol.top li small{color:var(--faint);}
+
+  /* findings */
+  .finding{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:15px 18px;margin:12px 0;box-shadow:var(--shadow);}
+  .finding .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .sev{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:5px;border:1px solid;white-space:nowrap;}
+  .sev.p0{color:var(--clay);border-color:color-mix(in srgb,var(--clay) 50%,transparent);background:color-mix(in srgb,var(--clay) 13%,transparent);}
+  .sev.p1{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,transparent);background:color-mix(in srgb,var(--gold) 13%,transparent);}
+  .sev.p2{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 50%,transparent);background:color-mix(in srgb,var(--blue) 13%,transparent);}
+  .finding h4{margin:0;font-family:var(--sans);font-weight:600;font-size:16px;color:var(--ink);}
+  .finding p{margin:8px 0 0;font-size:14.5px;}
+  .finding .fix{margin-top:9px;font-size:14.5px;color:var(--ink);padding-left:16px;border-left:2px solid var(--gold);}
+  .finding .fix b{color:var(--gold);}
+
+  ul.list{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:11px;}
+  ul.list li{padding-left:20px;position:relative;color:var(--muted);max-width:68ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:5px;}
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">UX Audit · Design Review</div>
+    <h1>Vantage — a full UX review</h1>
+    <p class="lede">A screen-by-screen read of the app, judged against its own mission — <b>nudge people out to shoot, inspire don't nag, own the life not the light</b>. The headline: this is <b>a genuinely strong, cohesive product</b>, not a prototype pretending to be one. The work now is closing the last gaps between "impressive demo" and "feels finished."</p>
+    <div class="meta">
+      <span class="tag">Reviewed <b>Today · Detail · Plan · Bag</b></span>
+      <span class="tag">Surface <b>web preview (phone-scale)</b></span>
+      <span class="tag">Findings <b>2 P0 · 7 P1 · 6 P2</b></span>
+      <span class="tag">Date <b>Jul 13, 2026</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>First — what's genuinely working</h2>
+    <p class="h2-sub">Lead with the truth: most of this is good, and it should be protected, not "fixed."</p>
+    <div class="win">
+      <div class="k">Strengths to keep</div>
+      <ul>
+        <li><b>The aesthetic is premium and coherent.</b> Warm golden-hour palette, editorial serif headers, restrained gold accent — it reads like a real product with a point of view, not a template.</li>
+        <li><b>The voice is excellent and consistent.</b> "Grab your 35mm and go," "Where the good frames hide," the honest gear lines — specific, warm, present tense. It matches VOICE.md and it makes the app feel like a friend, not a utility.</li>
+        <li><b>Gear-awareness is real and threaded everywhere.</b> The pick, the "why," the fit labels all reflect your actual kit. That's the differentiator, and it lands.</li>
+        <li><b>The nudge-first hierarchy is clear.</b> One confident pick on top, options beneath. The screen answers "where do I go tonight?" in one glance.</li>
+        <li><b>Lovely differentiated details.</b> The light-quality ramp chart, the illustrated spot art, the "why this pick" breakdown — these are the moments people screenshot.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Priorities at a glance</h2>
+    <p class="h2-sub">Severity is about impact on the mission (get people to shoot), not effort.</p>
+    <div class="pri">
+      <div class="pcard p0c"><div class="n">2</div><div class="lab">P0 · fix first</div><div class="desc">Misleads or contradicts reality; erodes trust in the app.</div></div>
+      <div class="pcard p1c"><div class="n">7</div><div class="lab">P1 · real polish</div><div class="desc">Dampens the "inspire" goal or leaves demo seams showing.</div></div>
+      <div class="pcard p2c"><div class="n">6</div><div class="lab">P2 · refine / verify</div><div class="desc">Nice-to-have, or needs checking on the actual phone.</div></div>
+    </div>
+    <h3 style="margin-top:26px">If you only do five things</h3>
+    <ol class="top">
+      <li>Make the <b>Bag tab a real gear screen</b> — strip the "SETUP · 2 OF 3 / Continue / Skip" onboarding chrome. <small>(P0 · #B1)</small></li>
+      <li>Fix the <b>Plan week</b> — it says "TONIGHT · SAT" on a Monday and never changes. <small>(P0 · #P1)</small></li>
+      <li>Stop showing the <b>"Add your gear" banner once gear is set</b>, and hide the <b>"Activity — coming soon"</b> placeholder. <small>(P1 · #T1, #T3)</small></li>
+      <li>Rethink the <b>"MEDIUM" confidence label</b> — it reads as "meh" on the one screen meant to excite. <small>(P1 · #T2)</small></li>
+      <li>Make the <b>heart/save actually save</b> — right now it looks functional but forgets. <small>(P1 · #D1)</small></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Today</h2>
+    <p class="h2-sub">The heart of the app — the nudge moment. Strong bones; a few things quietly undercut the "inspire" job.</p>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #T1</span><h4>The "Add your gear" banner persists after gear is added</h4></div>
+      <p>Your bag already holds a Sony a7 IV + 35mm, yet the top banner still says <b>"Add your gear — picks matched to the lens in your bag."</b> It's the first thing you see, and it's telling you to do something you've done. It reads as broken.</p>
+      <div class="fix"><b>→ Fix:</b> only show it when gear is empty; once set, either drop it or flip it to a quiet, dismissible "Tuned to your a7 IV · edit." (This is the G3 re-prompt story — dismiss with a floor, re-ask on real events, not every launch.)</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #T2</span><h4>"TONIGHT'S PICK · MEDIUM" surfaces internal confidence as a flat label</h4></div>
+      <p>On the one screen whose entire job is to <b>excite you into going</b>, the badge says "MEDIUM." To a user that reads as "eh, maybe." The confidence score is great <i>engineering</i>, but exposed raw it dampens the very feeling the pick should create.</p>
+      <div class="fix"><b>→ Fix:</b> reserve a visible flourish for <b>HIGH</b> nights only ("TONIGHT'S PICK ✦"), show nothing extra on medium, and let a genuinely weak night become the honest "quiet night" state instead of a labeled "MEDIUM." Never make the user grade their own evening a C.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #T3</span><h4>"Activity — Live event signal, coming soon" shows a placeholder to the user</h4></div>
+      <p>Inside "Why this pick?", the Activity line literally says <b>"coming soon."</b> Honest internally, but to a user it's an admission that a third of the reasoning isn't built. It makes the product feel unfinished at its most persuasive moment.</p>
+      <div class="fix"><b>→ Fix:</b> hide the Activity row until events exist, rather than showing an IOU. Two strong reasons (Light, Your kit) beat two strong + one "coming soon."</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #T4</span><h4>The avatar shows "M" — and goes nowhere</h4></div>
+      <p>Top-right avatar reads <b>"M"</b> (a leftover mock initial; you're Desha), and tapping it does nothing — there's no profile/account. In a personalization-first app, the wrong initial is a small credibility ding.</p>
+      <div class="fix"><b>→ Fix:</b> derive the initial (or drop the avatar until there's a profile to open). If it stays, it should lead somewhere — even just to the Bag/settings.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #T5</span><h4>The Today→Detail transition flashed black on web</h4></div>
+      <p>Opening a spot showed a black frame mid-animation (the opacity + translateY entrance). May be a web-only artifact, but a black flash on every open would feel janky.</p>
+      <div class="fix"><b>→ Fix:</b> verify on the Pixel; if present, cross-fade from the current screen rather than fading up from black, and confirm the hero image is loaded before animating.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Spot Detail</h2>
+    <p class="h2-sub">The best-looking screen in the app. Two functional gaps.</p>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #D1</span><h4>The heart/save looks functional but doesn't persist</h4></div>
+      <p>The save heart toggles visually but forgets on reload (persistence was deferred). A control that looks real but silently does nothing is worse than no control — it quietly teaches users the app doesn't remember them.</p>
+      <div class="fix"><b>→ Fix:</b> either wire it to local + cloud storage (you already have both patterns), or remove it until there's a Saved surface to hold the results.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #D2</span><h4>The light chart is beautiful but under-explained</h4></div>
+      <p>"When the light works" with a ramping bar chart + Golden/Blue/Flat legend is a standout — but a non-obsessive shooter may not read what the bars <i>mean</i> (quality over the day) or spot the "now" marker.</p>
+      <div class="fix"><b>→ Fix:</b> one plain-language line ("taller = better light; you're here →") turns a pretty chart into a understood one. Make the "now" bar unmistakable.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Plan</h2>
+    <p class="h2-sub">Conceptually right (browse/commit for the week), but it's the most "demo" screen — and it has a factual bug.</p>
+
+    <div class="finding">
+      <div class="head"><span class="sev p0">P0 · #P1</span><h4>The week is hardcoded — and the day labels are wrong</h4></div>
+      <p>It's Monday, but the first card says <b>"TONIGHT · SAT."</b> The whole week (Sat / Sun / Wed / Fri, fixed spots, fixed reasons) is static placeholder data that never changes. The moment a user notices the day is wrong, the app's credibility as a "live" tool takes a real hit — this is the same trust the nudge depends on.</p>
+      <div class="fix"><b>→ Fix (near-term):</b> at minimum, generate day labels from the real date so "tonight" is actually tonight. <b>Longer-term:</b> the week should come from the same brain that drives Today, ranked out over the next several days' light — not a hand-typed list.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #P2</span><h4>Four full-width gold "I'm going" buttons flatten the hierarchy</h4></div>
+      <p>Every card carries a big, full-bleed gold "I'm going" bar. Gold is your <i>accent</i> — the color that's supposed to mean "this, now." Repeated four times at full size, it stops signaling anything and the screen feels heavy and same-y.</p>
+      <div class="fix"><b>→ Fix:</b> demote the per-card action to a smaller, secondary control (outline or a compact pill), and reserve the big solid-gold CTA for the single primary nudge. Let the eye rest.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #P3</span><h4>"fits your 35mm" repeats on every card</h4></div>
+      <p>The fit label is a nice touch, but identical on all cards it becomes wallpaper. (Correct — your kit does fit them all — but visually redundant.)</p>
+      <div class="fix"><b>→ Fix:</b> show the fit label only when it <i>differs</i> from the obvious (e.g. "grab a tele" on a spot your kit doesn't cover), so it earns attention when it appears.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Bag</h2>
+    <p class="h2-sub">The clearest UX problem in the app lives here: an onboarding screen wearing a navigation tab's clothes.</p>
+
+    <div class="finding">
+      <div class="head"><span class="sev p0">P0 · #B1</span><h4>The Bag <i>tab</i> is still an onboarding <i>step</i></h4></div>
+      <p>Tapping "Bag" in the nav — to just check or tweak your gear — drops you into <b>"SETUP · 2 OF 3,"</b> with <b>"Continue"</b> and <b>"Skip — I'll add later"</b> at the bottom. But there's no 3-step setup flow (the app opens on Today), so "2 OF 3" points at steps that don't exist, and "Skip / Continue" imply a wizard you're not in. It's disorienting every time you visit the tab.</p>
+      <div class="fix"><b>→ Fix:</b> split the two jobs. Keep a first-run onboarding if you want one, but the <b>Bag tab</b> should be a calm gear-manager: title "Your bag," no step counter, and a single "Done" (or nothing — changes auto-save, which they already do). Kill "Skip — I'll add later" on a destination you chose to open.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p1">P1 · #B2</span><h4>No real first-run path to setting gear</h4></div>
+      <p>New user lands on Today (good). To set gear they tap the "Add your gear" banner → Bag → which then shows the confusing wizard chrome above. So the one onboarding action funnels into the one broken-feeling screen.</p>
+      <div class="fix"><b>→ Fix:</b> decide the model. Simplest: <b>no wizard</b> — Today works out of the box with sensible defaults, and Bag is always just gear management. The banner (when gear is unset) becomes a gentle "personalize your picks →," not a mandatory step.</div>
+    </div>
+
+    <div class="finding">
+      <div class="head"><span class="sev p2">P2 · #B3</span><h4>"YOUR KIT SHOOTS" is quietly one of the best moments — surface it more</h4></div>
+      <p>Changing the camera/lenses live-updates the genre chips (Street · Architecture). It's a delightful "the app gets my gear" beat that's currently buried below the fold. This is a strength hiding as an afterthought.</p>
+      <div class="fix"><b>→ Fix:</b> give it a touch more prominence (it's the payoff of the whole screen), and consider echoing it on Today ("your kit's built for street tonight").</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Cross-cutting themes</h2>
+    <p class="h2-sub">Patterns that span screens.</p>
+    <ul class="list">
+      <li><b>Demo seams vs. real data.</b> The recurring trust-leak is placeholder data surfacing as if it's live: the Plan week, the "M" avatar, "coming soon." Each is small; together they whisper "not finished." Prioritize replacing <i>visible</i> placeholders over invisible ones.</li>
+      <li><b>Controls that don't remember.</b> Save (heart) and — verify — any other visual-only toggles. A nudge app's whole promise is "it knows you"; a control that forgets undermines that more than its size suggests.</li>
+      <li><b>Guard the "inspire, don't nag" line.</b> "MEDIUM," the persistent gear banner, "coming soon" — individually minor, but they're all small downward pressures on the exact feeling the app sells. Polishing these is high-leverage for the mission.</li>
+      <li><b>Accent discipline.</b> Gold is doing a lot of jobs (CTAs, highlights, active nav, chart bars). It's mostly well-handled, but Plan's four gold buttons show what happens when the accent over-spends. Keep solid gold for "the one thing to do now."</li>
+      <li><b>The come-back loop is thin.</b> Nudge → shoot → return → <i>discovery</i> is the strategy, but on return there's little <i>new</i> to discover (Plan is static, no fresh content). The return moment (check-in + journal) works; what it returns you <i>to</i> needs freshness to close the loop.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Needs on-device evaluation</h2>
+    <p class="h2-sub">You have it on the Pixel now — these can only be judged in the hand, and they're where "experience" really lives.</p>
+    <ul class="list">
+      <li><b>The notification itself.</b> How the nudge actually reads on the lock screen — title/body truncation, the app icon, sound, whether it earns the tap. This is the product's front door; screenshot it and scrutinize it.</li>
+      <li><b>Touch targets & thumb reach.</b> The lens chips, the small "why" chevron, the back/heart circles — are they comfortably tappable one-handed? Is the primary action in the thumb zone?</li>
+      <li><b>Safe areas.</b> The sticky "I'm going" vs. the Pixel's gesture bar; the header vs. the status bar / notch. Verify nothing is clipped or fighting the system UI.</li>
+      <li><b>Motion & haptics.</b> Do "I'm going," toggles, and tab switches have haptic feedback? Do the animations feel native or webby? (See the black-flash note.)</li>
+      <li><b>Contrast in real light.</b> The muted-grey-on-dark labels look fine on a monitor; check them outdoors, at dusk, one-handed — the actual context of use.</li>
+      <li><b>Permission timing.</b> The notification-permission prompt fires on launch; consider asking it in-context ("want a nudge when tonight's good?") right after the first great pick, when the value is obvious.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>The bottom line</h2>
+    <p>Vantage already <i>feels</i> like something — the hard part (a real voice, a coherent look, a working brain that reaches your phone) is done and done well. What's left is unglamorous but high-leverage: <b>remove the visible demo seams, make every control keep its promise, and protect the "inspire" feeling from small downward tugs.</b> None of the P0/P1 items are big builds — they're the difference between "wow, a prototype" and "wait, this is a real app I'd use." Start with the Bag tab and the Plan dates; they're the two that actively contradict reality.</p>
+  </section>
+
+  <footer>Vantage · full UX review · reviewed on web at phone scale · findings are opinions, not commandments — argue with them</footer>
+</div>

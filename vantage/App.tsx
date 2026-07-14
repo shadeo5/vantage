@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar, useWindowDimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, StatusBar, Pressable, useWindowDimensions, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
 import { useFonts } from "expo-font";
 import { Newsreader_400Regular, Newsreader_500Medium } from "@expo-google-fonts/newsreader";
 import {
@@ -165,7 +166,14 @@ export default function App() {
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
             </View>
-            <View style={styles.avatar}><Text style={styles.avatarText}>M</Text></View>
+            {/* Neutral gear/profile entry (#T4) — no mock initial (there's no name to
+                derive), and it leads to the Bag tab instead of being a dead tap. */}
+            <Pressable onPress={() => goToTab("bag")} accessibilityLabel="Your gear" accessibilityRole="button" hitSlop={8} android_ripple={{ color: "rgba(255,255,255,0.1)", borderless: true, radius: 24 }} style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.6 }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.muted3} strokeWidth={1.8}>
+                <Circle cx={12} cy={8} r={3.4} />
+                <Path d="M5.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+              </Svg>
+            </Pressable>
           </View>
           <InspirationHero
             spot={hero} goldenRange={goldenRange} gearLens={gearLens}
@@ -236,7 +244,6 @@ const styles = StyleSheet.create({
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, lineHeight: 32, marginTop: 6 },
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: "#2a2a30", borderWidth: 1, borderColor: colors.hairline, justifyContent: "center", alignItems: "center" },
-  avatarText: { color: colors.ink, fontFamily: fonts.sansSemi, fontSize: 15 },
   secHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 },
   secTitle: { color: colors.ink, fontFamily: fonts.serif, fontSize: 22 },
   secCount: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 13 },

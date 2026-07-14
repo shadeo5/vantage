@@ -123,6 +123,13 @@ export default function App() {
   // Fresh, personal push copy for the lock screen (N3).
   const lockCopy = nudgeCopy(verdict, gearLens, now);
 
+  // Echo the Bag's "your kit shoots" payoff on Today (#B3) — a quiet reminder that
+  // the picks are tuned to the gear. Humanized list of up to three genres.
+  const kitEcho = kitGenres(cameraId, lenses).slice(0, 3).map((g) => g.toLowerCase());
+  const kitEchoText = kitEcho.length === 0 ? null
+    : kitEcho.length === 1 ? kitEcho[0]
+    : `${kitEcho.slice(0, -1).join(", ")} & ${kitEcho[kitEcho.length - 1]}`;
+
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (id: string) =>
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
   const toggleGoing = toggle(setGoing);
@@ -165,6 +172,7 @@ export default function App() {
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
+              {kitEchoText && <Text style={styles.kitEcho}>Your kit shoots {kitEchoText}.</Text>}
             </View>
             {/* Neutral gear/profile entry (#T4) — no mock initial (there's no name to
                 derive), and it leads to the Bag tab instead of being a dead tap. */}
@@ -243,6 +251,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "flex-start", marginBottom: 22 },
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, lineHeight: 32, marginTop: 6 },
+  kitEcho: { color: colors.muted2, fontFamily: fonts.sans, fontSize: 13, marginTop: 8 },
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: "#2a2a30", borderWidth: 1, borderColor: colors.hairline, justifyContent: "center", alignItems: "center" },
   secHead: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 },
   secTitle: { color: colors.ink, fontFamily: fonts.serif, fontSize: 22 },

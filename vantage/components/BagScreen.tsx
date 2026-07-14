@@ -61,14 +61,18 @@ export function BagScreen({
         })}
       </View>
 
-      <Text style={styles.section}>YOUR KIT SHOOTS</Text>
-      <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
-      <View style={styles.chips}>
-        {kitGenres.length === 0
-          ? <Text style={styles.kitSub}>Add a lens to see what this body can shoot.</Text>
-          : kitGenres.map((g) => (
-              <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
-            ))}
+      {/* The payoff of the screen (#B3) — elevated into its own gold panel so it
+          reads as the reward for setting gear, not an afterthought below the fold. */}
+      <View style={styles.kitPanel}>
+        <Text style={styles.kitPanelLabel}>YOUR KIT SHOOTS</Text>
+        <Text style={styles.kitSub}>Matched from your gear — updates as you change camera or lenses.</Text>
+        <View style={styles.chips}>
+          {kitGenres.length === 0
+            ? <Text style={styles.kitSub}>Add a lens to see what this body can shoot.</Text>
+            : kitGenres.map((g) => (
+                <View key={g} style={styles.genrePill}><Text style={styles.genreText}>{g}</Text></View>
+              ))}
+        </View>
       </View>
 
       <Pressable onPress={onToggleStyle} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.dashed2, pressed && { opacity: 0.7 }]}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
@@ -109,7 +113,9 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: "rgba(233,184,114,0.16)", borderColor: "rgba(233,184,114,0.5)" },
   chipOff: { backgroundColor: colors.surface, borderColor: colors.hairline },
   chipText: { fontFamily: fonts.sansSemi, fontSize: 13.5 },
-  kitSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginTop: -4, marginBottom: 12 },
+  kitPanel: { marginTop: 24, backgroundColor: "rgba(233,184,114,0.07)", borderWidth: 1, borderColor: "rgba(233,184,114,0.22)", borderRadius: 16, padding: 16 },
+  kitPanelLabel: { color: colors.golden, fontFamily: fonts.sansSemi, fontSize: 12.5, letterSpacing: 0.6, marginBottom: 8 },
+  kitSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 13, marginBottom: 12 },
   genrePill: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 22, backgroundColor: "rgba(233,184,114,0.12)", borderWidth: 1, borderColor: "rgba(233,184,114,0.35)" },
   genreText: { color: "#F0D9AE", fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed2: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 14, marginTop: 22 },

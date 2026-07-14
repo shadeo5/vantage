@@ -59,7 +59,11 @@ export default function App() {
   // Horizontal pager (N1): Today/Plan/Bag are three full-width pages; swipe and the
   // bottom bar both drive it and stay in sync. Detail rides above as an overlay so the
   // pager keeps its scroll position underneath.
-  const { width, height } = useWindowDimensions();
+  const { width: winWidth, height } = useWindowDimensions();
+  // Cap the content to a phone-scale column on wide screens (web) so the UI doesn't
+  // stretch edge-to-edge; on a real phone winWidth is already below the cap. The pager's
+  // paging math uses this same capped width, so swipe + scrollTo stay consistent.
+  const width = Math.min(winWidth, 440);
   const pagerRef = useRef<ScrollView>(null);
   const goToTab = (t: Tab) => {
     pagerRef.current?.scrollTo({ x: TABS.indexOf(t) * width, animated: true });
@@ -155,6 +159,7 @@ export default function App() {
     <View style={styles.root}>
       <StatusBar barStyle="light-content" />
 
+      <View style={[styles.column, { width }]}>
       <ScrollView
         ref={pagerRef}
         horizontal
@@ -239,12 +244,14 @@ export default function App() {
           <LockScreen onEnter={() => { setShowLock(false); goToTab("today"); }} title={lockCopy.title} body={lockCopy.body} heroImg={hero.img} />
         </View>
       )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.canvas },
+  root: { flex: 1, backgroundColor: colors.canvas, alignItems: "center" },
+  column: { flex: 1 }, // phone-scale column, width capped + centered on wide (web) screens
   pager: { flex: 1 },
   center: { justifyContent: "center", alignItems: "center" },
   content: { paddingTop: scr.padTop, paddingHorizontal: scr.padSide, paddingBottom: 118 },

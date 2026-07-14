@@ -5,6 +5,7 @@
   "private": true,
   "description": "Per-city content pipeline: real places -> Claude drafts spot content -> JSON the app can use.",
   "scripts": {
+    "curate": "node curate.mjs",
     "generate": "node generate.mjs"
   },
   "dependencies": {

@@ -1,0 +1,3 @@
+# generated curation scratch — reproducible via `npm run curate`.
+# The *vetted* per-city JSON (the source of truth) is committed under vetted/.
+out/

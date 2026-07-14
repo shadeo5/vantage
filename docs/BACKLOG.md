@@ -30,6 +30,8 @@ The app currently runs on 5 hand-curated Atlanta spots + Unsplash placeholders. 
 - ⬜ **C5 — Data model / serve (from the ADR).** `cities` + `spots` tables in Supabase; importer loads git-approved per-city JSON; app reads a cached city pack (B3 fallback = bundled Atlanta); nudge fn reads the same table. *AC: adding a published city needs no app release and no hand-synced copies.*
 - Note: mixed-genre content (street + cityscape + nature) is confirmed good — validated as "top areas to shoot today."
 - **First slice (per ADR build order):** Curate → Vet for one city (Nashville), OSM-only → run the built draft pipeline on the vetted list → eyeball quality. Then stand up the tables + importer and retire the duplication.
+  - ▶ **Curate BUILT** (`content-pipeline/curate.mjs`, `npm run curate -- <city>`): Overpass (reused from `archive/poc/scout.mjs`, no key) → genre-profiled scoring/dedup → `out/candidates.<city>.json` + a self-contained **`out/review.<city>.html`** vet surface (checkbox reject, inline name/genre edit, map/street/osm links, "download vetted JSON"). City briefs for nashville/chicago/blue-ridge. **Run live on Nashville**: 145 POIs → top 25; surfaced the Pedestrian Bridge (#1), Fort Nashborough, Farmer's Market. HONEST GAPS (the D1 escalation signal): statue-heavy (`tourism=artwork` = individual pieces), misses vibe-streets (Broadway, Gulch murals) — exactly what the human vet cuts/adds and the LLM-scout would later close. `out/` is gitignored; vetted list lands in `content-pipeline/vetted/`.
+  - 🎯 **NEXT: Vet** (human) → produce `content-pipeline/vetted/nashville.json`, then run `generate.mjs` on it (first real API spend) and eyeball copy quality.
 
 ---
 

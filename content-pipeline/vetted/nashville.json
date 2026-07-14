@@ -1,0 +1,15 @@
+[
+  { "name": "John Seigenthaler Pedestrian Bridge", "genre": "Street", "genres": ["Street", "Architecture", "Landscape"], "lat": 36.162298, "lon": -86.772372 },
+  { "name": "Capitol Boulevard", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.163846, "lon": -86.782968 },
+  { "name": "Deaderick Street", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.164735, "lon": -86.782883 },
+  { "name": "Woodland Street Bridge", "genre": "Architecture", "genres": ["Architecture", "Landscape", "Street"], "lat": 36.167678, "lon": -86.775585 },
+  { "name": "Fort Nashborough", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.164192, "lon": -86.775364 },
+  { "name": "Symphony Place", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.160229, "lon": -86.775871 },
+  { "name": "WhatLiftsYou", "genre": "Street", "genres": ["Street", "Portraits"], "lat": 36.15391, "lon": -86.784019 },
+  { "name": "Mixtape: Memories mural (Wedgewood-Houston)", "genre": "Street", "genres": ["Street", "Portraits"], "lat": 36.131892, "lon": -86.768722 },
+  { "name": "Printers Alley", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.164512, "lon": -86.778678 },
+  { "name": "Arcade Street", "genre": "Architecture", "genres": ["Architecture", "Street"], "lat": 36.164231, "lon": -86.780096 },
+  { "name": "Parthenon", "genre": "Architecture", "genres": ["Architecture", "Landscape"], "lat": 36.149716, "lon": -86.813382 },
+  { "name": "Belmont Mansion", "genre": "Architecture", "genres": ["Architecture"], "lat": 36.135602, "lon": -86.794772 },
+  { "name": "Capitol Hill", "genre": "Architecture", "genres": ["Architecture", "Landscape"], "lat": 36.165186, "lon": -86.784041 }
+]

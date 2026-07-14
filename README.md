@@ -42,7 +42,9 @@ Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output 
 - `TECH_DECISIONS.html` — living record of technical choices
 - `EVENTS_ARCHITECTURE.html` — ADR: how events + spots reconcile (Opportunity model, photo-lens gate, eclipse rule) — for the deferred events epic (E4)
 - `GEAR_MATCHING.html` — ADR: how a photographer's kit maps to shootable genres (the matching engine, + the open "filter vs. re-rank vs. annotate" decision) — epic E2/G2
-- `PUSH_ARCHITECTURE.html` — ADR: how the in-app nudge becomes a real push (Supabase cron → the ported brain → Expo Push) — epics E4 + E3/N2, in progress
+- `PUSH_ARCHITECTURE.html` — ADR: how the in-app nudge becomes a real push (Supabase cron → the ported brain → Expo Push) — **shipped** (E4 + E3/N2)
+
+**`docs/BACKEND_FIELD_GUIDE.html`** — plain-English visual walkthrough of the whole push backend (Supabase · Expo · Firebase, what each does + why). Great starting point if the backend feels like a lot.
 
 **`docs/BACKLOG.md`** — the **epic-organized backlog** (epics → just-in-time stories). **Start here for "what's next."**
 
@@ -56,20 +58,22 @@ Superseded by the strategy pivot (route-planning → nudge-first) or finished wo
 - `poc/` — the throwaway script that validated the whole idea (still runnable: `cd archive/poc && npm run scout`)
 - `Photographer Location Scout App.zip` — original design zip (extracted into `docs/design_handoff_vantage/`); safe to delete anytime
 
-## Where we are (Jul 12, 2026)
-Strategy locked. Redesigned app **built** (all 5 screens + nav) and running on web. Codebase cleaned + unit-tested (53 tests).
-- **E1 Content — done.** Illustrated placeholder imagery wired into all 5 spots (`assets/spots/`); voice guide + copy audit (C3); content pipeline built but running deferred.
-- **E2 Gear — essentially done.** Camera/lens catalog + matching engine (`vantage/lib/gear.ts`, ADR `docs/engineering/GEAR_MATCHING.html`) fully **wired**: Bag has a catalog camera picker (19 bodies) + lens chips + live "Your kit shoots"; Today/Lock/Plan copy names the lens that fits tonight's spot (annotate-only, honest); the profile **persists on-device** (`lib/gearProfile.ts` + `lib/gearStorage.ts`). Only **G3** (gear-banner re-prompt logic) remains.
-- Events architecture designed (ADR) incl. the photo-lens gate — for the deferred E4.
+## Where we are (Jul 13, 2026)
+Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tests), and now backed by a **live backend that pushes on its own.**
+- **E1 Content — done.** Illustrated placeholder imagery on all 5 spots; voice guide + copy audit; pipeline built (running deferred).
+- **E2 Gear — done.** Catalog + matching engine wired everywhere (Bag camera picker + lens chips + "Your kit shoots"; Today/Lock/Plan name the fitting lens, honest); profile persists on-device. Only **G3** (banner re-prompt) remains.
+- **E3 Nudge — DONE, end-to-end.** N1 brain (`lib/nudge.ts`) · N3 fresh copy (`lib/nudgeCopy.ts`) · N4 return-loop journal (`lib/journal.ts`) · **N2 real push** (`supabase/functions/nudge/`) — a Deno port of the brain, deployed, sending via Expo Push, **scheduled nightly by pg_cron** (`vantage-nightly-nudge`, ~6 pm Atlanta). Verified buzzing a real Pixel.
+- **E4 Backend — foundation live.** Supabase (schema + RLS + anon auth), app↔cloud sync (`lib/sync.ts`), deployed edge function + cron. Plain-English map: `docs/BACKEND_FIELD_GUIDE.html`. (Precompute/cache/real-events B2–B5 still planned.)
+- **E5 Platform — Android shipped.** Dev build (preview APK) installed on the Pixel; Firebase FCM configured.
 
-**E3 Nudge — mostly done (only real push delivery, N2, is left):** ✅ **N1 nudge brain** (`lib/nudge.ts`) decides tonight's pick + confidence + "why" (light-timing × gear-fit; activity = placeholder). ✅ **N3 richer copy** (`lib/nudgeCopy.ts`) — fresh, personal, confidence-tiered push lines, deterministically varied per day. ✅ **N4 return-loop** (`lib/journal.ts`) — "I'm going" → on return "did you make it?" → shooting journal + return metric. The in-app hero *is* the nudge; the loop (nudge → shoot → return → check-in) is closed.
+**🎯 The north star is done: the app buzzes your phone each evening, on its own, only when the light + your gear line up.** Everything below is "next," not "blocking."
 
-**E4 Backend — building (for the push nudge, N2):** design in `docs/engineering/PUSH_ARCHITECTURE.html`. Supabase project live; schema + RLS + anonymous-auth all set up. **App↔cloud sync is LIVE** (`vantage/lib/sync.ts`): the app anonymously signs in on launch and mirrors the gear profile to the `profiles` table (verified — row visible in Table Editor).
+**Pick up here next (nothing urgent):**
+1. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
+2. **Real data over placeholders** — the Plan week is still hardcoded; spots + events want real sourcing (E4 B2/B4, E1 content).
+3. **P2 — device GPS** instead of hardcoded downtown Atlanta.
+4. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
 
-**Pick up here next → two pieces left for a real push:**
-1. **Push token** — add `expo-notifications`, register for a token, save it on the profile. Needs a **Pixel dev build** (free) to actually get/receive a token.
-2. **The Edge Function** — port `nudge.ts`/`nudgeCopy.ts` server-side, run it on `pg_cron` daily, send via Expo Push using each profile's token. (Needs Desha to `supabase login` / deploy, or run via dashboard.)
-3. Apple's $99/yr only if/when we want it on an iPhone; the Pixel path is $0.
-2. Small solo items anytime: **G3** (smarter gear-banner re-prompting) · **event decisions** (EVENTS_ARCHITECTURE open questions) · content-pipeline run (deferred spend) · commit-attribution housekeeping.
+> ENV NOTE: `vantage/.env` is gitignored (recreate from `.env.example` + Supabase keys on a fresh clone). The **cloud build** gets Supabase creds from **EAS env vars**, not `.env`.
 
 > Note: the `.html` docs are also published as live shareable pages (artifacts). Editing a file here and re-publishing keeps its link.

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "930063691827",
+    "project_id": "vantage-57f96",
+    "storage_bucket": "vantage-57f96.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930063691827:android:e65017abd9a854fb0a3346",
+        "android_client_info": {
+          "package_name": "com.shadeo5.vantage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV2H1lpdCAGBUtxxY8qR4DKFnMlrlBXHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

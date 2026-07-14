@@ -34,3 +34,7 @@ yarn-error.*
 
 # local editor / tooling
 .claude/settings.local.json
+
+# firebase FCM service account key (secret — never commit)
+*service-account*.json
+google-service-account*.json

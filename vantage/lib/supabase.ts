@@ -8,7 +8,9 @@ import { createClient } from "@supabase/supabase-js";
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL ?? "";
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "";
 
-export const supabase = createClient(url, anonKey, {
+// Fall back to harmless placeholders so a missing config degrades to no-op sync
+// rather than crashing the app at startup (createClient throws on an empty URL).
+export const supabase = createClient(url || "https://unconfigured.supabase.co", anonKey || "unconfigured", {
   auth: {
     storage: AsyncStorage,
     autoRefreshToken: true,

@@ -57,12 +57,12 @@ export function InspirationHero({
         </View>
 
         <View style={styles.actions}>
-          <Pressable onPress={onGo} style={[styles.goBtn, isGoing ? styles.goOn : styles.goOff]}>
+          <Pressable onPress={onGo} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && styles.pressed]}>
             <Text style={[styles.goLabel, { color: isGoing ? colors.crowdLow : "#1a1408" }]}>
               {isGoing ? "✓ You're going" : "I'm going"}
             </Text>
           </Pressable>
-          <Pressable onPress={onOpen} style={styles.detailsBtn}><Text style={styles.detailsLabel}>Details</Text></Pressable>
+          <Pressable onPress={onOpen} android_ripple={{ color: "rgba(255,255,255,0.08)" }} style={({ pressed }) => [styles.detailsBtn, pressed && styles.pressed]}><Text style={styles.detailsLabel}>Details</Text></Pressable>
         </View>
 
         <Pressable onPress={onToggleWhy} style={styles.whyRow}>
@@ -92,6 +92,7 @@ function WhyLine({ color, k, v }: { color: string; k: string; v: string }) {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: 24, overflow: "hidden", borderWidth: 1, borderColor: colors.hairline, marginBottom: 30 },
+  pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
   banner: { height: 230, justifyContent: "flex-end", padding: 18 },
   badge: { position: "absolute", top: 14, left: 14, flexDirection: "row", alignItems: "center", gap: 7,
     backgroundColor: "rgba(10,9,11,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)", paddingHorizontal: 11, paddingVertical: 6, borderRadius: 20 },

@@ -16,25 +16,24 @@
 // ---------------------------------------------------------------------------
 
 import Anthropic from "@anthropic-ai/sdk";
-import { writeFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync } from "fs";
 
-const CITY = "Atlanta";
 const MODEL = "claude-opus-4-8";
 const CONCURRENCY = 3; // gentle on rate limits
 
-// ---- 1. INPUT: curated real places (name, genre, coords) ----
-// In production this list comes from the curation step (OSM + local knowledge);
-// here it's a fresh seed to test the drafting quality on unseen spots.
-const PLACES = [
-  { name: "Oakland Cemetery", genre: "Historic", lat: 33.7488, lon: -84.3722 },
-  { name: "Cabbagetown", genre: "Street", lat: 33.7490, lon: -84.3620 },
-  { name: "BeltLine Eastside Trail", genre: "Street", lat: 33.7690, lon: -84.3630 },
-  { name: "Castleberry Hill", genre: "Street art", lat: 33.7440, lon: -84.4030 },
-  { name: "Inman Park", genre: "Architecture", lat: 33.7620, lon: -84.3530 },
-  { name: "Sweet Auburn Curb Market", genre: "Market", lat: 33.7540, lon: -84.3800 },
-  { name: "Freedom Park", genre: "Nature", lat: 33.7620, lon: -84.3560 },
-  { name: "Georgia Tech — Tech Green", genre: "Architecture", lat: 33.7756, lon: -84.3963 },
-];
+// ---- 1. INPUT: the human-vetted places from stage 2 (Curate → Vet) ----
+// content-pipeline/vetted/<city>.json — each { name, genre, genres[], lat, lon }.
+//   npm run generate -- nashville     (defaults to nashville)
+const cityKey = (process.argv[2] || "nashville").toLowerCase();
+const CITY = cityKey.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+let PLACES;
+try {
+  PLACES = JSON.parse(readFileSync(new URL(`./vetted/${cityKey}.json`, import.meta.url), "utf8"));
+} catch {
+  console.error(`Could not read content-pipeline/vetted/${cityKey}.json — run \`npm run curate -- ${cityKey}\` and vet it first.`);
+  process.exit(1);
+}
+if (!Array.isArray(PLACES) || !PLACES.length) { console.error(`vetted/${cityKey}.json is empty.`); process.exit(1); }
 
 // ---- 2a. VOICE: the app's writing guide (part of the reusable recipe) ----
 const VOICE = `Vantage's voice: inspiring, personal, and concrete — like a local photographer friend
@@ -60,14 +59,16 @@ const SPOT_SCHEMA = {
 
 // ---- 2c. PROMPT: turns one place into a drafting instruction ----
 function buildPrompt(place) {
+  const genres = (place.genres && place.genres.length ? place.genres : [place.genre]).join(", ");
   return `${VOICE}
 
 Write the Vantage spot content for this real place in ${CITY}:
 - Name: ${place.name}
-- Genre hint: ${place.genre}
+- Genres it suits (primary first): ${genres}
 
 Rules:
 - Ground everything in what a photographer would actually find there; use real, specific detail.
+- Lead with the primary genre, but the "look" tips can nod to the others when they're genuinely there.
 - "look" must contain EXACTLY 3 tips, each a concrete frame or moment.
 - Pick "windowType" from the light that genuinely suits this place (street/night scenes often blue; open vistas golden; murals/markets can be flat).
 - Do not invent precise facts you can't be reasonably sure of (exact hours, prices, "last entry"). Keep logistics general.
@@ -91,9 +92,11 @@ async function draftOne(place) {
   return {
     id: place.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
     name: place.name,
+    genre: place.genre,                                   // primary (typed Genre) — vetted
+    genres: place.genres ?? [place.genre],                // multi-genre array, primary first
     lat: place.lat,
     lon: place.lon,
-    ...content,
+    ...content,                                           // type, windowType, reason, tagline, why, look, getting
     _tokens: res.usage,
   };
 }
@@ -125,12 +128,12 @@ async function main() {
   });
 
   mkdirSync(new URL("./out", import.meta.url), { recursive: true });
-  const outPath = new URL("./out/atlanta.json", import.meta.url);
+  const outPath = new URL(`./out/${cityKey}.json`, import.meta.url);
   writeFileSync(outPath, JSON.stringify(spots, null, 2));
 
   // rough cost: Opus 4.8 is $5 / $25 per 1M tokens (in / out)
   const cost = (inTok / 1e6) * 5 + (outTok / 1e6) * 25;
-  console.log(`\nWrote ${spots.length} spots → content-pipeline/out/atlanta.json`);
+  console.log(`\nWrote ${spots.length} spots → content-pipeline/out/${cityKey}.json`);
   console.log(`Tokens: ${inTok} in / ${outTok} out  ·  ~$${cost.toFixed(3)}`);
 }
 

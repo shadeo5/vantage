@@ -28,6 +28,7 @@ import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
 import { saveProfile, savePushToken } from "./lib/sync";
 import { registerForPush } from "./lib/push";
+import { tapFeedback, commitFeedback } from "./lib/haptics";
 
 type Tab = "today" | "plan" | "bag";
 const TABS: Tab[] = ["today", "plan", "bag"];
@@ -66,6 +67,7 @@ export default function App() {
   const width = Math.min(winWidth, 440);
   const pagerRef = useRef<ScrollView>(null);
   const goToTab = (t: Tab) => {
+    tapFeedback();
     pagerRef.current?.scrollTo({ x: TABS.indexOf(t) * width, animated: true });
     setTab(t);
   };
@@ -144,6 +146,7 @@ export default function App() {
   // Return loop (N4): "I'm going" records a commitment; a check-in resolves it into the journal.
   const commit = (spotId: string) => {
     const turningOn = !going.includes(spotId);
+    commitFeedback();
     toggleGoing(spotId);
     if (turningOn) setPending((p) => (p.some((c) => c.spotId === spotId) ? p : [...p, { spotId, at: now.toISOString() }]));
   };
@@ -219,10 +222,10 @@ export default function App() {
         {/* Bag */}
         <View style={{ width, height }}>
           <BagScreen
-            cameraId={cameraId} onPickCamera={setCameraId}
+            cameraId={cameraId} onPickCamera={(id) => { tapFeedback(); setCameraId(id); }}
             lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
             styleOpen={styleOpen} stylePick={stylePick}
-            onToggleLens={toggleLens} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={setStylePick}
+            onToggleLens={(id) => { tapFeedback(); toggleLens(id); }} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={(s) => { tapFeedback(); setStylePick(s); }}
           />
         </View>
       </ScrollView>
@@ -234,7 +237,7 @@ export default function App() {
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
             spot={getSpot(openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
-            onBack={() => setDetailOpen(false)} onToggleGoing={() => toggleGoing(openId)} onToggleSaved={() => toggleSaved(openId)}
+            onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />
         </View>
       )}

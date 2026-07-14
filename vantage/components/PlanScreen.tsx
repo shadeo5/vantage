@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable } from "react-native";
 import { colors, fonts, screen } from "../theme";
 import { getSpot, img, windowMeta } from "../lib/spots";
-import { fitLabel } from "../lib/gearProfile";
+import { fitGapLabel } from "../lib/gearProfile";
 
 // When a card falls: `offset` = N days from today; `dow` = the next occurrence of a
 // weekday (0=Sun). Event-anchored spots use `dow` so "the Sunday market" really lands
@@ -47,6 +47,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
           const spot = getSpot(m.id);
           const wm = windowMeta(spot.windowType);
           const on = going.includes(m.id);
+          const fitGap = fitGapLabel(cameraId, lensIds, spot.genre); // only shows when the kit falls short (#P3)
           return (
             <View key={m.id}>
               <View style={styles.dayRow}>
@@ -62,7 +63,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
                     <Text style={styles.reason} numberOfLines={1}>{m.reason}</Text>
                     <View style={styles.meta}>
                       <Text style={[styles.window, { color: wm.color }]}>{wm.icon} {wm.label} · {windowTimeFor(spot.windowType)}</Text>
-                      <Text style={styles.fit}>{fitLabel(cameraId, lensIds, spot.genre)}</Text>
+                      {fitGap && <Text style={styles.fit}>{fitGap}</Text>}
                     </View>
                   </View>
                 </Pressable>

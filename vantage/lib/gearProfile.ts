@@ -60,6 +60,13 @@ export function fitLabel(cameraId: string, lensIds: string[], genre: Genre): str
   return best ? `fits your ${best}` : "a stretch for your kit";
 }
 
+// Only the *actionable* half of fitLabel: null when the kit already covers the genre
+// (the common case — no need to repeat "fits your 35mm" on every card), and the honest
+// "a stretch" note only when there's a real gap worth flagging (#P3).
+export function fitGapLabel(cameraId: string, lensIds: string[], genre: Genre): string | null {
+  return bestLensForGenre(cameraId, lensIds, genre) ? null : "a stretch for your kit";
+}
+
 // From the kit, the label of a lens (or the fixed-lens camera) that actually suits a
 // genre — so the app never claims a telephoto is "perfect for street." Null if nothing
 // in the kit fits, which the caller turns into honest "your kit's a stretch" copy.

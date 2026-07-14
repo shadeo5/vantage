@@ -1,4 +1,4 @@
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
+import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, fitGapLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
 import { getLens, getCamera } from "../lib/gear";
 
 describe("gear profile", () => {
@@ -74,6 +74,15 @@ describe("gear profile", () => {
     test("honestly flags a genre the kit can't cover", () => {
       // The X100VI body + only a macro lens covers neither Sports nor Wildlife.
       expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a stretch for your kit");
+    });
+  });
+
+  describe("fitGapLabel", () => {
+    test("is null when the kit already covers the genre (no wallpaper label)", () => {
+      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBeNull();
+    });
+    test("surfaces the stretch note only when there's a real gap", () => {
+      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a stretch for your kit");
     });
   });
 });

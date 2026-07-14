@@ -36,7 +36,7 @@ export default function App() {
     HankenGrotesk_600SemiBold, HankenGrotesk_700Bold,
   });
 
-  const [screen, setScreen] = useState<Screen>("lock");
+  const [screen, setScreen] = useState<Screen>("today");
   const [openId, setOpenId] = useState<string>(HERO_ID);
   const [detailFrom, setDetailFrom] = useState<Screen>("today");
   const [going, setGoing] = useState<string[]>([]);

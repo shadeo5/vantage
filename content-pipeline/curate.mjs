@@ -27,6 +27,18 @@ const CITIES = {
     name: "Nashville", region: "TN", center: { lat: 36.1627, lon: -86.7816 }, radiusM: 6500,
     genreProfile: { Street: 1.0, Architecture: 0.85, Nature: 0.5, Landscape: 0.45, Details: 0.4 },
   },
+  atlanta: {
+    name: "Atlanta", region: "GA", center: { lat: 33.7490, lon: -84.3880 }, radiusM: 7000,
+    genreProfile: { Street: 1.0, Architecture: 0.9, Nature: 0.6, Landscape: 0.5, Details: 0.4 },
+    // Expansion: skip the 5 spots the app already ships (don't re-curate what's live).
+    exclude: [
+      { lat: 33.7550, lon: -84.3720 }, // Sweet Auburn
+      { lat: 33.7540, lon: -84.3620 }, // Krog Street Tunnel
+      { lat: 33.7545, lon: -84.3710 }, // Jackson Street Bridge
+      { lat: 33.7850, lon: -84.3730 }, // Piedmont Park
+      { lat: 33.7720, lon: -84.3650 }, // Ponce City Market
+    ],
+  },
   chicago: {
     name: "Chicago", region: "IL", center: { lat: 41.8827, lon: -87.6233 }, radiusM: 7500,
     genreProfile: { Architecture: 1.0, Street: 0.9, Landscape: 0.55, Nature: 0.4, Details: 0.35 },
@@ -150,7 +162,9 @@ async function fetchPlaces(city) {
   for (const p of places) {
     p.density = places.filter((q) => q !== p && metersBetween(p, q) <= DENSITY_RADIUS_M).length;
   }
-  return dedupeNearby(places);
+  // Drop any spot the city brief already ships (expansion = new spots only).
+  const kept = dedupeNearby(places).filter((p) => !(city.exclude || []).some((e) => metersBetween(e, p) <= 250));
+  return kept;
 }
 
 // Drop a POI if a higher-weight POI with an overlapping name sits almost on top of
@@ -179,7 +193,17 @@ function rank(places, city) {
     const prominenceBoost = p.prominent ? 1.25 : 1.0;
     p.raw = p.weight * profile * densityBoost * prominenceBoost;
   }
-  const ranked = places.sort((a, b) => b.raw - a.raw).slice(0, TOP_N);
+  const sorted = places.sort((a, b) => b.raw - a.raw);
+  // Diversity: cap any single bucket so a mural-heavy city (Atlanta has hundreds of
+  // mapped murals) doesn't eat every slot and bury the cityscape/nature variety.
+  // Backfill from the remainder only if capping leaves us short of TOP_N.
+  const MAX_PER_BUCKET = 6;
+  const count = {}, primary = [], overflow = [];
+  for (const p of sorted) {
+    if ((count[p.bucket] || 0) < MAX_PER_BUCKET) { primary.push(p); count[p.bucket] = (count[p.bucket] || 0) + 1; }
+    else overflow.push(p);
+  }
+  const ranked = primary.concat(overflow).slice(0, TOP_N).sort((a, b) => b.raw - a.raw);
   // Normalize to a 0–100 score RELATIVE to this run's top pick, so the number is
   // legible at a glance (100 = strongest candidate here; it's a rank signal, not
   // an absolute grade). The row number is the true rank.

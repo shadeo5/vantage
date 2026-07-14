@@ -1,0 +1,289 @@
+[
+  {
+    "id": "john-seigenthaler-pedestrian-bridge",
+    "name": "John Seigenthaler Pedestrian Bridge",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Architecture",
+      "Landscape"
+    ],
+    "lat": 36.162298,
+    "lon": -86.772372,
+    "type": "Cityscape",
+    "windowType": "blue",
+    "reason": "Skyline reflections over the Cumberland at dusk",
+    "tagline": "A truss bridge with the whole downtown skyline behind it",
+    "why": "This old truss bridge gives you a clean, elevated line right toward the downtown towers, with the Cumberland River curving below. The steel framework overhead makes a ready-made leading line, and once the city lights come on the whole scene reflects off the water. It's one of the few spots in Nashville where you get skyline, river, and architecture in a single frame.",
+    "look": [
+      "The truss beams overhead framing the downtown towers as you shoot east",
+      "Long exposure of the river catching skyline lights at blue hour",
+      "A lone walker or cyclist mid-span for scale against the steel"
+    ],
+    "getting": "On the east edge of downtown, spanning the Cumberland near Nissan Stadium; walk on from either bank, park downtown or across the river."
+  },
+  {
+    "id": "capitol-boulevard",
+    "name": "Capitol Boulevard",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.163846,
+    "lon": -86.782968,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Brick facades and warm windows at dusk",
+    "tagline": "A short, storied block where old Nashville still leans in close.",
+    "why": "Capitol Boulevard is a compact, walkable stretch that trades the glass towers downtown for older brick storefronts, tall arched windows, and the kind of human-scale detail you can actually frame. As blue hour settles, the warm interior light of restaurants and bars plays against the cooling sky, and the state capitol rising nearby gives you a payoff at the top of the street. It's the rare downtown block that feels intimate rather than overwhelming.",
+    "look": [
+      "The capitol dome framed at the end of the boulevard as the sky goes deep blue",
+      "Warm window light spilling onto brick facades and wet pavement after rain",
+      "A single figure crossing the crosswalk against glowing storefronts at dusk"
+    ],
+    "getting": "Right on the north edge of downtown near the capitol; walkable from Broadway with metered street parking and nearby garages."
+  },
+  {
+    "id": "deaderick-street",
+    "name": "Deaderick Street",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.164735,
+    "lon": -86.782883,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Glass towers and clean lines at dusk",
+    "tagline": "Downtown's tidy corridor of glass, stone, and symmetry",
+    "why": "Deaderick is a short, walkable stretch that packs a lot of downtown geometry into a few blocks — the reflective face of state office buildings, clean pedestrian paving, and sightlines that funnel toward the Capitol up the hill. It's quiet enough that you can actually set up a frame without dodging crowds, and the mix of modern glass and older stone gives you contrast in a single shot. Blue hour is when the office lights kick on and the glass turns to layered reflections.",
+    "look": [
+      "The uphill sightline toward the Capitol, compressed with a longer lens at dusk",
+      "Reflections of one building's facade in the glass of another after office lights come on",
+      "A lone pedestrian crossing the empty street for scale against the towers"
+    ],
+    "getting": "Right in downtown Nashville near the Capitol; walkable from the core, with paid garages and metered street parking nearby."
+  },
+  {
+    "id": "woodland-street-bridge",
+    "name": "Woodland Street Bridge",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Landscape",
+      "Street"
+    ],
+    "lat": 36.167678,
+    "lon": -86.775585,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Skyline reflections over the Cumberland at dusk",
+    "tagline": "A pedestrian-friendly perch on the downtown skyline",
+    "why": "The Woodland Street Bridge hands you one of Nashville's cleanest skyline views, with the Cumberland River curving beneath and the downtown towers stacking up on the far bank. There's a wide walkway so you can set up without dodging traffic, and the light at blue hour turns the whole scene into glass and neon. It's the kind of spot where the city photographs itself if you just wait for the lights to come up.",
+    "look": [
+      "The full downtown skyline glowing across the water right as blue hour peaks",
+      "Reflections of the AT&T 'Batman' building rippling on the Cumberland below",
+      "The bridge's own steel lines leading your eye toward the towers for a strong foreground"
+    ],
+    "getting": "Short walk east from downtown or the Nissan Stadium side; easiest on foot from the riverfront area."
+  },
+  {
+    "id": "fort-nashborough",
+    "name": "Fort Nashborough",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.164192,
+    "lon": -86.775364,
+    "type": "Architecture",
+    "windowType": "golden",
+    "reason": "Log fort walls against the river at dusk",
+    "tagline": "A frontier stockade tucked below downtown's skyline",
+    "why": "This reconstructed log fort sits right above the Cumberland River, and the rough-hewn timber walls make a rich contrast against Nashville's glass towers just uphill. It's small and often quiet, which means you can work the textures and lines without a crowd. Golden hour throws warm light across the logs and turns the whole stockade honey-colored.",
+    "look": [
+      "Late sun raking across the chinked log walls, deep shadows in every gap",
+      "The blockhouse corner framed with downtown high-rises rising behind it",
+      "Down at the riverside walk, the fort's silhouette against the Cumberland at last light"
+    ],
+    "getting": "On First Avenue North along the downtown riverfront; walkable from Broadway, with public lots and garages nearby."
+  },
+  {
+    "id": "symphony-place",
+    "name": "Symphony Place",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.160229,
+    "lon": -86.775871,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Curved glass and steel at dusk",
+    "tagline": "Where the Schermerhorn's neighbor catches the last light",
+    "why": "Symphony Place is a study in modern geometry sitting right next to the limestone classicism of the Schermerhorn Symphony Center, so you get contrast in one frame. The curved glass facade throws reflections of downtown and the changing sky, and the whole block gets quiet and clean once the workday crowd thins out. It's the kind of spot where the building does half the work for you.",
+    "look": [
+      "The glass curtain wall reflecting the sky as blue hour deepens",
+      "The clash of the Schermerhorn's columns against the modern tower behind it",
+      "A lone figure crossing the plaza, lit by lobby glow after dark"
+    ],
+    "getting": "In the SoBro/downtown core near the Schermerhorn, a short walk from Broadway; street parking or nearby garages."
+  },
+  {
+    "id": "whatliftsyou",
+    "name": "WhatLiftsYou",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Portraits"
+    ],
+    "lat": 36.15391,
+    "lon": -86.784019,
+    "type": "Street art",
+    "windowType": "flat",
+    "reason": "Iconic wings mural for portraits",
+    "tagline": "Spread your wings on The Gulch's most-photographed wall",
+    "why": "WhatLiftsYou is Kelsey Montague's angel-wing mural in The Gulch, and it's become Nashville's go-to spot for a stand-in-the-middle portrait. The white feathers pop against the brick, and the whole thing is built to put a person right at the center of the frame. Overcast light keeps the wings evenly lit and kills the harsh shadows that split the wall on bright afternoons.",
+    "look": [
+      "Someone standing centered with arms out, wings framing them symmetrically",
+      "A tight detail crop on the feather tips against the red brick",
+      "The candid line of people waiting their turn, phones up, on the sidewalk"
+    ],
+    "getting": "In The Gulch on 11th Ave S; walkable from downtown, with paid lots and garages nearby."
+  },
+  {
+    "id": "mixtape-memories-mural-wedgewood-houston",
+    "name": "Mixtape: Memories mural (Wedgewood-Houston)",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Portraits"
+    ],
+    "lat": 36.131892,
+    "lon": -86.768722,
+    "type": "Street art",
+    "windowType": "flat",
+    "reason": "Bold mural colors pop on overcast days",
+    "tagline": "A wall built for color and portraits",
+    "why": "The Mixtape mural in Wedgewood-Houston is a wash of saturated color and hand-lettered nostalgia that holds up as both a backdrop and a subject. WeHo's warehouse blocks give you room to work without crowds, and the flat, even light of an overcast day keeps those colors true instead of blown out. It's the kind of wall that turns a quick portrait shoot into something with real personality.",
+    "look": [
+      "A subject standing dead-center, colors framing them on both sides",
+      "Tight crops on the lettering and cassette details for texture",
+      "Someone walking past mid-stride to add movement against the static wall"
+    ],
+    "getting": "In the Wedgewood-Houston arts district south of downtown; easy street parking on the surrounding warehouse blocks."
+  },
+  {
+    "id": "printers-alley",
+    "name": "Printers Alley",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.164512,
+    "lon": -86.778678,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Vintage neon signs glowing after dark",
+    "tagline": "A narrow lane of neon and old brick, best when the signs flicker on",
+    "why": "Printers Alley is a tight cobblestone corridor packed with layered neon signs, weathered brick, and speakeasy doorways that light up as the sky drops to blue. It's one of the few spots downtown where the architecture and the light do the work for you — you just have to time it right. The alley's narrowness forces compression, so every frame stacks signs, fire escapes, and reflections into one dense scene.",
+    "look": [
+      "The stacked neon signs converging down the alley just as blue hour hits and the cobblestones go wet-shiny",
+      "A doorway silhouette — someone stepping into a club under a glowing marquee",
+      "Tight detail on peeling brick, old ironwork, and a single buzzing sign against dark"
+    ],
+    "getting": "Right in downtown Nashville between 3rd and 4th Avenues; walkable from Broadway, use a nearby downtown garage."
+  },
+  {
+    "id": "arcade-street",
+    "name": "Arcade Street",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Street"
+    ],
+    "lat": 36.164231,
+    "lon": -86.780096,
+    "type": "Architecture",
+    "windowType": "flat",
+    "reason": "Skylit Victorian arcade, layered symmetry",
+    "tagline": "A glass-roofed corridor of light and old brick",
+    "why": "The Arcade is one of Nashville's oldest indoor shopping passages, a two-story Victorian gallery capped by a peaked skylight that turns midday into soft, even light. The repeating storefronts, iron railings, and long central corridor hand you symmetry and leading lines almost for free. It's compact, weathered, and full of texture — a rare quiet interior in the middle of downtown.",
+    "look": [
+      "Center yourself under the skylight and shoot straight down the corridor for a symmetrical vanishing point",
+      "Climb to the second-floor balcony and frame the geometry of the railings against the shop signs below",
+      "Catch a lone figure walking through the passage, backlit by the glass roof, for a moody street beat"
+    ],
+    "getting": "Downtown between 4th and 5th Ave N; walkable from Broadway with nearby public parking garages."
+  },
+  {
+    "id": "parthenon",
+    "name": "Parthenon",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Landscape"
+    ],
+    "lat": 36.149716,
+    "lon": -86.813382,
+    "type": "Architecture",
+    "windowType": "golden",
+    "reason": "Full-scale Greek temple glowing at sunset",
+    "tagline": "A full-scale Parthenon in the middle of a park",
+    "why": "This is a full-scale replica of the Athens Parthenon, sitting right in the middle of Centennial Park, and it photographs like nothing else in Nashville. The Doric columns catch warm light beautifully as the sun drops, and the reflecting pond in front hands you a mirror composition on a calm evening. It's grand enough to fill a wide frame and detailed enough to reward you up close.",
+    "look": [
+      "The west facade and columns backlit and glowing during the last hour of sun",
+      "A full reflection of the facade in the pond on a still evening",
+      "Tight detail on the fluted columns and pediment with raking side light"
+    ],
+    "getting": "In Centennial Park on West End Ave, just west of downtown; free lot at the park with more street parking nearby."
+  },
+  {
+    "id": "belmont-mansion",
+    "name": "Belmont Mansion",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture"
+    ],
+    "lat": 36.135602,
+    "lon": -86.794772,
+    "type": "Architecture",
+    "windowType": "golden",
+    "reason": "Italianate villa glowing at golden hour",
+    "tagline": "Antebellum grandeur on a Belmont hillside",
+    "why": "Belmont Mansion is one of the South's grandest surviving 19th-century villas, and its Italianate details reward a slow, deliberate eye. The pink-cream facade, the ornate tower, and the cast-iron garden ornaments all catch warm light beautifully as the sun drops. It sits on the Belmont University campus, so you can work the exterior and grounds without fighting crowds.",
+    "look": [
+      "The bell tower and arched windows backlit against a golden-hour sky",
+      "Cast-iron gazebo and statuary framed by the formal garden's lines",
+      "Detail shots of the ornate cornices and columns as low sun rakes the stucco"
+    ],
+    "getting": "On the Belmont University campus off Belmont Blvd; street parking nearby, a short drive or bus ride from downtown."
+  },
+  {
+    "id": "capitol-hill",
+    "name": "Capitol Hill",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Landscape"
+    ],
+    "lat": 36.165186,
+    "lon": -86.784041,
+    "type": "Architecture",
+    "windowType": "golden",
+    "reason": "Greek Revival lines above the skyline",
+    "tagline": "Tennessee's grandest building, crowning the city",
+    "why": "The Tennessee State Capitol sits high on the hill, one of the oldest working capitol buildings in the country, and its Greek Revival columns catch late light beautifully. The grounds give you elevation and open sightlines back toward downtown, so you're shooting both the architecture and the city it looks over. It's a rare spot where formal symmetry and sweeping vista live side by side.",
+    "look": [
+      "Warm side-light raking across the limestone columns at golden hour",
+      "The downtown skyline framed from the terrace as the sun drops west",
+      "Monuments and staircases on the grounds leading the eye up to the portico"
+    ],
+    "getting": "Walking distance from downtown Nashville; street and garage parking nearby, easy on foot from Legislative Plaza."
+  }
+]

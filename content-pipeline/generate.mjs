@@ -24,7 +24,9 @@ const CONCURRENCY = 3; // gentle on rate limits
 // ---- 1. INPUT: the human-vetted places from stage 2 (Curate → Vet) ----
 // content-pipeline/vetted/<city>.json — each { name, genre, genres[], lat, lon }.
 //   npm run generate -- nashville     (defaults to nashville)
-const cityKey = (process.argv[2] || "nashville").toLowerCase();
+const args = process.argv.slice(2);
+const cityKey = (args.find((a) => !a.startsWith("--")) || "nashville").toLowerCase();
+const limit = args.find((a) => a.startsWith("--limit=")) ? parseInt(args.find((a) => a.startsWith("--limit=")).slice(8), 10) : null;
 const CITY = cityKey.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
 let PLACES;
 try {
@@ -34,6 +36,7 @@ try {
   process.exit(1);
 }
 if (!Array.isArray(PLACES) || !PLACES.length) { console.error(`vetted/${cityKey}.json is empty.`); process.exit(1); }
+if (limit && limit > 0) PLACES = PLACES.slice(0, limit);   // --limit=N for a cheap taste test
 
 // ---- 2a. VOICE: the app's writing guide (part of the reusable recipe) ----
 const VOICE = `Vantage's voice: inspiring, personal, and concrete — like a local photographer friend

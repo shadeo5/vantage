@@ -92,7 +92,7 @@
     <p class="lede">How a new place — <b>Nashville, Chicago, Blue Ridge</b> — goes from a name to a vetted, illustrated, served spot list. Mostly automatic, with <b>one human gate where it matters</b>, and a <b>both/and</b> data model: git for review, Postgres for serving.</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — content pipeline (E1 · C1/C4)</b></span>
-      <span class="tag">Status <b>Proposed · 3 decisions open</b></span>
+      <span class="tag">Status <b>Proposed · D2 decided · 2 open</b></span>
       <span class="tag">Updated <b>Jul 14, 2026</b></span>
     </div>
   </header>
@@ -252,7 +252,7 @@
     <div class="sec-head"><span class="n">09</span><h2>Open decisions</h2></div>
     <ul class="list open">
       <li><b>D1 · Curation ambition.</b> Ship <b>OSM-only</b> first (proven, free, human fills gaps) or go straight to the <b>OSM + LLM-scout blend</b> (richer, more to build)? <i>Leaning: OSM-only for city #1, add scout once the gate tells us what it's missing.</i></li>
-      <li><b>D2 · Draft: agent or one-shot.</b> Start with the proven one-shot and add a research-agent only where copy reads generic? <i>Leaning: yes.</i></li>
+      <li><b>D2 · Draft: agent or one-shot.</b> <i>Decided: one-shot default, agent as a targeted upgrade.</i> The proven one-shot (<code>generate.mjs</code>) drafts every spot; a spot escalates to the <b>research-agent pass</b> (web-grounded, then self-checked against the voice + honesty guide) <b>only when its vet-stage copy is vague or its specifics can't be trusted</b> — typically thin-knowledge places (an obscure Blue Ridge overlook), not major-city landmarks. So the extra cost is spent only where it buys accuracy, and the trigger is the quality review, not an upfront choice. How often the agent is actually needed is a question city #1 answers.</li>
       <li><b>D3 · Imagery route.</b> Which image model / service generates the per-spot illustrations, and at what cost/size (the current ~3&nbsp;MB assets need compression regardless)? <i>Open.</i></li>
     </ul>
   </section>

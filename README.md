@@ -74,7 +74,7 @@ Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tes
 **Pick up here next (nothing urgent):**
 1. **Verify E7 on the Pixel** — merge branch `e7-ux-review`, run an `eas build`, and eyeball the on-device-only items (row 15): haptics feel, notification look, safe areas (sticky CTA vs gesture bar), thumb reach, contrast, permission timing.
 2. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
-3. **Real data over placeholders** — the Plan week's day labels are now real-dated (#P1), but its spot list + reasons are still placeholder; spots + events want real sourcing (E4 B2/B4, E1 content), and the week should eventually come from the nudge brain.
+3. **Real data over placeholders (E1 — the biggest workstream)** — content at scale is designed in **`docs/engineering/CONTENT_PIPELINE.html`** (Curate → Vet 👤 → Draft → Image → Serve; both/and data model = git reviews, Postgres serves, Storage holds images; retires the `lib/spots.ts` ↔ nudge-fn duplication). First slice: Curate→Vet one city (Nashville, OSM-only) → run the built draft pipeline → eyeball quality. The Plan week's day labels are now real-dated (#P1) but its spots are still placeholder.
 4. **P2 — device GPS** instead of hardcoded downtown Atlanta.
 5. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
 

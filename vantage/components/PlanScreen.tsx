@@ -4,32 +4,53 @@ import { colors, fonts, screen } from "../theme";
 import { getSpot, img, windowMeta } from "../lib/spots";
 import { fitLabel } from "../lib/gearProfile";
 
-type PlanMeta = { id: string; label: string; tag: string; reason: string };
+// When a card falls: `offset` = N days from today; `dow` = the next occurrence of a
+// weekday (0=Sun). Event-anchored spots use `dow` so "the Sunday market" really lands
+// on a Sunday and "Friday art walk" on a Friday — no more hand-typed labels drifting
+// out of sync with the calendar. (Near-term #P1 fix; longer-term the week comes from
+// the nudge brain over the next several days' light.)
+type When = { offset: number } | { dow: number };
+type PlanMeta = { id: string; when: When; tag: string; reason: string };
 const PLAN: PlanMeta[] = [
-  { id: "sweetauburn", label: "Tonight · Sat", tag: "The light", reason: "Golden light straight down Auburn Ave." },
-  { id: "krog", label: "Sun", tag: "The crowd", reason: "The Sunday market crowd fills the strip." },
-  { id: "jackson", label: "Wed", tag: "The light", reason: "Clear skies line up behind the towers." },
-  { id: "ponce", label: "Fri", tag: "Happening", reason: "BeltLine art walk after work." },
+  { id: "sweetauburn", when: { offset: 0 }, tag: "The light", reason: "Golden light straight down Auburn Ave." },
+  { id: "krog", when: { dow: 0 }, tag: "The crowd", reason: "The Sunday market crowd fills the strip." },
+  { id: "jackson", when: { offset: 3 }, tag: "The light", reason: "Clear skies line up behind the towers." },
+  { id: "ponce", when: { dow: 5 }, tag: "Happening", reason: "BeltLine art walk after work." },
 ];
 const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);
 
 export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, onToggleGoing }: {
   going: string[]; cameraId: string; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
+  const now = new Date();
+  const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateFor = (w: When) => {
+    const d = new Date(today0);
+    if ("offset" in w) d.setDate(d.getDate() + w.offset);
+    else d.setDate(d.getDate() + ((w.dow - d.getDay() + 7) % 7));
+    return d;
+  };
+  const dayLabel = (d: Date) => {
+    const dow = d.toLocaleDateString("en-US", { weekday: "short" });
+    if (d.getTime() === today0.getTime()) return `Tonight · ${dow}`;
+    if (d.getTime() === today0.getTime() + 86400000) return `Tomorrow · ${dow}`;
+    return dow;
+  };
+  const week = PLAN.map((m) => ({ ...m, date: dateFor(m.when) })).sort((a, b) => a.date.getTime() - b.date.getTime());
   return (
     <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
       <Text style={styles.eyebrow}>YOUR PLAN · {going.length} GOING</Text>
       <Text style={styles.title}>This week</Text>
 
       <View style={{ gap: 26 }}>
-        {PLAN.map((m) => {
+        {week.map((m) => {
           const spot = getSpot(m.id);
           const wm = windowMeta(spot.windowType);
           const on = going.includes(m.id);
           return (
             <View key={m.id}>
               <View style={styles.dayRow}>
-                <Text style={styles.dayLabel}>{m.label.toUpperCase()}</Text>
+                <Text style={styles.dayLabel}>{dayLabel(m.date).toUpperCase()}</Text>
                 <View style={styles.dayLine} />
               </View>
               <View style={styles.card}>

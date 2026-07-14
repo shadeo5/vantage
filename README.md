@@ -73,7 +73,7 @@ Strategy locked. Redesigned app **built** (5 screens + nav), unit-tested (73 tes
 
 **Pick up here next (nothing urgent):**
 1. **iOS** — an iPhone build + push needs an **Apple Developer account ($99/yr)**; Android was $0.
-2. **Real data over placeholders** — the Plan week is still hardcoded; spots + events want real sourcing (E4 B2/B4, E1 content).
+2. **Real data over placeholders** — the Plan week's day labels are now real-dated (#P1), but its spot list + reasons are still placeholder; spots + events want real sourcing (E4 B2/B4, E1 content), and the week should eventually come from the nudge brain.
 3. **P2 — device GPS** instead of hardcoded downtown Atlanta.
 4. Small solo items: **G3** (gear-banner re-prompt) · a quiet-hours / frequency cap on the nudge · content-pipeline run.
 

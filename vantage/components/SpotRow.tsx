@@ -6,7 +6,7 @@ import { Spot, img, windowMeta } from "../lib/spots";
 export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank: number; windowTime: string; onPress: () => void }) {
   const wm = windowMeta(spot.windowType);
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.row, pressed && { opacity: 0.85 }]}>
+    <Pressable onPress={onPress} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={styles.thumbImg}>
         <Text style={styles.rank}>{rank}</Text>
       </ImageBackground>
@@ -23,7 +23,8 @@ export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank:
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: 13, alignItems: "center", backgroundColor: colors.surfaceSubtle, borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", borderRadius: 16, padding: 11 },
+  row: { flexDirection: "row", gap: 13, alignItems: "center", backgroundColor: colors.surfaceSubtle, borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", borderRadius: 16, padding: 11, overflow: "hidden" },
+  rowPressed: { opacity: 0.85, transform: [{ scale: 0.99 }] },
   thumb: { width: 74, height: 74, justifyContent: "flex-start" },
   thumbImg: { borderRadius: 12 },
   rank: { margin: 5, color: colors.ink, fontFamily: fonts.serif, fontSize: 13, textShadowColor: "rgba(0,0,0,0.6)", textShadowRadius: 3 },

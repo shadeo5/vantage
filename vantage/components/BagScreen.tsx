@@ -41,7 +41,7 @@ export function BagScreen({
           {CAMERAS.map((c) => {
             const on = c.id === cameraId;
             return (
-              <Pressable key={c.id} onPress={() => { onPickCamera(c.id); setCamOpen(false); }} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+              <Pressable key={c.id} onPress={() => { onPickCamera(c.id); setCamOpen(false); }} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                 <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{cameraLabel(c)}</Text>
               </Pressable>
             );
@@ -54,7 +54,7 @@ export function BagScreen({
         {lensChips.map((l) => {
           const on = selectedLensIds.includes(l.id);
           return (
-            <Pressable key={l.id} onPress={() => onToggleLens(l.id)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+            <Pressable key={l.id} onPress={() => onToggleLens(l.id)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
               <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{l.label}</Text>
             </Pressable>
           );
@@ -71,13 +71,13 @@ export function BagScreen({
             ))}
       </View>
 
-      <Pressable onPress={onToggleStyle} style={styles.dashed2}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
+      <Pressable onPress={onToggleStyle} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.dashed2, pressed && { opacity: 0.7 }]}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
       {styleOpen && (
         <View style={styles.chips}>
           {STYLES.map((s) => {
             const on = stylePick === s;
             return (
-              <Pressable key={s} onPress={() => onPickStyle(s)} style={[styles.chip, on ? styles.chipOn : styles.chipOff]}>
+              <Pressable key={s} onPress={() => onPickStyle(s)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                 <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{s}</Text>
               </Pressable>
             );
@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
   dashed: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 13, marginTop: 10 },
   dashedText: { color: colors.muted, fontFamily: fonts.sansMed, fontSize: 14 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
-  chip: { paddingVertical: 9, paddingHorizontal: 15, borderRadius: 22, borderWidth: 1 },
+  chip: { paddingVertical: 9, paddingHorizontal: 15, borderRadius: 22, borderWidth: 1, overflow: "hidden" },
+  chipPressed: { opacity: 0.7, transform: [{ scale: 0.96 }] },
   chipOn: { backgroundColor: "rgba(233,184,114,0.16)", borderColor: "rgba(233,184,114,0.5)" },
   chipOff: { backgroundColor: colors.surface, borderColor: colors.hairline },
   chipText: { fontFamily: fonts.sansSemi, fontSize: 13.5 },

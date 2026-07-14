@@ -75,21 +75,33 @@ Turn the in-app hero into an actual proactive nudge — the north star.
 
 ---
 
-## E7 · Experience & polish  🎯 (from the Jul-13 UX review — `docs/UX_REVIEW.html`)
-Now that the app is on a real Pixel, the job is closing "impressive demo → feels finished." Full findings + on-device checklist in the review. Priorities:
-- 🎯 **UX-P0a — Bag tab ≠ onboarding.** Strip "SETUP · 2 OF 3 / Continue / Skip — I'll add later" from the Bag *tab*; make it a calm gear manager ("Your bag", changes auto-save). Keep a real first-run flow separate if wanted.
-- 🎯 **UX-P0b — Plan dates wrong/hardcoded.** "TONIGHT · SAT" shows on a Monday; the whole week is static. Near-term: generate day labels from the real date. Longer-term: drive the week from the nudge brain over the next few days' light.
-- 🎯 **UX-P1a — Gear banner persists after gear set** (ties to **G3**). Only show when gear is empty; else quiet/dismissible.
-- 🎯 **UX-P1b — "MEDIUM" confidence reads as "meh."** Reserve a flourish for HIGH only; medium shows nothing extra; genuinely weak night → honest "quiet night."
-- 🎯 **UX-P1c — Hide "Activity — coming soon"** placeholder until events exist.
-- 🎯 **UX-P1d — Save (heart) doesn't persist.** Wire to local+cloud storage or remove until a Saved surface exists.
-- ⬜ **UX-P1e — Plan's four full-width gold "I'm going" buttons** flatten hierarchy → demote to secondary; reserve solid gold for the one primary CTA.
+## E7 · Experience & polish  ▶ (from the Jul-13 UX review — `docs/UX_REVIEW.html`)
+Now that the app is on a real Pixel, the job is closing "impressive demo → feels finished." The review logged **2 P0 · 10 P1 · 7 P2**. Below is the **authoritative ordered work-list** — one row per review finding (its `#ID`), in the order to build. This is what the `/loop` run walks top-to-bottom.
 
-**Native feel (from on-device use):**
-- ⬜ **UX-N1 — Swipe navigation between tabs.** Today/Plan/Bag as a horizontal pager; swipe + the bottom bar both drive it, kept in sync. **NOT STARTED** — the one big refactor left (App.tsx render → paged ScrollView, Detail as an absolute overlay so the pager keeps its position). Do it fresh with full context; needs on-device verification.
-- ✅ **UX-N2 — Bottom-tab icons.** Heavier strokes (2), size 24, brighter inactive, gold "pill" behind the active tab, press ripple. (`BottomNav.tsx`)
-- ▶ **UX-N3 — Button press feedback.** DONE: Today hero (I'm going / Details), Plan (card + I'm going), Bag (Continue / Skip / camera card), check-in buttons. REMAINING: lens/camera/style chips, Today `SpotRow` rows, `SpotDetail` back/heart/sticky-CTA.
-- ✅ **UX-N4 — Overscroll bounce.** `alwaysBounceVertical` + `overScrollMode="always"` on Today/Plan/Bag/Detail scroll views.
+**Ordered checklist (each row = one review finding; build in this order):**
+| # | ID | Sev | Item | Status |
+|---|----|-----|------|--------|
+| 1 | #B1 | P0 | **Bag tab ≠ onboarding** — strip "SETUP · 2 OF 3 / Continue / Skip"; make the Bag *tab* a calm gear manager ("Your bag", changes auto-save, single "Done" or nothing). | ⬜ |
+| 2 | #P1 | P0 | **Plan week hardcoded / wrong day labels** — "TONIGHT · SAT" on a Monday. Near-term: generate day labels from the real date. Longer-term: drive the week from the nudge brain. | ⬜ |
+| 3 | #T1 | P1 | **Gear banner persists after gear set** (ties **G3**) — only show when gear is empty; else drop or a quiet dismissible "Tuned to your a7 IV · edit." | ⬜ |
+| 4 | #T3 | P1 | **Hide "Activity — coming soon"** in "Why this pick?" until events exist — two strong reasons beat two + an IOU. | ⬜ |
+| 5 | #T2 | P1 | **"MEDIUM" confidence reads as "meh"** — flourish for HIGH only ("TONIGHT'S PICK ✦"), nothing extra on medium, genuinely weak night → honest "quiet night." | ⬜ |
+| 6 | #D1 | P1 | **Heart/save doesn't persist** — wire to local+cloud (patterns exist) or remove until a Saved surface exists. *(decision: persist vs remove — default persist local, flag cloud.)* | ⬜ |
+| 7 | #P2 | P1 | **Plan's four full-width gold "I'm going" buttons flatten hierarchy** — demote per-card action to secondary (outline/compact pill); reserve solid gold for the one primary CTA. | ⬜ |
+| 8 | #B2 | P1 | **No real first-run path to gear** — decide the model. Default (recommend): no wizard — Today works with sensible defaults, Bag is always gear-management, banner (when unset) is a gentle "personalize your picks →". *(pairs with #B1.)* | ⬜ |
+| 9 | #T4 | P2 | **"M" avatar** — wrong initial + dead tap. Derive the initial (or drop until a profile exists); if it stays, make it lead to Bag/settings. | ⬜ |
+| 10 | #D2 | P2 | **Light chart under-explained** — one plain-language line ("taller = better light; you're here →") + make the "now" bar unmistakable. | ⬜ |
+| 11 | #P3 | P2 | **"fits your 35mm" repeats every Plan card** — show the fit label only when it *differs* from the obvious (e.g. "grab a tele"). | ⬜ |
+| 12 | #B3 | P2 | **Surface "YOUR KIT SHOOTS" more** — it's the payoff of the Bag screen; give it prominence + consider echoing on Today ("your kit's built for street tonight"). | ⬜ |
+| 13 | #T5 | P2 | **Today→Detail black flash on web** — verify on Pixel; if present, cross-fade from the current screen instead of fading up from black; confirm hero image loaded before animating. | ⬜ |
+| 14 | — | P2 | **No max-width (web stretch)** — cross-cutting refinement from E7's old P2 bucket; cap content width so the web preview doesn't stretch edge-to-edge. | ⬜ |
+| 15 | — | — | **On-device pass** (ties **Q6**) — mostly needs the hand: notification appearance, touch targets/thumb reach, safe areas (sticky CTA vs gesture bar), **haptics** (code-able via `expo-haptics`), contrast in real light, in-context permission timing. | ⬜ |
+
+**Done (this workstream):**
+- ✅ **#N1 (UX-N1) — Swipe navigation.** Today/Plan/Bag are a horizontal paging `ScrollView` in `App.tsx`; swipe + the bottom bar both drive it, kept in sync via `onScroll` (not `onMomentumScrollEnd`, which doesn't fire on web). Detail + Lock ride as absolute overlays so the pager keeps its scroll position. Replaced the old `screen`/`detailFrom` state with `tab` + `detailOpen`/`showLock`. Verified on web (user confirmed swipe + tab-sync); on-device pending an `eas build`.
+- ✅ **#N2 (UX-N2) — Bottom-tab icons.** Heavier strokes (2), size 24, brighter inactive, gold "pill" behind the active tab, press ripple. (`BottomNav.tsx`)
+- ✅ **#N3 (UX-N3) — Button press feedback.** All controls now have a pressed state (opacity/scale) + `android_ripple`: Today hero, Plan card+CTA, Bag Continue/Skip/camera + lens/camera/style chips + "pick your style" toggle, check-in buttons, `SpotRow` rows, `SpotDetail` back/heart circles + sticky CTA.
+- ✅ **#N4 (UX-N4) — Overscroll bounce.** `alwaysBounceVertical` + `overScrollMode="always"` on Today/Plan/Bag/Detail scroll views.
 - NOTE: these are JS changes — live on web immediately, but need an `eas build` to appear on the installed Pixel APK.
-- ⬜ **UX-P2 — Refinements:** "M" avatar (wrong initial + dead tap) · Today→Detail black-flash transition · light-chart plain-language hint · show "fits your 35mm" only when it differs · no max-width (web stretch) · surface "Your kit shoots" more.
-- ⬜ **UX — On-device pass** (ties to **Q6**): notification appearance, touch targets/thumb reach, safe areas (sticky CTA vs gesture bar), haptics, contrast in real light, in-context permission timing.
+
+**Loop guidance:** decision-heavy rows (#D1 persist-vs-remove, #P2 hierarchy, #B2 first-run model) — make the flagged default call, note it in the commit, keep moving; don't block. Rows needing the physical phone (#T5 verify, most of the on-device pass) — do the code-able part, flag the rest for Desha's hands.

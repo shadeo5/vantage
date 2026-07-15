@@ -7,9 +7,12 @@
   "scripts": {
     "curate": "node --env-file-if-exists=.env curate.mjs",
     "generate": "node --env-file-if-exists=.env generate.mjs",
+    "images": "node --env-file-if-exists=.env build-images.mjs",
     "seed": "node build-seed.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.70.0"
+    "@anthropic-ai/sdk": "^0.70.0",
+    "openai": "^6.47.0",
+    "sharp": "^0.35.3"
   }
 }

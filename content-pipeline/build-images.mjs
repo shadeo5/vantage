@@ -15,7 +15,7 @@
 
 import OpenAI from "openai";
 import sharp from "sharp";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
 
 const MODEL = "gpt-image-1.5";
 const SIZE = "1024x1024";
@@ -72,6 +72,8 @@ mkdirSync(dir, { recursive: true });
 
 console.log(`Generating ${spots.length} ${cityKey} illustrations with ${MODEL} (${QUALITY})...\n`);
 for (const s of spots) {
+  const dest = new URL(`${s.id}.webp`, dir);
+  if (existsSync(dest)) { console.log(`  ${s.id.padEnd(30)} · skip (exists)`); continue; }   // resume-safe
   process.stdout.write(`  ${s.id.padEnd(30)} `);
   const r = await client.images.generate({ model: MODEL, prompt: buildPrompt(s), size: SIZE, quality: QUALITY });
   const png = Buffer.from(r.data[0].b64_json, "base64");

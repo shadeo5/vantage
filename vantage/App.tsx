@@ -10,7 +10,9 @@ import {
 
 import { colors, fonts, screen as scr } from "./theme";
 import { FALLBACK_SPOTS, findSpot, spotImageSource, HERO_ID, type Spot } from "./lib/spots";
-import { fetchCityPack } from "./lib/cityPack";
+import { fetchCityPack, fetchCities, CITY_ID, type City } from "./lib/cityPack";
+import { loadCityId, saveCityId } from "./lib/cityStorage";
+import { CitySwitcher } from "./components/CitySwitcher";
 import { getLightWindows, goldenWindowLabel, fmtTime } from "./lib/light";
 import { GearBanner } from "./components/GearBanner";
 import { InspirationHero } from "./components/InspirationHero";
@@ -45,6 +47,10 @@ export default function App() {
   // paint, then swap to the published DB pack once it loads (falls back to the core
   // on any failure, so this never leaves the screen empty).
   const [spots, setSpots] = useState<Spot[]>(FALLBACK_SPOTS);
+  // City selection: which city's pack is showing. Default Atlanta until the saved
+  // choice hydrates (GPS-based default is P2). `cities` feeds the header switcher.
+  const [cityId, setCityId] = useState<string>(CITY_ID);
+  const [cities, setCities] = useState<City[]>([]);
   const [tab, setTab] = useState<Tab>("today");
   const [detailOpen, setDetailOpen] = useState(false);
   const [showLock, setShowLock] = useState(false);
@@ -86,19 +92,26 @@ export default function App() {
     if (next && next !== tab) setTab(next);
   };
 
-  // Load the live city pack from the DB once on launch (Serve slice 3).
+  // Load the selected city's pack from the DB whenever the city changes (Serve slice
+  // 3). Runs on mount for the default, then again when the saved/chosen city lands.
   useEffect(() => {
-    fetchCityPack().then(setSpots);
+    fetchCityPack(cityId).then(setSpots);
+  }, [cityId]);
+
+  // Load the list of published cities once, for the header switcher.
+  useEffect(() => {
+    fetchCities().then(setCities);
   }, []);
 
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
-    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds()]).then(([ids, cam, pend, log, savedIds]) => {
+    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId()]).then(([ids, cam, pend, log, savedIds, savedCity]) => {
       if (ids) setLenses(ids);
       if (cam) setCameraId(cam);
       setPending(pend);
       setJournal(log);
       if (savedIds) setSaved(savedIds);
+      if (savedCity) setCityId(savedCity); // last chosen city wins over the default
       setDueIds(pend.map((c) => c.spotId)); // commitments from a prior session → due to check in
       setHydrated(true);
     });
@@ -110,8 +123,9 @@ export default function App() {
       savePending(pending);
       saveJournal(journal);
       saveSavedIds(saved);
+      saveCityId(cityId);
     }
-  }, [lenses, cameraId, pending, journal, saved, hydrated]);
+  }, [lenses, cameraId, pending, journal, saved, cityId, hydrated]);
   // Mirror the gear profile to the cloud (anon sign-in + upsert) so the server can nudge.
   useEffect(() => {
     if (hydrated) saveProfile(cameraId, lenses);
@@ -156,6 +170,9 @@ export default function App() {
   const toggleLens = toggle(setLenses);
   const openDetail = (id: string) => { setOpenId(id); setDetailOpen(true); };
 
+  // Display name for the current city (from the fetched list; falls back to the slug).
+  const currentCityName = cities.find((c) => c.id === cityId)?.name ?? (cityId.charAt(0).toUpperCase() + cityId.slice(1));
+
   // Return loop (N4): "I'm going" records a commitment; a check-in resolves it into the journal.
   const commit = (spotId: string) => {
     const turningOn = !going.includes(spotId);
@@ -193,6 +210,7 @@ export default function App() {
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
+              <CitySwitcher cities={cities} currentId={cityId} currentName={currentCityName} onSelect={setCityId} />
               {kitEchoText && <Text style={styles.kitEcho}>Your kit's ideal for {kitEchoText}.</Text>}
             </View>
             {/* Neutral gear/profile entry (#T4) — no mock initial (there's no name to

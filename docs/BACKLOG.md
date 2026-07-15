@@ -69,7 +69,7 @@ Turn the in-app hero into an actual proactive nudge — the north star.
 
 ## E5 · Platform & ship  ▶
 - ✅ **P1 — Dev build** (EAS, Android). Preview-APK profile (`eas.json`, internal distribution) built + installed on the Pixel; push token registered (`lib/push.ts`) → saved to the profile. Firebase FCM configured (`google-services.json` + service-account key on EAS). iOS build later (needs Apple Developer, $99/yr). *(Also fixed expo-doctor — `@types/jest` dedupe.)*
-- ⬜ **P2 — Real location** (device GPS) instead of hardcoded downtown Atlanta.
+- ▶ **P2 — Real location** (device GPS) instead of hardcoded downtown Atlanta. **City switcher DONE** (manual half): the Today header has a `⌖ <City> ▾` pill (`components/CitySwitcher.tsx`) that opens a modal list of the published cities (`fetchCities()` reads the `cities` table) and switches the loaded pack; the choice persists (`lib/cityStorage.ts`, AsyncStorage) and wins over the Atlanta default. Verified in-browser: Atlanta (16) ↔ Nashville (13) swap live — hero, "best near you", and per-spot light all recompute (Nashville golden hour reads later, matching its western longitude). REMAINING (the GPS half): on first launch, default to the nearest published city from device position (`expo-location` → haversine to `cities.center_lat/lon`), Atlanta fallback, manual pick still overrides. Deferred per Desha's call (ship the switcher first; GPS needs the dep + a Pixel rebuild to test the permission prompt).
 - ⬜ **P3 — Weather (Open-Meteo)** → weather-aware light chart (cloud cover tempers golden hour).
 - ◽ **P4 — Accounts / auth** (anonymous → real, once cross-device sync matters).
 - ◽ **P5 — App Store + Play submission.**

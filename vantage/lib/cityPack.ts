@@ -6,15 +6,40 @@
 // backend unconfigured, RLS, or an empty result — we fall back to the five bundled
 // core Atlanta spots so the app always has content and art (see FALLBACK_SPOTS).
 //
-// The app is currently pinned to downtown Atlanta (real device GPS is P2), so it
-// reads the Atlanta pack. Nashville is already published in the DB and will surface
-// the moment a city switch / GPS lands — no app release needed, which is the whole
-// point of the both/and content model.
+// The user chooses a city via the Today header switcher (fetchCities lists the
+// published ones); the app reads that city's pack. Atlanta is the default until a
+// location-based default (device GPS) lands as P2. This is the whole point of the
+// both/and content model — a published city needs no app release to appear.
 import { supabase } from "./supabase";
 import { FALLBACK_SPOTS, type Spot, type WindowType } from "./spots";
 import { type Genre } from "./gear";
 
-export const CITY_ID = "atlanta";
+export const CITY_ID = "atlanta"; // default city until GPS-based selection (P2)
+
+// A selectable city, from the `cities` table (published rows only).
+export type City = { id: string; name: string; region: string | null };
+
+type CityRow = { id: string; name: string; region: string | null };
+
+// List the published cities the user can switch between. Returns [] on any failure
+// (the switcher then just shows the current city — the pack still loads/falls back).
+export async function fetchCities(): Promise<City[]> {
+  try {
+    const { data, error } = await supabase
+      .from("cities")
+      .select("id,name,region")
+      .eq("published", true)
+      .order("name");
+    if (error || !data) {
+      if (error) console.warn("[cityPack] cities load failed:", error.message);
+      return [];
+    }
+    return (data as CityRow[]).map((c) => ({ id: c.id, name: c.name, region: c.region }));
+  } catch (e) {
+    console.warn("[cityPack] cities load threw:", e);
+    return [];
+  }
+}
 
 // The columns we select, in DB shape. `genres` is multi-genre (primary first);
 // `image_url` is the Storage URL (null for the bundled core → art comes from the app).

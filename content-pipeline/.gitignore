@@ -1,3 +1,6 @@
 # generated curation scratch — reproducible via `npm run curate`.
 # The *vetted* per-city JSON (the source of truth) is committed under vetted/.
 out/
+
+# API key for the draft step — NEVER commit. Copy .env.example to .env.
+.env

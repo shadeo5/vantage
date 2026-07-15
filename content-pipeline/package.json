@@ -5,8 +5,8 @@
   "private": true,
   "description": "Per-city content pipeline: real places -> Claude drafts spot content -> JSON the app can use.",
   "scripts": {
-    "curate": "node curate.mjs",
-    "generate": "node generate.mjs"
+    "curate": "node --env-file-if-exists=.env curate.mjs",
+    "generate": "node --env-file-if-exists=.env generate.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0"

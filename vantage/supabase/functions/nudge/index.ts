@@ -2,8 +2,9 @@
 //
 // Runs on a schedule: read every profile with a push token, decide tonight's
 // pick with the SAME brain as the app (light-timing × gear-fit), and if it's a
-// "go", send a fresh push via Expo. This is a faithful PORT of vantage/lib/
-// {nudge,nudgeCopy,gear,gearProfile,light,spots}.ts — keep the two in sync.
+// "go", send a fresh push via Expo. The brain/copy/gear logic mirror vantage/lib/
+// {nudge,nudgeCopy,gear,gearProfile,light}.ts. Spots are now read from the `spots`
+// table (Atlanta, published) — no longer a hardcoded copy, retiring the duplication.
 //
 // Invoke with ?force=1 to send regardless of the go/no-go bar (for testing).
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -12,18 +13,9 @@ import * as SunCalc from "npm:suncalc@2";
 // ── types ──────────────────────────────────────────────────────────────────
 type Genre = "Street" | "Portraits" | "Landscape" | "Architecture" | "Nature" | "Sports" | "Wildlife" | "Details";
 type WindowType = "golden" | "blue" | "flat";
-type Spot = { id: string; name: string; type: string; genre: Genre; windowType: WindowType; distance: string; reason: string; lat: number; lon: number };
+type Spot = { id: string; name: string; type: string; genre: Genre; windowType: WindowType; reason: string; lat: number; lon: number };
 type Camera = { id: string; model: string; cropFactor: number; fixedLens?: { minFocal: number; maxAperture: number } };
 type Lens = { id: string; short: string; minFocal: number; maxFocal: number; maxAperture: number; category: string };
-
-// ── spots (data only — no images) ────────────────────────────────────────────
-const SPOTS: Spot[] = [
-  { id: "sweetauburn", name: "Sweet Auburn", type: "Street", genre: "Street", windowType: "golden", distance: "6 min", reason: "Historic district, alive at dusk", lat: 33.7550, lon: -84.3720 },
-  { id: "krog", name: "Krog Street Tunnel", type: "Street art", genre: "Street", windowType: "blue", distance: "9 min", reason: "Neon and spray paint after dark", lat: 33.7540, lon: -84.3620 },
-  { id: "jackson", name: "Jackson Street Bridge", type: "Cityscape", genre: "Architecture", windowType: "golden", distance: "12 min", reason: "The skyline shot, glowing", lat: 33.7545, lon: -84.3710 },
-  { id: "piedmont", name: "Piedmont Park", type: "Nature", genre: "Nature", windowType: "golden", distance: "8 min", reason: "Open sky over Midtown", lat: 33.7850, lon: -84.3730 },
-  { id: "ponce", name: "Ponce City Market Roof", type: "Cityscape", genre: "Architecture", windowType: "blue", distance: "11 min", reason: "Rooftops and bridges light up", lat: 33.7720, lon: -84.3650 },
-];
 
 // ── gear catalog (crop factors + the six selectable lenses) ──────────────────
 const CAMERAS: Record<string, Camera> = {
@@ -122,8 +114,8 @@ function gearFitScore(cameraId: string, lensIds: string[], genre: Genre): number
   return LENS_CHIPS.some((c) => c.short === best) ? 1.0 : 0.7;
 }
 type Verdict = { go: boolean; score: number; confidence: "high" | "medium" | "low"; spot: Spot; window: { start: Date; end: Date } };
-function tonightNudge(now: Date, cameraId: string, lensIds: string[]): Verdict {
-  const scored = SPOTS.map((spot) => {
+function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): Verdict {
+  const scored = spots.map((spot) => {
     const win = windowFor(spot, now);
     const light = BASE_QUALITY[spot.windowType] * lightTiming(now, win.start, win.end);
     const gear = gearFitScore(cameraId, lensIds, spot.genre);
@@ -153,9 +145,9 @@ function nudgeCopy(v: Verdict, lens: string, now: Date, tz: string): { title: st
     ? [`Tonight's the night — ${s.name} is about to glow.`, `Drop what you're doing — ${s.name} is going to be special.`, `${s.name} is calling, and the light's on your side.`]
     : [`Worth heading out — ${s.name} should be good tonight.`, `${s.name} is a solid bet this evening.`, `Keep the ${lens} close — ${s.name} is worth a look tonight.`];
   const bodies = [
-    `${win} hits ${at} and ${s.name} comes alive. Grab your ${lens} — ${s.distance} away.`,
-    `${lens} weather at ${s.name}. ${win} at ${at}, ${s.distance} out.`,
-    `${win} at ${at} — ${s.name}'s ${s.distance} away and made for your ${lens}.`,
+    `${win} hits ${at} and ${s.name} comes alive — grab your ${lens}.`,
+    `${lens} weather at ${s.name}. ${win} at ${at}.`,
+    `${win} at ${at} — ${s.name} was made for your ${lens}.`,
   ];
   return { title: pick(titles, seed), body: pick(bodies, seed + 1) };
 }
@@ -165,6 +157,19 @@ Deno.serve(async (req) => {
   const force = new URL(req.url).searchParams.has("force");
   const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const now = new Date();
+
+  // Spots from the DB (Atlanta, published) — the single source; no hardcoded copy.
+  const { data: spotRows, error: spotsError } = await supabase
+    .from("spots").select("id, name, type, genres, window_type, reason, lat, lon")
+    .eq("city_id", "atlanta").eq("published", true);
+  if (spotsError) return new Response(JSON.stringify({ error: spotsError.message }), { status: 500 });
+  const SPOTS: Spot[] = (spotRows ?? []).map((r) => ({
+    id: r.id, name: r.name, type: r.type ?? "",
+    genre: ((r.genres ?? [])[0] ?? "Street") as Genre,
+    windowType: (r.window_type ?? "golden") as WindowType,
+    reason: r.reason ?? "", lat: r.lat, lon: r.lon,
+  }));
+  if (!SPOTS.length) return new Response(JSON.stringify({ error: "no published Atlanta spots in DB" }), { status: 500 });
 
   const { data: profiles, error } = await supabase
     .from("profiles").select("id, push_token, camera_id, lens_ids, timezone").not("push_token", "is", null);
@@ -179,7 +184,7 @@ Deno.serve(async (req) => {
     const cameraId = p.camera_id ?? "fuji-x100vi";
     const lensIds: string[] = p.lens_ids ?? [];
     const tz = p.timezone ?? "America/New_York";
-    const verdict = tonightNudge(now, cameraId, lensIds);
+    const verdict = tonightNudge(SPOTS, now, cameraId, lensIds);
     if (!verdict.go && !force) { skipped++; continue; }
     const lens = bestLensForGenre(cameraId, lensIds, verdict.spot.genre) ?? primaryLensLabel(lensIds);
     const copy = nudgeCopy(verdict, lens, now, tz);

@@ -8,7 +8,8 @@
     "curate": "node --env-file-if-exists=.env curate.mjs",
     "generate": "node --env-file-if-exists=.env generate.mjs",
     "images": "node --env-file-if-exists=.env build-images.mjs",
-    "seed": "node build-seed.mjs"
+    "seed": "node build-seed.mjs",
+    "image-urls": "node build-image-urls.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",

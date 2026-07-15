@@ -140,11 +140,12 @@ export default function App() {
 
   const now = new Date();
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
-  const verdict = tonightNudge(spots, now, cameraId, lenses);
+  // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
+  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal });
   const hero = verdict.spot;
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
   // quiet night this comes back short or empty, and the section hides entirely.
-  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id);
+  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id, { journal });
   const windows = getLightWindows(now, hero.lat, hero.lon);
   const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);

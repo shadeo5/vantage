@@ -124,3 +124,46 @@ describe("bestNearYou (capped, quality-gated)", () => {
     expect(bestNearYou(SPOTS, now, cam, kit, hero.id)).toEqual(bestNearYou(SPOTS, now, cam, kit, hero.id));
   });
 });
+
+describe("variety (no repeating the same spot every night)", () => {
+  const cam = "fuji-x100vi";
+  const kit = ["sony-fe35-18"];
+  const golden = SPOTS.find((s) => s.windowType === "golden")!;
+
+  test("is stable within a day (no jitter on re-render)", () => {
+    const now = new Date(2026, 0, 5, 19, 0, 0);
+    expect(tonightNudge(SPOTS, now, cam, kit).spot.id).toBe(tonightNudge(SPOTS, now, cam, kit).spot.id);
+  });
+
+  test("rotates the pick across days for equally-good spots", () => {
+    // Six identical spots score the same every evening; without variety the hero would
+    // always be the first in array order. The per-day rotation must move it around.
+    const pack = Array.from({ length: 6 }, (_, i) => ({ ...golden, id: `g${i}` }));
+    const heroes = new Set<string>();
+    for (let day = 1; day <= 12; day++) heroes.add(tonightNudge(pack, new Date(2026, 0, day, 19, 0, 0), cam, kit).spot.id);
+    expect(heroes.size).toBeGreaterThan(1);
+  });
+
+  test("a spot shot today steps aside for an equally-good fresh one", () => {
+    const a: Spot = { ...golden, id: "a" };
+    const b: Spot = { ...golden, id: "b" };
+    const now = new Date(2026, 0, 5, 19, 0, 0);
+    const journal = [{ spotId: "a", at: now.toISOString(), went: true }];
+    // The recency penalty (0.18) outweighs the variety bump (max 0.10), so the just-shot
+    // spot always yields to an equally-good fresh one — regardless of the day's rotation.
+    expect(tonightNudge([a, b], now, cam, kit, { journal }).spot.id).toBe("b");
+  });
+
+  test("never overrides a clearly better spot", () => {
+    // A strong golden spot (~0.67+) vs a weak flat/unmatched one (<=0.47): the gap
+    // exceeds the variety bump, so the strong one stays the pick on every day-seed.
+    const strong: Spot = { ...golden, id: "strong", windowType: "golden", genre: "Street" };
+    const weak: Spot = { ...golden, id: "weak", windowType: "flat", genre: "Wildlife" };
+    for (let day = 3; day <= 10; day++) {
+      const dayNow = new Date(2026, 5, day, 19, 0, 0);
+      const w = getLightWindows(dayNow, golden.lat, golden.lon);
+      const primeNow = new Date((w.goldenEvening.start.getTime() + w.goldenEvening.end.getTime()) / 2);
+      expect(tonightNudge([strong, weak], primeNow, cam, kit).spot.id).toBe("strong");
+    }
+  });
+});

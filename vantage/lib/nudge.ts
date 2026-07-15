@@ -12,6 +12,7 @@ import { Spot } from "./spots";
 import { getLightWindows, fmtTime, LightWindows } from "./light";
 import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
 import type { Genre } from "./gear";
+import type { JournalEntry } from "./journal";
 
 export type Confidence = "high" | "medium" | "low";
 export type NudgeSignal = { key: "light" | "activity" | "gear"; label: string; score: number; detail: string };
@@ -81,6 +82,51 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[]): 
   return { spot, score, signals, win };
 }
 
+// --- Variety (so Today doesn't headline the same spot every night) --------------
+// Two honest nudges reshape the ORDER without overriding real quality:
+//  • a per-day rotation that reshuffles spots of comparable score. Many spots tie —
+//    every golden spot scores the same at the same hour — so this alone rotates the
+//    pick day-to-day instead of always taking the first in array order; and
+//  • a recency penalty for a spot you just SHOT (from the journal): you were there, so
+//    it steps aside for something fresh, decaying back over a few days.
+// Both are bounded and never gate a spot out on quality — they only reorder within a
+// band, and the "is tonight worth it?" verdict still reads off the real (base) score.
+const VARIETY_W = 0.10;   // max day-rotation bump — only swaps near-ties, never beats a clearly better night
+const RECENCY_W = 0.18;   // penalty for a just-shot spot (> VARIETY_W, so it always yields to an equal fresh one)
+const RECENCY_DAYS = 4;   // ...decaying to zero over this many days
+
+export type NudgeOpts = { journal?: JournalEntry[] };
+
+// Day-of-year seed — rotates the order each evening, stable within a day (matches nudgeCopy).
+function daySeed(d: Date): number {
+  const startOfYear = new Date(d.getFullYear(), 0, 0);
+  return Math.floor((d.getTime() - startOfYear.getTime()) / 86_400_000);
+}
+
+// Stable string hash → [0,1). Deterministic per (spot, day), so re-renders don't jitter.
+function hash01(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return ((h >>> 0) % 100000) / 100000;
+}
+
+// Penalty (0..RECENCY_W) for a spot shot recently, decaying to zero over RECENCY_DAYS.
+function recencyPenalty(spotId: string, now: Date, journal?: JournalEntry[]): number {
+  if (!journal?.length) return 0;
+  let mostRecent = -Infinity;
+  for (const j of journal) if (j.went && j.spotId === spotId) mostRecent = Math.max(mostRecent, new Date(j.at).getTime());
+  if (mostRecent === -Infinity) return 0;
+  const days = (now.getTime() - mostRecent) / 86_400_000;
+  if (days < 0 || days >= RECENCY_DAYS) return 0;
+  return RECENCY_W * (1 - days / RECENCY_DAYS);
+}
+
+// The RANKING score: real quality, reshuffled by day-rotation minus recency. Quality
+// gates still read the base score — this only decides ORDER among worth-showing spots.
+function varietyRank(base: number, spot: Spot, now: Date, opts?: NudgeOpts): number {
+  return base - recencyPenalty(spot.id, now, opts?.journal) + VARIETY_W * hash01(`${spot.id}:${daySeed(now)}`);
+}
+
 function confidenceFor(score: number): Confidence {
   if (score >= 0.75) return "high";
   if (score >= GO_THRESHOLD) return "medium";
@@ -98,20 +144,22 @@ export const MAX_NEAR_YOU = 4;
 // own (a QUALITY GATE — so every spot shown is genuinely worth it, and a quiet night
 // honestly shows fewer or none rather than padding to a fixed count), excluding the
 // hero, capped at MAX_NEAR_YOU.
-export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string): Spot[] {
+export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string, opts?: NudgeOpts): Spot[] {
   return spots
-    .map((s) => scoreSpot(s, now, cameraId, lensIds))
-    .filter((s) => s.spot.id !== excludeId && s.score >= GO_THRESHOLD)
-    .sort((a, b) => b.score - a.score)
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
+    .filter((s) => s.spot.id !== excludeId && s.base >= GO_THRESHOLD) // gate on real quality
+    .sort((a, b) => b.rank - a.rank)                                  // order by the variety-aware rank
     .slice(0, MAX_NEAR_YOU)
     .map((s) => s.spot);
 }
 
 // Decide tonight: rank every spot, pick the best, and say whether to nudge.
-export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): NudgeVerdict {
-  const scored = spots.map((s) => scoreSpot(s, now, cameraId, lensIds)).sort((a, b) => b.score - a.score);
-  const top = scored[0];
-  const go = top.score >= GO_THRESHOLD;
+export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[], opts?: NudgeOpts): NudgeVerdict {
+  const scored = spots
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
+    .sort((a, b) => b.rank - a.rank);
+  const top = scored[0].ss;
+  const go = top.score >= GO_THRESHOLD; // "worth going out?" reads off REAL quality, not variety
   return {
     go,
     score: top.score,

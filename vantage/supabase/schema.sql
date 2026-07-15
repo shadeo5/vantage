@@ -36,3 +36,46 @@ alter table public.nudge_log enable row level security;
 create policy "Users read their own nudge log"
   on public.nudge_log for select
   using ((select auth.uid()) = user_id);
+
+-- ── Content: cities + spots (per the CONTENT_PIPELINE ADR) ───────────────────
+-- Public, read-only reference content produced by the content pipeline (curate →
+-- vet → draft). Written by the pipeline via the SQL editor / service_role; readable
+-- by everyone (anonymous auth included) once published. `genres` is multi-genre,
+-- primary first. No PostGIS yet — the app filters client-side.
+create table if not exists public.cities (
+  id          text primary key,               -- slug: 'nashville', 'atlanta'
+  name        text not null,
+  region      text,
+  center_lat  double precision,
+  center_lon  double precision,
+  published   boolean not null default false
+);
+
+create table if not exists public.spots (
+  id           text primary key,              -- slug from the spot name
+  city_id      text not null references public.cities(id) on delete cascade,
+  name         text not null,
+  type         text,                          -- display label: Cityscape, Street art, …
+  genres       text[] not null default '{}',  -- multi-genre, primary first (gear-fit reads genres[1])
+  window_type  text,                          -- 'golden' | 'blue' | 'flat'
+  reason       text,
+  tagline      text,
+  why          text,
+  look         text[] not null default '{}',  -- the 3 "what to look for" tips
+  getting      text,
+  image_url    text,                          -- → Supabase Storage (populated in the Image slice)
+  lat          double precision,
+  lon          double precision,
+  published    boolean not null default false
+);
+
+create index if not exists spots_city_idx on public.spots (city_id);
+
+alter table public.cities enable row level security;
+alter table public.spots  enable row level security;
+
+-- Public read of published rows only (drafts stay hidden until flipped published).
+create policy "Anyone can read published cities"
+  on public.cities for select using (published);
+create policy "Anyone can read published spots"
+  on public.spots for select using (published);

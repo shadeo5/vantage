@@ -1,0 +1,245 @@
+[
+  {
+    "id": "fairlie-poplar-historic-district",
+    "name": "Fairlie-Poplar Historic District",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Architecture"
+    ],
+    "lat": 33.756495,
+    "lon": -84.391038,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Terra-cotta facades and old streetlamps at dusk",
+    "tagline": "Atlanta's oldest streets, still holding the light",
+    "why": "This is where Atlanta's early-20th-century commercial architecture still stands shoulder to shoulder — narrow streets, ornate terra-cotta, and cast-iron detail packed into a walkable grid. The tight blocks throw dramatic shadow and reflection, and the mix of old brick against downtown's glass towers gives you layered frames everywhere you turn. It's quiet enough after work hours to actually work a composition without the crowd.",
+    "look": [
+      "The Flatiron Building's narrow wedge from across Broad Street, catching the last warm light on its facade",
+      "Reflections and streetlamp glow along Broad Street pedestrian stretch once the blue hour sets in",
+      "Looking up into terra-cotta cornices and old signage against modern towers for a clean old-versus-new contrast"
+    ],
+    "getting": "Downtown near Peachtree Center MARTA; walkable from most of the city core, with street parking easier in the evenings."
+  },
+  {
+    "id": "atl-nighthawks-at-the-diner",
+    "name": "ATL Nighthawks at the Diner",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Portraits"
+    ],
+    "lat": 33.759903,
+    "lon": -84.391659,
+    "type": "Street",
+    "windowType": "blue",
+    "reason": "Diner glow and lone figures after dark",
+    "tagline": "Warm counter light against the cold blue night",
+    "why": "There's a Hopper-esque quiet to a late-night diner that few Atlanta scenes match. When the sky goes deep blue and the interior burns warm and amber through the glass, you get instant mood and separation. The regulars, the servers on their feet, the solitary coffee drinkers — they're honest portraits waiting to happen.",
+    "look": [
+      "Shoot through the front glass at blue hour — warm interior against the cold sky",
+      "A lone figure hunched at the counter, framed by the row of stools",
+      "Steam off a coffee cup or grill, backlit by a window or hanging light"
+    ],
+    "getting": "Easy to reach by car with street or lot parking nearby; check hours before a late-night visit."
+  },
+  {
+    "id": "look-at-them-look-at-us",
+    "name": "Look At Them Look At Us",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Portraits"
+    ],
+    "lat": 33.756496,
+    "lon": -84.391907,
+    "type": "Street art",
+    "windowType": "flat",
+    "reason": "Bold mural portraits under even light",
+    "tagline": "A wall that stares back on the Westside",
+    "why": "This large-scale mural of oversized faces gives you something rare in street shooting: subjects that hold perfectly still and never break eye contact. The scale and direct gaze turn any passerby into part of the frame, and the flat, saturated color reads best without hard shadows cutting across it. It's a quick stop that rewards patience for the right person to walk through.",
+    "look": [
+      "A real passerby small against the giant painted faces for scale",
+      "Tight crop on the eyes where the paint meets the wall's texture",
+      "Someone pausing mid-stride, caught between the mural's gaze and yours"
+    ],
+    "getting": "On Atlanta's Westside near the BeltLine's western reaches; easiest by car or bike with street parking nearby."
+  },
+  {
+    "id": "state-farm-arena",
+    "name": "State Farm Arena",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Architecture"
+    ],
+    "lat": 33.757171,
+    "lon": -84.396353,
+    "type": "Street",
+    "windowType": "blue",
+    "reason": "Crowd energy and glass under arena lights",
+    "tagline": "Where the crowd and the concrete come alive at night",
+    "why": "State Farm Arena turns into a stage of its own on game and concert nights, with rivers of fans, glowing signage, and modern glass and steel catching every light. The plaza around it gives you clean architectural lines by day and pure kinetic street energy after dark. Downtown's Centennial district hums right here, so you're never short of movement.",
+    "look": [
+      "Fans streaming toward the entrance under the illuminated marquee at blue hour",
+      "Reflections of the skyline in the arena's glass facade just as lights kick on",
+      "Low-angle shot up the steel-and-glass exterior against the darkening sky"
+    ],
+    "getting": "In downtown Atlanta near CNN Center; MARTA to GWCC/CNN Center or Dome station, with paid parking decks nearby."
+  },
+  {
+    "id": "underground-atlanta",
+    "name": "Underground Atlanta",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Architecture"
+    ],
+    "lat": 33.752537,
+    "lon": -84.390148,
+    "type": "Street",
+    "windowType": "blue",
+    "reason": "Neon and brick corridors after dark",
+    "tagline": "A city beneath the city, glowing after hours",
+    "why": "Underground Atlanta is where the original city street level got buried and left behind, so you're shooting inside history — old storefronts, gaslight-era facades, and low brick arches lit by neon and string lights. It swings between gritty and vibrant depending on the night, which makes for honest street frames you won't get above ground. When events and vendors fill the space, the energy is loud and colorful.",
+    "look": [
+      "Neon signage reflecting on wet brick along the lower promenade at dusk",
+      "The original 19th-century storefront facades framed under the arches",
+      "Vendors and passersby silhouetted against string-lit corridors"
+    ],
+    "getting": "Right by Five Points MARTA station downtown; transit is easiest, with paid parking nearby."
+  },
+  {
+    "id": "podium-plaza",
+    "name": "Podium Plaza",
+    "genre": "Street",
+    "genres": [
+      "Street",
+      "Architecture"
+    ],
+    "lat": 33.759738,
+    "lon": -84.393564,
+    "type": "Street",
+    "windowType": "blue",
+    "reason": "Reflections and clean lines after dusk",
+    "tagline": "Where hard lines meet moving crowds",
+    "why": "Podium Plaza is that pocket of downtown Atlanta where modern glass towers frame a public open space, and the geometry does half the work for you. The mix of steel, stone, and reflective facades gives you strong lines by day and glowing reflections once the office lights come on. It's a spot that rewards patience — wait for a lone figure to cross and the whole frame clicks into place.",
+    "look": [
+      "A single commuter crossing the plaza at blue hour, small against the tower glass",
+      "Reflections of lit windows pooling on polished stone after rain",
+      "Tight upward angles where two facades meet to make a clean diagonal"
+    ],
+    "getting": "Central downtown — easiest by MARTA rail, with paid parking decks nearby."
+  },
+  {
+    "id": "olympic-rings",
+    "name": "Olympic Rings",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture"
+    ],
+    "lat": 33.759732,
+    "lon": -84.392262,
+    "type": "Architecture",
+    "windowType": "blue",
+    "reason": "Interlocking rings glow after sunset",
+    "tagline": "A '96 landmark that still lights up the night",
+    "why": "Centennial Olympic Park's rings are a clean geometric subject that rewards patience. The interlocking shapes catch the fountain reflections and the surrounding downtown skyline, and once the city lights kick in they read boldly against the deep sky. It's one of the few spots in Atlanta where architecture, water, and history stack in a single frame.",
+    "look": [
+      "The rings lit up at blue hour with the Skyview wheel or downtown towers stacked behind",
+      "Low-angle shot through one ring, using the arch as a natural frame for the fountain",
+      "Long-exposure of the Fountain of Rings jets nearby, kids running through the water on warm evenings"
+    ],
+    "getting": "Centennial Olympic Park, walkable from downtown and the Peachtree Center MARTA station; nearby parking decks fill on event nights."
+  },
+  {
+    "id": "atlanta-botanical-garden",
+    "name": "Atlanta Botanical Garden",
+    "genre": "Architecture",
+    "genres": [
+      "Architecture",
+      "Nature",
+      "Landscape"
+    ],
+    "lat": 33.790604,
+    "lon": -84.373828,
+    "type": "Nature",
+    "windowType": "golden",
+    "reason": "Living sculptures and glass at golden hour",
+    "tagline": "Where architecture and greenery grow into each other",
+    "why": "The Botanical Garden layers glasshouse geometry against living color, so you get architectural lines and organic texture in the same frame. The Fuqua Orchid Center and the Canopy Walk give you elevated angles you won't find at ground level anywhere else in the city. Late light rakes across the manicured beds and turns the whole place warm and dimensional.",
+    "look": [
+      "The Canopy Walk railing leading your eye out over the treetops in golden light",
+      "Backlit orchids and glass panels inside the Fuqua Conservatory",
+      "The Earth Goddess or seasonal topiary framed against a clean sky at dusk"
+    ],
+    "getting": "On Piedmont Ave beside Piedmont Park; on-site parking deck, or transit and rideshare drop you at the entrance."
+  },
+  {
+    "id": "woodruff-park",
+    "name": "Woodruff Park",
+    "genre": "Nature",
+    "genres": [
+      "Nature",
+      "Street",
+      "Architecture"
+    ],
+    "lat": 33.755579,
+    "lon": -84.38855,
+    "type": "Nature",
+    "windowType": "golden",
+    "reason": "Downtown greenery framed by towers at dusk",
+    "tagline": "A pocket of green where downtown Atlanta slows down",
+    "why": "Woodruff Park is that rare downtown square where trees, fountains, and glass towers all crowd into one frame. Late-day light rakes across the open lawn and catches the water feature just as office crowds and skaters give the place life. It's the spot to shoot nature and city in the same breath.",
+    "look": [
+      "Golden-hour reflections off the surrounding glass towers pooling onto the lawn",
+      "The fountain and water wall backlit with skaters and passersby in silhouette",
+      "Tree canopy against the geometry of downtown high-rises from a low angle"
+    ],
+    "getting": "In the heart of downtown at Peachtree and Auburn; easy walk from the Peachtree Center MARTA station."
+  },
+  {
+    "id": "liberty-plaza",
+    "name": "Liberty Plaza",
+    "genre": "Nature",
+    "genres": [
+      "Nature",
+      "Street"
+    ],
+    "lat": 33.748534,
+    "lon": -84.387106,
+    "type": "Cityscape",
+    "windowType": "golden",
+    "reason": "Capitol backdrop and open-plaza light",
+    "tagline": "Where the Gold Dome meets open sky",
+    "why": "Liberty Plaza sits right across from the State Capitol, giving you a rare pocket of open sky and a clean sightline to that gold dome in the middle of downtown. The mix of hardscape, young trees, and government architecture makes it a quiet spot to shoot when the rallies and events aren't filling it. Late afternoon light rakes across the plaza and warms the dome beautifully.",
+    "look": [
+      "The Gold Dome catching low golden-hour light framed between the plaza's trees",
+      "Long shadows stretching across the open pavement as people cross late in the day",
+      "Tight detail shots of leaves and branches against the Capitol's classical columns"
+    ],
+    "getting": "Downtown near the State Capitol on Washington St; easy from MARTA's Georgia State station, with street and deck parking nearby."
+  },
+  {
+    "id": "georgia-aquarium",
+    "name": "Georgia Aquarium",
+    "genre": "Nature",
+    "genres": [
+      "Nature",
+      "Architecture"
+    ],
+    "lat": 33.763439,
+    "lon": -84.394038,
+    "type": "Nature",
+    "windowType": "flat",
+    "reason": "Backlit ocean life in the dark tunnels",
+    "tagline": "Whale sharks drift overhead in a wall of blue",
+    "why": "The Ocean Voyager tunnel is one of the only places in the city where you can shoot whale sharks and manta rays gliding right over your head. The tanks glow a deep, even blue that does all the lighting work for you, so it's an all-weather spot — overcast or pouring outside, the light indoors never changes. It's slow, meditative shooting: you wait for the shape you want to swim into frame.",
+    "look": [
+      "A whale shark's silhouette passing directly overhead in the acrylic tunnel",
+      "Backlit jellyfish drifting against pure black — pull exposure down for the glow",
+      "Kids' faces lit blue, pressed to the big Ocean Voyager viewing window"
+    ],
+    "getting": "Downtown at Pemberton Place near Centennial Olympic Park; paid deck on site or take MARTA to Peachtree Center or GWCC/Omni."
+  }
+]

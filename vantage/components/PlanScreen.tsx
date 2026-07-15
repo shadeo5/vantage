@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable } from "react-native";
 import { colors, fonts, screen } from "../theme";
-import { getSpot, img, windowMeta } from "../lib/spots";
+import { findSpot, spotImageSource, windowMeta, type Spot } from "../lib/spots";
 import { fitGapLabel } from "../lib/gearProfile";
 
 // When a card falls: `offset` = N days from today; `dow` = the next occurrence of a
@@ -19,8 +19,8 @@ const PLAN: PlanMeta[] = [
 ];
 const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);
 
-export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, onToggleGoing }: {
-  going: string[]; cameraId: string; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
+export function PlanScreen({ spots, going, cameraId, lensIds, windowTimeFor, onOpen, onToggleGoing }: {
+  spots: Spot[]; going: string[]; cameraId: string; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
   const now = new Date();
   const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -44,7 +44,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
 
       <View style={{ gap: 26 }}>
         {week.map((m) => {
-          const spot = getSpot(m.id);
+          const spot = findSpot(spots, m.id);
           const wm = windowMeta(spot.windowType);
           const on = going.includes(m.id);
           const fitGap = fitGapLabel(cameraId, lensIds, spot.genre); // only shows when the kit falls short (#P3)
@@ -56,7 +56,7 @@ export function PlanScreen({ going, cameraId, lensIds, windowTimeFor, onOpen, on
               </View>
               <View style={styles.card}>
                 <Pressable style={({ pressed }) => [styles.cardTop, pressed && { opacity: 0.7 }]} onPress={() => onOpen(m.id)}>
-                  <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
+                  <ImageBackground source={spotImageSource(spot)} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.tag, { color: tagColor(m.tag) }]}>{m.tag.toUpperCase()}</Text>
                     <Text style={styles.name} numberOfLines={1}>{spot.name}</Text>

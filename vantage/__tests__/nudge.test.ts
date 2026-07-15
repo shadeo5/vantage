@@ -1,5 +1,5 @@
 import { lightTiming, gearFitScore, tonightNudge } from "../lib/nudge";
-import { SPOTS } from "../lib/spots";
+import { FALLBACK_SPOTS as SPOTS } from "../lib/spots";
 
 describe("lightTiming", () => {
   // All times same-day / same-zone, so comparisons are timezone-independent.
@@ -38,7 +38,7 @@ describe("gearFitScore", () => {
 });
 
 describe("tonightNudge", () => {
-  const v = tonightNudge(new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
+  const v = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
 
   test("returns a real spot and the Why-signals in order (no unbuilt Activity row)", () => {
     expect(SPOTS.some((s) => s.id === v.spot.id)).toBe(true);
@@ -59,7 +59,7 @@ describe("tonightNudge", () => {
   });
   test("picks the highest-scoring spot (deterministic for a fixed input)", () => {
     // Re-running with the same inputs yields the same pick — no hidden randomness.
-    const again = tonightNudge(new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
+    const again = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
     expect(again.spot.id).toBe(v.spot.id);
     expect(again.score).toBe(v.score);
   });

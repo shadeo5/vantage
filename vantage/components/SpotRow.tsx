@@ -1,13 +1,13 @@
 import React from "react";
 import { View, Text, StyleSheet, ImageBackground, Pressable } from "react-native";
 import { colors, fonts } from "../theme";
-import { Spot, img, windowMeta } from "../lib/spots";
+import { Spot, spotImageSource, windowMeta } from "../lib/spots";
 
 export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank: number; windowTime: string; onPress: () => void }) {
   const wm = windowMeta(spot.windowType);
   return (
     <Pressable onPress={onPress} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
-      <ImageBackground source={img(spot.img)} style={styles.thumb} imageStyle={styles.thumbImg}>
+      <ImageBackground source={spotImageSource(spot)} style={styles.thumb} imageStyle={styles.thumbImg}>
         <Text style={styles.rank}>{rank}</Text>
       </ImageBackground>
       <View style={styles.body}>
@@ -15,7 +15,7 @@ export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank:
         <Text style={styles.reason} numberOfLines={1}>{spot.reason}</Text>
         <View style={styles.meta}>
           <Text style={[styles.window, { color: wm.color }]}>{wm.icon} {wm.label} · {windowTime}</Text>
-          <Text style={styles.dist}>{spot.distance}</Text>
+          {spot.distance ? <Text style={styles.dist}>{spot.distance}</Text> : null}
         </View>
       </View>
     </Pressable>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts } from "../theme";
-import { Spot, img } from "../lib/spots";
+import { Spot, spotImageSource } from "../lib/spots";
 import { NudgeSignal, Confidence } from "../lib/nudge";
 
 const SIG_COLOR: Record<NudgeSignal["key"], string> = {
@@ -30,7 +30,7 @@ export function InspirationHero({
   return (
     <View style={styles.card}>
       <Pressable onPress={onOpen}>
-        <ImageBackground source={img(spot.img)} style={styles.banner}>
+        <ImageBackground source={spotImageSource(spot)} style={styles.banner}>
           {/* warm golden wash + bottom scrim */}
           <LinearGradient colors={["rgba(246,185,94,0.55)", "rgba(214,138,60,0.5)", "rgba(138,90,82,0.55)"]}
             start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
@@ -58,8 +58,8 @@ export function InspirationHero({
 
         <View style={styles.chips}>
           <Text style={[styles.chip, styles.chipGold]}>☀ {goldenRange}</Text>
-          <Text style={styles.chip}>{spot.distance} away</Text>
-          <Text style={styles.chip}>Street life</Text>
+          {spot.distance ? <Text style={styles.chip}>{spot.distance} away</Text> : null}
+          {spot.type ? <Text style={styles.chip}>{spot.type}</Text> : null}
         </View>
 
         <View style={styles.actions}>

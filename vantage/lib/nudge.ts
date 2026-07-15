@@ -8,7 +8,7 @@
 // HONEST about what it knows: with no weather/events wired yet, "light" scores
 // WHEN the good light is (and whether it's already gone), not cloud cover; the
 // activity signal is a placeholder (weight 0) marking where events plug in later.
-import { SPOTS, Spot } from "./spots";
+import { Spot } from "./spots";
 import { getLightWindows, fmtTime, LightWindows } from "./light";
 import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
 import type { Genre } from "./gear";
@@ -87,9 +87,18 @@ function confidenceFor(score: number): Confidence {
   return "low";
 }
 
+// Rank a pack of spots for tonight, best first. The Today "best near you" list and
+// the hero pick both come off this single ordering.
+export function rankSpots(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): Spot[] {
+  return spots
+    .map((s) => scoreSpot(s, now, cameraId, lensIds))
+    .sort((a, b) => b.score - a.score)
+    .map((s) => s.spot);
+}
+
 // Decide tonight: rank every spot, pick the best, and say whether to nudge.
-export function tonightNudge(now: Date, cameraId: string, lensIds: string[]): NudgeVerdict {
-  const scored = SPOTS.map((s) => scoreSpot(s, now, cameraId, lensIds)).sort((a, b) => b.score - a.score);
+export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): NudgeVerdict {
+  const scored = spots.map((s) => scoreSpot(s, now, cameraId, lensIds)).sort((a, b) => b.score - a.score);
   const top = scored[0];
   const go = top.score >= GO_THRESHOLD;
   return {

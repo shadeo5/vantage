@@ -9,7 +9,8 @@ import {
 } from "@expo-google-fonts/hanken-grotesk";
 
 import { colors, fonts, screen as scr } from "./theme";
-import { SPOTS, getSpot, HERO_ID } from "./lib/spots";
+import { FALLBACK_SPOTS, findSpot, spotImageSource, HERO_ID, type Spot } from "./lib/spots";
+import { fetchCityPack } from "./lib/cityPack";
 import { getLightWindows, goldenWindowLabel, fmtTime } from "./lib/light";
 import { GearBanner } from "./components/GearBanner";
 import { InspirationHero } from "./components/InspirationHero";
@@ -22,7 +23,7 @@ import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
-import { tonightNudge } from "./lib/nudge";
+import { tonightNudge, rankSpots } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
@@ -40,6 +41,10 @@ export default function App() {
     HankenGrotesk_600SemiBold, HankenGrotesk_700Bold,
   });
 
+  // Live spot pack (Serve slice 3): seed with the bundled core for an instant first
+  // paint, then swap to the published DB pack once it loads (falls back to the core
+  // on any failure, so this never leaves the screen empty).
+  const [spots, setSpots] = useState<Spot[]>(FALLBACK_SPOTS);
   const [tab, setTab] = useState<Tab>("today");
   const [detailOpen, setDetailOpen] = useState(false);
   const [showLock, setShowLock] = useState(false);
@@ -81,6 +86,11 @@ export default function App() {
     if (next && next !== tab) setTab(next);
   };
 
+  // Load the live city pack from the DB once on launch (Serve slice 3).
+  useEffect(() => {
+    fetchCityPack().then(setSpots);
+  }, []);
+
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
     Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds()]).then(([ids, cam, pend, log, savedIds]) => {
@@ -116,8 +126,10 @@ export default function App() {
 
   const now = new Date();
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
-  const verdict = tonightNudge(now, cameraId, lenses);
+  const verdict = tonightNudge(spots, now, cameraId, lenses);
   const hero = verdict.spot;
+  // "Best near you" = the same ranking, minus tonight's hero.
+  const nearYou = rankSpots(spots, now, cameraId, lenses).filter((s) => s.id !== hero.id);
   const windows = getLightWindows(now, hero.lat, hero.lon);
   const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);
@@ -157,7 +169,7 @@ export default function App() {
     setDueIds((d) => d.filter((id) => id !== spotId));
   };
   const dueCommitment = pending.find((c) => dueIds.includes(c.spotId));
-  const dueSpot = dueCommitment ? getSpot(dueCommitment.spotId) : null;
+  const dueSpot = dueCommitment ? findSpot(spots, dueCommitment.spotId) : null;
 
   return (
     <View style={styles.root}>
@@ -200,10 +212,10 @@ export default function App() {
           />
           <View style={styles.secHead}>
             <Text style={styles.secTitle}>Best near you</Text>
-            <Text style={styles.secCount}>{SPOTS.length} tonight</Text>
+            <Text style={styles.secCount}>{spots.length} tonight</Text>
           </View>
           <View style={{ gap: 12 }}>
-            {SPOTS.filter((s) => s.id !== hero.id).map((spot, i) => (
+            {nearYou.map((spot, i) => (
               <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
             ))}
           </View>
@@ -217,7 +229,7 @@ export default function App() {
 
         {/* Plan */}
         <View style={{ width, height }}>
-          <PlanScreen going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={openDetail} onToggleGoing={commit} />
+          <PlanScreen spots={spots} going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={openDetail} onToggleGoing={commit} />
         </View>
 
         {/* Bag */}
@@ -237,7 +249,7 @@ export default function App() {
       {detailOpen && (
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
-            spot={getSpot(openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
+            spot={findSpot(spots, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
             onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />
         </View>
@@ -245,7 +257,7 @@ export default function App() {
 
       {showLock && (
         <View style={StyleSheet.absoluteFill}>
-          <LockScreen onEnter={() => { setShowLock(false); goToTab("today"); }} title={lockCopy.title} body={lockCopy.body} heroImg={hero.img} />
+          <LockScreen onEnter={() => { setShowLock(false); goToTab("today"); }} title={lockCopy.title} body={lockCopy.body} heroImg={spotImageSource(hero)} />
         </View>
       )}
       </View>

@@ -1,12 +1,13 @@
 import { nudgeCopy } from "../lib/nudgeCopy";
 import { tonightNudge } from "../lib/nudge";
+import { FALLBACK_SPOTS as SPOTS } from "../lib/spots";
 
 const CAM = "fuji-x100vi";
 const KIT = ["sony-fe35-18"];
 
 function copyOn(day: number) {
   const now = new Date(2026, 6, day, 19, 0, 0);
-  return nudgeCopy(tonightNudge(now, CAM, KIT), "35mm", now);
+  return nudgeCopy(tonightNudge(SPOTS, now, CAM, KIT), "35mm", now);
 }
 
 describe("nudgeCopy", () => {
@@ -27,7 +28,7 @@ describe("nudgeCopy", () => {
 
   test("weaves in the pick, the lens, and a time on a go night", () => {
     const now = new Date(2026, 6, 13, 19, 0, 0);
-    const v = tonightNudge(now, CAM, KIT);
+    const v = tonightNudge(SPOTS, now, CAM, KIT);
     const c = nudgeCopy(v, "35mm", now);
     if (v.go) {
       expect(c.body).toContain(v.spot.name);

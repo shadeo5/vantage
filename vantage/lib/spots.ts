@@ -1,8 +1,15 @@
-// Curated Atlanta spots — content ported from the Claude Design handoff (v2).
-// The rich copy (why / what-to-look-for / getting-there) is hand-authored in the
-// design; sourcing this at scale is the upcoming "content strategy" workstream.
+// Spot types + the BUNDLED FALLBACK pack.
+//
+// As of Serve slice 3 the live content comes from the DB (see lib/cityPack.ts):
+// the app reads published Atlanta spots from Postgres, with per-spot illustrations
+// served from Supabase Storage. This file no longer holds the app's runtime spot
+// list — it holds the type, the light-window helpers, and the five hand-authored
+// core Atlanta spots kept as a BUNDLED FALLBACK (used before the DB responds, or if
+// it's offline/unconfigured). Those five also ship their illustrations in the app
+// bundle (their DB rows carry a null image_url), so they always have art.
 // Light timing stays LIVE via lib/light.ts + each spot's real coordinates.
 
+import { type ImageSourcePropType } from "react-native";
 import { type Genre } from "./gear";
 
 export type WindowType = "golden" | "blue" | "flat";
@@ -11,14 +18,16 @@ export type Spot = {
   id: string;
   name: string;
   type: string;       // display label, e.g. "Cityscape", "Street art"
-  genre: Genre;       // the matching genre, for gear-fit checks
+  genre: Genre;       // the matching genre (primary), for gear-fit checks
+  genres?: Genre[];   // multi-genre, primary first (from the DB `genres text[]`)
   windowType: WindowType;
-  distance: string;
+  distance?: string;  // only the bundled core carries this; DB spots have no GPS yet
   reason: string;      // one-line for list rows
   tagline: string;     // under the detail title
   why: string;
   look: string[];      // "what to look for here"
-  img: string;         // key into SPOT_IMAGES (matches the spot id)
+  img: string;         // key into SPOT_IMAGES (bundled core only; matches the spot id)
+  imageUrl?: string;   // remote Storage URL (DB spots); when set, wins over the bundle
   getting: string;
   lat: number;
   lon: number;
@@ -27,7 +36,8 @@ export type Spot = {
 // Local illustrated placeholder imagery — interim AI-generated illustrations
 // (stylized art, NOT documentary photos of the real place). See
 // docs/design/ILLUSTRATION_STYLE.md. Keys match spot ids; require() paths must be
-// static string literals for Metro to bundle them.
+// static string literals for Metro to bundle them. Only the five core spots are
+// bundled — every other spot's illustration is served from Storage via imageUrl.
 const SPOT_IMAGES: Record<string, number> = {
   sweetauburn: require("../assets/spots/sweetauburn.png"),
   krog: require("../assets/spots/krog.png"),
@@ -36,14 +46,25 @@ const SPOT_IMAGES: Record<string, number> = {
   ponce: require("../assets/spots/ponce.png"),
 };
 
-// Resolve a spot's bundled illustration by id (falls back to the hero image).
-export function img(id: string): number {
-  return SPOT_IMAGES[id] ?? SPOT_IMAGES.sweetauburn;
+// Resolve the image source for a spot: a remote Storage URL when the spot carries
+// one, otherwise its bundled illustration (falls back to the hero image for a spot
+// with neither — e.g. a brand-new DB spot whose image hasn't been generated yet).
+export function spotImageSource(spot: Spot): ImageSourcePropType {
+  if (spot.imageUrl) return { uri: spot.imageUrl };
+  return SPOT_IMAGES[spot.img] ?? SPOT_IMAGES.sweetauburn;
+}
+
+// Find a spot by id within a loaded pack (falls back to the first spot).
+export function findSpot(spots: Spot[], id: string): Spot {
+  return spots.find((s) => s.id === id) ?? spots[0];
 }
 
 export const HERO_ID = "sweetauburn";
 
-export const SPOTS: Spot[] = [
+// The five hand-authored core Atlanta spots — the bundled fallback pack. The live
+// app list is loaded from the DB (lib/cityPack.ts); these are what it shows before
+// that resolves, or when the backend is unreachable.
+export const FALLBACK_SPOTS: Spot[] = [
   {
     id: "sweetauburn", name: "Sweet Auburn", type: "Street", genre: "Street", windowType: "golden",
     distance: "6 min", reason: "Historic district, alive at dusk",
@@ -115,8 +136,6 @@ export const SPOTS: Spot[] = [
     lat: 33.7720, lon: -84.3650,
   },
 ];
-
-export const getSpot = (id: string): Spot => SPOTS.find((s) => s.id === id) ?? SPOTS[0];
 
 export function windowMeta(t: WindowType): { color: string; icon: string; label: string } {
   if (t === "golden") return { color: "#E9B872", icon: "☀", label: "Golden" };

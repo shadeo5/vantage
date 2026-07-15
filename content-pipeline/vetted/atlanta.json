@@ -1,0 +1,13 @@
+[
+  { "name": "Fairlie-Poplar Historic District", "genre": "Street", "genres": ["Street", "Architecture"], "lat": 33.756495, "lon": -84.391038 },
+  { "name": "ATL Nighthawks at the Diner", "genre": "Street", "genres": ["Street", "Portraits"], "lat": 33.759903, "lon": -84.391659 },
+  { "name": "Look At Them Look At Us", "genre": "Street", "genres": ["Street", "Portraits"], "lat": 33.756496, "lon": -84.391907 },
+  { "name": "State Farm Arena", "genre": "Street", "genres": ["Street", "Architecture"], "lat": 33.757171, "lon": -84.396353 },
+  { "name": "Underground Atlanta", "genre": "Street", "genres": ["Street", "Architecture"], "lat": 33.752537, "lon": -84.390148 },
+  { "name": "Podium Plaza", "genre": "Street", "genres": ["Street", "Architecture"], "lat": 33.759738, "lon": -84.393564 },
+  { "name": "Olympic Rings", "genre": "Architecture", "genres": ["Architecture"], "lat": 33.759732, "lon": -84.392262 },
+  { "name": "Atlanta Botanical Garden", "genre": "Architecture", "genres": ["Architecture", "Nature", "Landscape"], "lat": 33.790604, "lon": -84.373828 },
+  { "name": "Woodruff Park", "genre": "Nature", "genres": ["Nature", "Street", "Architecture"], "lat": 33.755579, "lon": -84.38855 },
+  { "name": "Liberty Plaza", "genre": "Nature", "genres": ["Nature", "Street"], "lat": 33.748534, "lon": -84.387106 },
+  { "name": "Georgia Aquarium", "genre": "Nature", "genres": ["Nature", "Architecture"], "lat": 33.763439, "lon": -84.394038 }
+]

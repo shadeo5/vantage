@@ -25,7 +25,7 @@ import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
-import { tonightNudge, rankSpots } from "./lib/nudge";
+import { tonightNudge, bestNearYou } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
@@ -142,8 +142,9 @@ export default function App() {
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   const verdict = tonightNudge(spots, now, cameraId, lenses);
   const hero = verdict.spot;
-  // "Best near you" = the same ranking, minus tonight's hero.
-  const nearYou = rankSpots(spots, now, cameraId, lenses).filter((s) => s.id !== hero.id);
+  // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
+  // quiet night this comes back short or empty, and the section hides entirely.
+  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id);
   const windows = getLightWindows(now, hero.lat, hero.lon);
   const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);
@@ -228,15 +229,21 @@ export default function App() {
             isGoing={going.includes(hero.id)} whyOpen={whyOpen}
             onOpen={() => openDetail(hero.id)} onGo={() => commit(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
           />
-          <View style={styles.secHead}>
-            <Text style={styles.secTitle}>Best near you</Text>
-            <Text style={styles.secCount}>{spots.length} tonight</Text>
-          </View>
-          <View style={{ gap: 12 }}>
-            {nearYou.map((spot, i) => (
-              <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
-            ))}
-          </View>
+          {/* Curated, quality-gated (max 4) — hidden entirely when nothing else
+              clears the bar, so a quiet night stays honest instead of padded. */}
+          {nearYou.length > 0 && (
+            <>
+              <View style={styles.secHead}>
+                <Text style={styles.secTitle}>Best near you</Text>
+                <Text style={styles.secCount}>{nearYou.length} more</Text>
+              </View>
+              <View style={{ gap: 12 }}>
+                {nearYou.map((spot, i) => (
+                  <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
+                ))}
+              </View>
+            </>
+          )}
           {shotCount(journal) > 0 && (
             <View style={styles.journalSec}>
               <Text style={styles.secTitle}>Your shoots</Text>

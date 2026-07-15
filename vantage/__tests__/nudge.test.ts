@@ -1,5 +1,6 @@
-import { lightTiming, gearFitScore, tonightNudge } from "../lib/nudge";
-import { FALLBACK_SPOTS as SPOTS } from "../lib/spots";
+import { lightTiming, gearFitScore, tonightNudge, bestNearYou, MAX_NEAR_YOU } from "../lib/nudge";
+import { FALLBACK_SPOTS as SPOTS, type Spot } from "../lib/spots";
+import { getLightWindows } from "../lib/light";
 
 describe("lightTiming", () => {
   // All times same-day / same-zone, so comparisons are timezone-independent.
@@ -62,5 +63,64 @@ describe("tonightNudge", () => {
     const again = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
     expect(again.spot.id).toBe(v.spot.id);
     expect(again.score).toBe(v.score);
+  });
+});
+
+describe("bestNearYou (capped, quality-gated)", () => {
+  const cam = "fuji-x100vi";
+  const kit = ["sony-fe35-18"];
+  const now = new Date(2026, 6, 13, 19, 0, 0);
+
+  test("caps at MAX_NEAR_YOU and excludes the hero, even when many spots clear", () => {
+    // Build 8 strong copies of a golden spot and evaluate at its prime golden moment
+    // (timing 1.0) so all of them clear — TZ-independent since the moment is derived
+    // from the computed window, not wall-clock.
+    const golden = SPOTS.find((s) => s.windowType === "golden")!;
+    const w = getLightWindows(now, golden.lat, golden.lon);
+    const primeNow = new Date((w.goldenEvening.start.getTime() + w.goldenEvening.end.getTime()) / 2);
+    const pack = Array.from({ length: 8 }, (_, i) => ({ ...golden, id: `g${i}` }));
+    const hero = tonightNudge(pack, primeNow, cam, kit).spot;
+    const near = bestNearYou(pack, primeNow, cam, kit, hero.id);
+    expect(near).toHaveLength(MAX_NEAR_YOU);
+    expect(near.map((s) => s.id)).not.toContain(hero.id);
+    expect(new Set(near.map((s) => s.id)).size).toBe(near.length); // no duplicates
+  });
+
+  test("only includes spots that clear the go bar on their own (quality gate)", () => {
+    const hero = tonightNudge(SPOTS, now, cam, kit).spot;
+    const near = bestNearYou(SPOTS, now, cam, kit, hero.id);
+    // Each alternate would itself be a 'go' if it were the only spot.
+    for (const s of near) expect(tonightNudge([s], now, cam, kit).go).toBe(true);
+    // ...and it's exactly the top non-hero clearers, capped.
+    const clearing = SPOTS.filter((s) => s.id !== hero.id && tonightNudge([s], now, cam, kit).go);
+    expect(near).toHaveLength(Math.min(clearing.length, MAX_NEAR_YOU));
+  });
+
+  test("drops a spot below the go bar even while stronger ones clear (the gate)", () => {
+    const g = SPOTS.find((s) => s.windowType === "golden")!;
+    const w = getLightWindows(now, g.lat, g.lon);
+    const primeNow = new Date((w.goldenEvening.start.getTime() + w.goldenEvening.end.getTime()) / 2);
+    // Two strong golden spots the street kit fits (score high) + one that CAN'T clear:
+    // a flat window (base 0.55) with a genre nothing in the kit covers (gear 0.35) tops
+    // out at ~0.47 < 0.55 for any timing, so the gate must always exclude it.
+    const strongA: Spot = { ...g, id: "strongA", windowType: "golden", genre: "Street" };
+    const strongB: Spot = { ...g, id: "strongB", windowType: "golden", genre: "Street" };
+    const weak: Spot = { ...g, id: "weak", windowType: "flat", genre: "Wildlife" };
+    const pack = [strongA, strongB, weak];
+    const hero = tonightNudge(pack, primeNow, cam, kit).spot;
+    const near = bestNearYou(pack, primeNow, cam, kit, hero.id);
+    expect(near.map((s) => s.id)).toContain(hero.id === "strongA" ? "strongB" : "strongA");
+    expect(near.map((s) => s.id)).not.toContain("weak");
+  });
+
+  test("returns nothing when the hero is the only spot (section hides)", () => {
+    const one = [SPOTS[0]];
+    const hero = tonightNudge(one, now, cam, kit).spot;
+    expect(bestNearYou(one, now, cam, kit, hero.id)).toHaveLength(0);
+  });
+
+  test("is deterministic for a fixed input", () => {
+    const hero = tonightNudge(SPOTS, now, cam, kit).spot;
+    expect(bestNearYou(SPOTS, now, cam, kit, hero.id)).toEqual(bestNearYou(SPOTS, now, cam, kit, hero.id));
   });
 });

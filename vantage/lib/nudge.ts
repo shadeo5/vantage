@@ -87,12 +87,23 @@ function confidenceFor(score: number): Confidence {
   return "low";
 }
 
-// Rank a pack of spots for tonight, best first. The Today "best near you" list and
-// the hero pick both come off this single ordering.
-export function rankSpots(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): Spot[] {
+// Today shows one hero + a short "best near you" list. We CAP that list rather than
+// dumping the whole ranked pack: too many options dilute the pick, imply a precision
+// the light×gear signal doesn't have past the top few, and turn an inspiration
+// surface back into a directory. The cap is a single knob so it's easy to tune and
+// so any future surface inherits the same rule.
+export const MAX_NEAR_YOU = 4;
+
+// The "best near you" alternates: ranked spots that each clear the go bar on their
+// own (a QUALITY GATE — so every spot shown is genuinely worth it, and a quiet night
+// honestly shows fewer or none rather than padding to a fixed count), excluding the
+// hero, capped at MAX_NEAR_YOU.
+export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string): Spot[] {
   return spots
     .map((s) => scoreSpot(s, now, cameraId, lensIds))
+    .filter((s) => s.spot.id !== excludeId && s.score >= GO_THRESHOLD)
     .sort((a, b) => b.score - a.score)
+    .slice(0, MAX_NEAR_YOU)
     .map((s) => s.spot);
 }
 

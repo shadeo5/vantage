@@ -289,6 +289,7 @@
       <li><b>Concert / festival</b> → crowd energy, stage light spill, the queue before doors</li>
     </ul>
     <p style="margin-top:13px">Same LLM recipe as the spot pipeline (voice guide + structured output), different input: an event <em>type</em>, optionally fused with the venue spot's place-facts.</p>
+    <p style="margin-top:13px"><b>Update (2026-07-16) — first catalog is hand-curated, not category-generated.</b> The initial editorial seed, <code>content-pipeline/content/atlanta-events.json</code> (12 marquee Atlanta events), was <b>hand-curated per event</b> — each carries its own <code>why</code>/<code>look</code> plus per-archetype <code>kitAngles</code> (wide/normal/tele/macro) — rather than generated from an event <em>type</em>. Reason: the marquee tentpoles are few, high-value, and specific enough that per-event editorial beats a category template; the category-keyed generation above stays the <em>scale</em> path once the long tail is ingested. Sourcing strategy that fed the curation: <code>EVENT_DATA_SOURCES.md</code>.</p>
   </section>
 
   <!-- 08 -->

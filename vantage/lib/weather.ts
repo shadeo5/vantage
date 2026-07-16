@@ -16,9 +16,14 @@
 // it actually knows, same as the rest of the nudge brain.
 import type { LightType } from "./light";
 
-export type CloudCover = {
+export type Forecast = {
   // Cloud fraction 0..1 at a given moment (nearest forecast hour). 0 = clear, 1 = overcast.
-  at(date: Date): number;
+  cloudAt(date: Date): number;
+  // Rain PROBABILITY 0..1 at a moment — drives the "check your kit's sealed" warning.
+  rainAt(date: Date): number;
+  // Actively precipitating at a moment (WMO weather_code says rain/drizzle/snow/storm) —
+  // drives wet-weather shot types (reflections, umbrellas) vs. just "might rain."
+  wetAt(date: Date): boolean;
   fetchedAt: number;
 };
 
@@ -34,37 +39,48 @@ function hourKey(d: Date): string {
 // Pull hourly cloud cover for today + tomorrow (late windows spill past midnight). Returns
 // null on ANY failure — the caller degrades to astronomical-only light, never blank
 // (same best-effort pattern as cityPack / gearStorage).
-export async function fetchCloudCover(lat: number, lon: number): Promise<CloudCover | null> {
+export async function fetchForecast(lat: number, lon: number): Promise<Forecast | null> {
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}` +
-      `&hourly=cloud_cover&timezone=auto&forecast_days=2`;
+      `&hourly=cloud_cover,precipitation_probability,weather_code&timezone=auto&forecast_days=2`;
     const res = await fetch(url);
     if (!res.ok) return null;
-    const json = (await res.json()) as { hourly?: { time?: string[]; cloud_cover?: number[] } };
+    const json = (await res.json()) as {
+      hourly?: { time?: string[]; cloud_cover?: number[]; precipitation_probability?: number[]; weather_code?: number[] };
+    };
     const times = json.hourly?.time;
     const cover = json.hourly?.cloud_cover;
     if (!times?.length || !cover?.length) return null;
+    const prob = json.hourly?.precipitation_probability ?? [];
+    const code = json.hourly?.weather_code ?? [];
 
-    // Index by the hour key (slice "2026-07-16T14:00" → "2026-07-16T14").
-    const byHour = new Map<string, number>();
+    // Index each signal by the hour key (slice "2026-07-16T14:00" → "2026-07-16T14").
+    const cloudBy = new Map<string, number>();
+    const rainBy = new Map<string, number>();
+    const codeBy = new Map<string, number>();
     for (let i = 0; i < times.length; i++) {
-      const c = cover[i];
-      if (typeof c === "number") byHour.set(times[i].slice(0, 13), Math.max(0, Math.min(1, c / 100)));
+      const key = times[i].slice(0, 13);
+      if (typeof cover[i] === "number") cloudBy.set(key, clamp01(cover[i] / 100));
+      if (typeof prob[i] === "number") rainBy.set(key, clamp01(prob[i] / 100));
+      if (typeof code[i] === "number") codeBy.set(key, code[i]);
     }
-    if (byHour.size === 0) return null;
+    if (cloudBy.size === 0) return null;
 
     return {
       fetchedAt: Date.now(),
-      at(date: Date) {
-        const v = byHour.get(hourKey(date));
-        return v === undefined ? 0 : v; // missing hour → assume clear (don't invent bad weather)
-      },
+      // Missing hour → assume clear/dry (don't invent bad weather).
+      cloudAt: (date) => cloudBy.get(hourKey(date)) ?? 0,
+      rainAt: (date) => rainBy.get(hourKey(date)) ?? 0,
+      // WMO weather_code ≥ 51 = drizzle / rain / snow / showers / thunderstorm (actively wet).
+      wetAt: (date) => (codeBy.get(hourKey(date)) ?? 0) >= 51,
     };
   } catch {
     return null;
   }
 }
+
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 
 // smoothstep — 0 below `a`, 1 above `b`, an S-curve between. Gives the "soft knee" so a
 // few clouds barely register but overcast bites.

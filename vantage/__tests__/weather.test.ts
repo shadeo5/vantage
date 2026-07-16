@@ -1,5 +1,9 @@
-import { cloudFactor, skyLabel, type CloudCover } from "../lib/weather";
+import { cloudFactor, skyLabel, type Forecast } from "../lib/weather";
 import { hourlyLight } from "../lib/light";
+
+// A fixed-value forecast stub — cloud everywhere, dry unless told otherwise.
+const fc = (cloud: number, rain = 0, wet = false): Forecast =>
+  ({ fetchedAt: 0, cloudAt: () => cloud, rainAt: () => rain, wetAt: () => wet });
 
 describe("cloudFactor — the honest sky model", () => {
   test("clear skies leave golden light untouched", () => {
@@ -41,11 +45,11 @@ describe("skyLabel", () => {
 describe("hourlyLight with a cloud forecast", () => {
   const LAT = 33.749, LON = -84.388;
   const DAY = new Date(2026, 6, 11, 14, 0, 0);
-  const overcast: CloudCover = { fetchedAt: 0, at: () => 1 };   // fully socked in
-  const clear: CloudCover = { fetchedAt: 0, at: () => 0 };      // bluebird
+  const overcast = fc(1);   // fully socked in
+  const clear = fc(0);      // bluebird
 
   test("overcast knocks the golden peak below the clear-sky peak", () => {
-    const goldenPeak = (cloud?: CloudCover) =>
+    const goldenPeak = (cloud?: Forecast) =>
       Math.max(...hourlyLight(DAY, LAT, LON, cloud).filter((b) => b.type === "golden").map((b) => b.quality));
     expect(goldenPeak(overcast)).toBeLessThan(goldenPeak(clear));
   });

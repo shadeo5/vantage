@@ -4,19 +4,19 @@ import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
 import { Spot, spotImageSource, windowMeta } from "../lib/spots";
 import { getLightWindows, goldenWindowLabel, hourlyLight, fmtTime } from "../lib/light";
-import { skyLabel, type CloudCover } from "../lib/weather";
+import { skyLabel, type Forecast } from "../lib/weather";
 import { LightChart } from "./LightChart";
 
 export function SpotDetail({
   spot, isGoing, isSaved, cloud, onBack, onToggleGoing, onToggleSaved,
 }: {
-  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: CloudCover | null; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
+  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
 }) {
   const now = new Date();
   const windows = getLightWindows(now, spot.lat, spot.lon);
   // Chart tempered by the real sky (P3) — bars show the light you'll actually get.
   const bars = hourlyLight(now, spot.lat, spot.lon, cloud);
-  const skyNow = cloud ? skyLabel(cloud.at(now)) : null;
+  const skyNow = cloud ? skyLabel(cloud.cloudAt(now)) : null;
   const wm = windowMeta(spot.windowType);
   const windowTime = spot.windowType === "blue" ? fmtTime(windows.blueEvening.start) : fmtTime(windows.goldenEvening.start);
 

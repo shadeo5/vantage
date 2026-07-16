@@ -28,8 +28,8 @@ describe("weather tempers the verdict (P3)", () => {
   // A prime golden evening: window live, so light leads the score.
   const now = new Date(2026, 6, 13, 20, 30, 0);
   const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
-  const overcast = { fetchedAt: 0, at: () => 1 };
-  const clear = { fetchedAt: 0, at: () => 0 };
+  const overcast = { fetchedAt: 0, cloudAt: () => 1, rainAt: () => 0, wetAt: () => false };
+  const clear = { fetchedAt: 0, cloudAt: () => 0, rainAt: () => 0, wetAt: () => false };
 
   test("overcast lowers the pick's score vs. clear skies", () => {
     const bright = tonightNudge(SPOTS, now, cam, kit, { cloud: clear }).score;

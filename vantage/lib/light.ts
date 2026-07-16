@@ -1,6 +1,6 @@
 // Light-timing helpers — real golden/blue-hour math via SunCalc (free, offline).
 import * as SunCalc from "suncalc";
-import { cloudFactor, type CloudCover } from "./weather";
+import { cloudFactor, type Forecast } from "./weather";
 
 export type LightWindows = {
   goldenEvening: { start: Date; end: Date };
@@ -53,6 +53,12 @@ function typeFromAltitude(altDeg: number): LightType {
   return "night";
 }
 
+// The light phase at a specific moment — the conditions/shoot-brief layer keys off
+// this ("is it dark enough to need fast glass?", "golden or flat right now?").
+export function lightPhaseAt(date: Date, lat: number, lon: number): LightType {
+  return typeFromAltitude(SunCalc.getPosition(date, lat, lon).altitude);
+}
+
 // 0..1 quality: peaks near the horizon, decays as the sun climbs (harsh midday)
 // or sinks below into night. This is what gives the ramp-up / ramp-down shape.
 function qualityFromAltitude(altDeg: number): number {
@@ -66,7 +72,7 @@ function qualityFromAltitude(altDeg: number): number {
 // golden peaks and render a smooth ramp. When a cloud forecast is supplied, each bar's
 // quality is tempered by the sky (overcast knocks golden/blue down; flat is left alone) —
 // so the chart shows the light you'll ACTUALLY get, not just the astronomical ideal.
-export function hourlyLight(date: Date, lat: number, lon: number, cloud?: CloudCover | null, startHour = 5, endHour = 21): LightBar[] {
+export function hourlyLight(date: Date, lat: number, lon: number, cloud?: Forecast | null, startHour = 5, endHour = 21): LightBar[] {
   const nowMs = date.getTime();
   const bars: LightBar[] = [];
   for (let m = startHour * 60; m <= endHour * 60; m += 30) {
@@ -76,7 +82,7 @@ export function hourlyLight(date: Date, lat: number, lon: number, cloud?: CloudC
     const altDeg = SunCalc.getPosition(t, lat, lon).altitude;
     const type = typeFromAltitude(altDeg);
     const base = qualityFromAltitude(altDeg);
-    const q = cloud ? Math.max(0.05, Math.min(1, base * cloudFactor(cloud.at(t), type))) : base;
+    const q = cloud ? Math.max(0.05, Math.min(1, base * cloudFactor(cloud.cloudAt(t), type))) : base;
     bars.push({
       hour: t.getHours(),
       type,

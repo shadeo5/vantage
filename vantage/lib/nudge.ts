@@ -11,7 +11,7 @@
 import { Spot } from "./spots";
 import { getLightWindows, fmtTime, LightWindows } from "./light";
 import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
-import { cloudFactor, skyLabel, type CloudCover } from "./weather";
+import { cloudFactor, skyLabel, type Forecast } from "./weather";
 import type { Genre } from "./gear";
 import type { JournalEntry } from "./journal";
 
@@ -63,13 +63,13 @@ export function gearFitScore(cameraId: string, lensIds: string[], genre: Genre):
 
 type ScoredSpot = { spot: Spot; score: number; signals: NudgeSignal[]; win: { start: Date; end: Date } };
 
-function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], cloud?: CloudCover | null): ScoredSpot {
+function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], cloud?: Forecast | null): ScoredSpot {
   const w = getLightWindows(now, spot.lat, spot.lon);
   const win = windowFor(spot, w);
   const timing = lightTiming(now, win.start, win.end);
   // Weather tempers the light HONESTLY: overcast knocks golden/blue down, leaves flat
   // (soft-daylight) shooting alone. No forecast → astronomical-only (factor 1).
-  const sky = cloud ? cloud.at(win.start) : null;
+  const sky = cloud ? cloud.cloudAt(win.start) : null;
   const weather = sky === null ? 1 : cloudFactor(sky, spot.windowType);
   const light = BASE_QUALITY[spot.windowType] * timing * weather;
   const gear = gearFitScore(cameraId, lensIds, spot.genre);
@@ -101,7 +101,7 @@ const VARIETY_W = 0.10;   // max day-rotation bump — only swaps near-ties, nev
 const RECENCY_W = 0.18;   // penalty for a just-shot spot (> VARIETY_W, so it always yields to an equal fresh one)
 const RECENCY_DAYS = 4;   // ...decaying to zero over this many days
 
-export type NudgeOpts = { journal?: JournalEntry[]; cloud?: CloudCover | null };
+export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null };
 
 // Day-of-year seed — rotates the order each evening, stable within a day (matches nudgeCopy).
 function daySeed(d: Date): number {

@@ -1,0 +1,260 @@
+<title>Vantage — Conditions &amp; the Shoot Brief</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:58px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .spot{color:var(--gold);font-weight:600;} .event{color:var(--blue);font-weight:600;}
+
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px;}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+
+  .flow-wrap{overflow-x:auto;margin:18px 0;}
+  .flow{min-width:660px;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:0;}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:13px;color:var(--ink);padding:2px 0;}
+  .stage .item.g{color:var(--gold);} .stage .item.b{color:var(--blue);}
+  .arrow{color:var(--faint);text-align:center;font-size:20px;padding:0 10px;}
+
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call.clay{border-left-color:var(--clay);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);} .call.clay .k{color:var(--clay);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px;padding:0;margin:16px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Architecture · Engineering</div>
+    <h1>Conditions &amp; the Shoot Brief</h1>
+    <p class="lede">Now that <b>weather is a live signal</b>, the nudge can stop being a go/no-go score and become a <b>brief</b>: given tonight's light, sky, and rain — plus <i>your</i> kit — here's what's shootable, whether your gear's up for it, and the shots to chase. Bad golden hour stops meaning "quiet night" and starts meaning "shoot this, this way."</p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — conditions guidance</b></span>
+      <span class="tag">Status <b>Design — build next</b></span>
+      <span class="tag">Updated <b>Jul 16, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>Why this earns its own layer</h2></div>
+    <p>The <a href="./PUSH_ARCHITECTURE.html">nudge brain</a> today answers one question — <b>"is tonight worth going out?"</b> — with a single score and a go/quiet verdict. The <b>weather layer</b> (P3, <code>lib/weather.ts</code>) just made that score honest about the sky. But it exposed a gap: on a <b>96% overcast evening</b> the top spot's score drops just under the go bar, the verdict flips to <b>"a quiet night,"</b> and — because "best near you" is gated on the same bar — the whole browse list vanishes. The app goes dark exactly when it should be most useful.</p>
+    <p>That's the wrong answer, because <b>overcast isn't "nothing to shoot"</b> — it's the wrong light for <i>golden hour</i> and the <i>right</i> light for even street, portraits, texture, and color. The fix isn't a looser threshold; it's a richer output. Turn the verdict into a <b>shoot brief</b>: a constructive read that always has a next move, even on a gray night or after dark.</p>
+    <div class="call">
+      <div class="k">The reframe in one line</div>
+      <p>From <b>"Is tonight good? (score → go / quiet)"</b> to <b>"Given these conditions and your kit — shoot this, here's whether your gear's ready, here's the shot."</b> Same signals, a brief instead of a gate.</p>
+    </div>
+    <p>It also lands squarely on the product's spine: a <b>personal</b> reason to go shoot. "Your f/1.8 eats this dark — go work the neon" is about the least generic thing the app can say, and it's <b>ideal-for, never a limit</b> — the standing gear-framing rule. This is the layer that makes weather + gear pay off together instead of as two separate multipliers.</p>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>The conditions model</h2></div>
+    <p>Three inputs, normalized into one <code>Conditions</code> read for the moment that matters (the spot's window tonight):</p>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="stage"><div class="lbl">Light phase</div><div class="item g">golden</div><div class="item b">blue</div><div class="item">flat · night</div></div>
+        <div class="arrow">+</div>
+        <div class="stage"><div class="lbl">Sky (have it)</div><div class="item">cloud cover %</div><div class="item" style="color:var(--faint)">clear → overcast</div></div>
+        <div class="arrow">+</div>
+        <div class="stage"><div class="lbl">Precip (to add)</div><div class="item b">rain probability</div><div class="item" style="color:var(--faint)">weather_code</div></div>
+      </div>
+    </div>
+    <p><b>Light phase</b> and <b>cloud</b> already exist — <code>light.ts</code> gives the phase from sun altitude, <code>weather.ts</code> gives hourly cloud from Open-Meteo. The only new plumbing is <b>precipitation</b>, and it's cheap: the same Open-Meteo call, two more hourly variables.</p>
+    <pre><code><span class="c-com">// weather.ts — one-line extension of the existing fetch</span>
+hourly=cloud_cover<span class="c-key">,precipitation_probability,weather_code</span>
+
+<span class="c-com">// the normalized read the brief consumes</span>
+Conditions {
+  phase: <span class="c-str">"golden" | "blue" | "flat" | "night"</span>
+  cloud: <span class="c-blue">number</span>   <span class="c-com">// 0..1, already have</span>
+  rain:  <span class="c-blue">number</span>   <span class="c-com">// 0..1 probability at the window (new)</span>
+  wet:   <span class="c-blue">boolean</span>  <span class="c-com">// weather_code says actively raining/snowing (new)</span>
+}</code></pre>
+    <div class="call clay">
+      <div class="k">Honesty guardrail</div>
+      <p>We <b>infer</b> conditions from sun altitude + cloud + precip — we never meter the actual scene. So the brief says <i>"looks like a fast-glass night,"</i> never <i>"it's 3 lux."</i> Same discipline as the rest of the brain: confident where the signal is real, quiet where it isn't.</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>Gear-readiness — is your kit up for tonight?</h2></div>
+    <p>This is the half that's <b>buildable today</b>: every lens and body in <code>gear.ts</code> already carries <code>maxAperture</code>, so we can read the kit's <b>fastest available f-number</b> against the darkness and say something true. It's a pure function — kit + phase → a readiness verdict + an honest line.</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>When it's dark…</th><th>Kit's fastest glass</th><th>Read</th><th>The line (ideal-for)</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="4"><b>Night</b> <span style="color:var(--faint)">(sun &lt; −6°, after blue hour)</span></td><td><b>≤ f/2.0</b></td><td>Set</td><td>"Your f/1.8 eats the dark — work handheld."</td></tr>
+          <tr><td><b>f/2.1–2.8</b></td><td>Workable</td><td>"Push ISO and you're fine — lean on lit pockets."</td></tr>
+          <tr><td><b>f/2.9–4.0</b></td><td>Borderline</td><td>"Steady up or find light — or make the dark the subject."</td></tr>
+          <tr><td><b>&gt; f/4.0</b></td><td>Slow for dark</td><td>"Too slow for full dark handheld — catch the last light by [time], bring a tripod, or shoot silhouettes."</td></tr>
+          <tr><td><b>Blue hour</b></td><td>any</td><td>Fine</td><td>"Enough light for anything — a tripod unlocks the long-exposure cityscape."</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>That single table <b>is</b> the "fast lens / flash / chase the light / silhouette" fork from the brief — not four features, one readiness function reading aperture against darkness. Every branch stays framed as what the kit's <b>ideal for</b> and how to make the night work — it never tells someone their gear "can't."</p>
+    <div class="call blue">
+      <div class="k">Rain — the phased call</div>
+      <p><b>v1 (warn-first):</b> when rain probability at go-time is high, the brief carries a plain nudge — <i>"Rain likely at 8pm — make sure your body + lens are sealed, or pack a cover."</i> No kit modeling yet. <b>v2 (personalize):</b> add a <code>weatherSealed</code> flag to the catalog (the "WR" / "GM" / "L" in model names already hints it) so the warning knows whether <i>your</i> gear is rated, and softens or sharpens accordingly.</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>Shot-type guidance — what to shoot</h2></div>
+    <p>The creative payoff, and the honest answer to "quiet night." A rules table maps conditions → a handful of <b>shot archetypes</b> — the same spirit as the light-phase mapping we already have, and it reuses a precedent: the events data already carries <code>kitAngles</code> (wide / normal / tele / macro) and every spot a <code>look[]</code>. This makes that guidance <b>conditional</b> instead of static.</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Conditions</th><th>Shoot…</th><th>Why it works</th></tr></thead>
+        <tbody>
+          <tr><td><b>Overcast · daylight</b></td><td>Even-light street &amp; portraits · saturated color · texture &amp; detail · high-key</td><td>Harsh shadows gone; a giant softbox — colors sing, faces are even. <i>The overcast win.</i></td></tr>
+          <tr><td><b>Clear · golden</b></td><td>Warm side-light portraits · long shadows · backlit rim · lens flare</td><td>The classic — low warm sun, directional and forgiving.</td></tr>
+          <tr><td><b>Clear · sun down / can't reach golden</b></td><td>Silhouettes (expose for the sky) · afterglow skylines</td><td>No warm light left to chase — make shape the subject.</td></tr>
+          <tr><td><b>Blue hour</b></td><td>Long-exposure cityscape · window &amp; sign light · reflections</td><td>Sky and artificial light balance; tripod turns motion to glow.</td></tr>
+          <tr><td><b>Night</b></td><td>Neon &amp; reflections · fast-glass candids · light trails (tripod) · flash portraits</td><td>The city lights itself — shoot the light sources, not the dark.</td></tr>
+          <tr><td><b>Rain / wet</b></td><td>Reflections &amp; puddles · umbrellas &amp; color · from-cover framing · moody B&amp;W</td><td>Wet streets mirror the lights; weather is mood. <span style="color:var(--clay)">(+ seal warning)</span></td></tr>
+          <tr><td><b>Harsh midday · clear</b></td><td>Hard-shadow graphic B&amp;W · geometry &amp; shade · high contrast</td><td>Bad for soft — good for bold. Use the contrast, don't fight it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;margin-top:12px">Guidance is <b>filtered by the kit</b>: "flash portraits" only surfaces if there's flash in the bag (later — we don't model flash yet); "light trails (tripod)" is offered as a technique, not assumed gear. Cross-checked against <a href="../design/VOICE.md">VOICE</a> — specific, honest, never a generic "there'll be people there."</p>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>The decisions</h2></div>
+    <p>Four forks sit inside this layer — which is why it earns an ADR. Recommendations are the flagged default calls; the load-bearing one is D1.</p>
+    <div class="tw" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Decision</th><th>Status</th><th>Reasoning / alternatives</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>D1 · Additive brief vs. conditions re-rank</b></td>
+            <td><span class="pill plan">Open — your call</span></td>
+            <td><b>The load-bearing one.</b> <i>Additive:</i> keep the existing pick, add a readiness line + shot prompts beneath it (safe, ships alone, doesn't touch ranking). <i>Re-rank:</i> conditions <b>change the hero</b> — a gray evening promotes a flat-light spot over a washed-out golden one. <b>Leaning: ship additive first, let it earn the re-rank.</b> Re-rank overlaps the one-scorer principle in the <a href="./EVENTS_ARCHITECTURE.html">Events</a> ADR — do it there, not as a parallel system.</td>
+          </tr>
+          <tr>
+            <td><b>D2 · Rules table vs. LLM guidance</b></td>
+            <td><span class="pill proto">Rules first</span></td>
+            <td>Deterministic condition→shot rules are transparent, unit-testable, free, and match how the rest of the brain works. An LLM pass (like the events/spot draft) could tailor prompts per <i>spot × condition</i> later — escalate only if the rules feel generic. Rules for v1.</td>
+          </tr>
+          <tr>
+            <td><b>D3 · Weather-sealing</b></td>
+            <td><span class="pill proto">Warn-first</span></td>
+            <td>Your call, and the right one: <b>warn on rain now</b> (no kit data needed), add a structured <code>weatherSealed</code> flag to the catalog <b>later</b> to personalize. Ships value on day one; avoids a data pass across ~40 items before the feature's proven.</td>
+          </tr>
+          <tr>
+            <td><b>D4 · Readiness thresholds</b></td>
+            <td><span class="pill plan">Tunable</span></td>
+            <td>The f-stop cutoffs (≤2.0 set, &gt;4.0 slow) are a first honest guess — they ignore body high-ISO ability (a modern sensor at f/4 can beat an old one at f/2). Single-constant knobs, tuned once we shoot against them. See simplifications.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="call blue">
+      <div class="k">Cross-reference</div>
+      <p>D1's re-rank touches the same scorer as the <b>Gear Matching</b> (Decision C) and <b>Events</b> ADRs. The rule holds: conditions influence <b>one ranker</b>, never a second parallel brain. The additive brief is safe precisely because it sits <i>beside</i> the ranker, not inside it.</p>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Known simplifications &amp; honesty guardrails</h2></div>
+    <ul class="list">
+      <li><b>Inferred, not metered.</b> Conditions come from sun altitude + cloud + precip, not a light meter on the scene. The brief hedges accordingly and never states a lux value.</li>
+      <li><b>Body ISO isn't modeled (D4).</b> Readiness reads lens aperture only; a modern high-ISO body genuinely changes what "too slow" means. Documented so a slow-lens warning is never mistaken for a hard limit.</li>
+      <li><b>No flash / tripod in the kit data.</b> Flash-lit and long-exposure prompts are offered as <i>techniques</i>, not assumed gear — until the catalog models accessories, we suggest, we don't assert you have them.</li>
+      <li><b>Ideal-for, never a limit.</b> Every readiness branch — even "&gt; f/4.0, slow for dark" — is framed as how to make the night work (last light / tripod / silhouette), never as gear that "can't." The standing rule, enforced in copy.</li>
+      <li><b>Rain warning is generic in v1.</b> It tells everyone to check sealing regardless of their actual gear — honest but blunt, until <code>weatherSealed</code> lands (D3 v2).</li>
+    </ul>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Open questions</h2></div>
+    <ul class="list open">
+      <li>Does the brief ever <b>re-rank the hero</b> on conditions, or only annotate the existing pick? (D1 — needs the ranking model settled, overlaps Events.)</li>
+      <li>How many shot prompts is the right number — one hero shot, or a short set? Too many turns inspiration back into a checklist.</li>
+      <li>Where does the brief live in the UI — folded into "Why this pick?", a new "Tonight's shoot" card, or the spot detail's "what to look for"?</li>
+      <li>Should a <b>genuinely bad</b> night (dark + slow kit + rain, nothing sealed) still push a brief, or is "stay in, clean your sensor" a valid honest answer?</li>
+      <li>Wind &amp; temperature: worth pulling for long-exposure stability / "dress warm," or scope creep?</li>
+      <li>Does conditions guidance feed the <b>push copy</b> (E3/N3) too, or stay in-app for now?</li>
+    </ul>
+  </section>
+
+  <!-- 08 -->
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Build slices</h2></div>
+    <p>Ordered so each slice stands on its own and the risky re-rank (D1) stays last:</p>
+    <ul class="list">
+      <li><b>Slice 1 — Conditions read.</b> Extend the Open-Meteo fetch with <code>precipitation_probability</code> + <code>weather_code</code>; add the pure <code>Conditions</code> type + a <code>conditionsFor(window)</code> helper. Tested. <span style="color:var(--faint)">(tiny)</span></li>
+      <li><b>Slice 2 — Gear-readiness.</b> Pure <code>kitReadiness(kit, phase)</code> over <code>maxAperture</code> → verdict + honest line. Buildable today, no new data. Tested against the f-stop table.</li>
+      <li><b>Slice 3 — Shot-type rules.</b> <code>shotsFor(conditions, kit)</code> → 1–3 kit-filtered shot prompts from the §04 table. Tested.</li>
+      <li><b>Slice 4 — Surface it (additive, D1).</b> The "quiet night" hero gains a brief: readiness line + shot prompts + any rain warning. Wire into Today / Detail. This alone fixes the empty-list collapse.</li>
+      <li><b>Slice 5 — (later) <code>weatherSealed</code> in the catalog</b> (D3 v2) → personalize the rain warning.</li>
+      <li><b>Slice 6 — (later, if earned) conditions re-rank</b> (D1) → gray nights promote flat-light spots. Do it inside the one scorer, with Events.</li>
+    </ul>
+    <div class="call">
+      <div class="k">Recommended first build</div>
+      <p>Slices <b>1 → 2 → 3 → 4</b> as one thread — the additive brief. It's self-contained, needs no ranking changes, uses data we already have (plus the trivial precip add), and turns the overcast "quiet night" into a shoot plan. Re-rank waits until it's earned.</p>
+    </div>
+  </section>
+
+  <footer>Vantage · ADR — conditions guidance · sits on P3 weather (<code>lib/weather.ts</code>) + gear (<code>lib/gear.ts</code>) · feeds the nudge (E3) · backlog: new epic</footer>
+</div>

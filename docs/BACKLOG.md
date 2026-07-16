@@ -118,3 +118,14 @@ Now that the app is on a real Pixel, the job is closing "impressive demo → fee
 - NOTE: these are JS changes — live on web immediately, but need an `eas build` to appear on the installed Pixel APK.
 
 **Loop guidance:** decision-heavy rows (#D1 persist-vs-remove, #P2 hierarchy, #B2 first-run model) — make the flagged default call, note it in the commit, keep moving; don't block. Rows needing the physical phone (#T5 verify, most of the on-device pass) — do the code-able part, flag the rest for Desha's hands.
+
+---
+
+## E8 · Conditions & the shoot brief  ▶ (new — from the P3 weather landing)
+**ADR: `docs/engineering/SHOOT_BRIEF.html`** (Design — build next). Now that weather is a live signal, turn the nudge from a go/quiet **score** into a **brief**: given tonight's light × cloud × rain plus the user's kit — what's shootable, whether the gear's ready, and the shots to chase. Directly fixes the P3 side-effect where a 96% overcast evening drops the top score under the go bar and the "best near you" list (gated on the same bar) vanishes — overcast should mean "shoot flat-light street, this way," not a dead screen. Decisions (defaults called in the ADR): **D1** additive brief first vs. conditions re-rank (**leaning additive**, re-rank belongs in the one Events scorer — the load-bearing open call); **D2** rules-first (LLM later); **D3** rain **warn-first**, structured `weatherSealed` later; **D4** tunable f-stop readiness thresholds. Honesty: inferred-not-metered, ideal-for-never-a-limit.
+- 🎯 **CB1 — Conditions read.** Extend the Open-Meteo fetch with `precipitation_probability` + `weather_code`; a pure `Conditions` type + `conditionsFor(window)`. *(ADR slice 1)*
+- 🎯 **CB2 — Gear-readiness.** Pure `kitReadiness(kit, phase)` over `maxAperture` → verdict + honest line (fast-glass / push-ISO / tripod / silhouette). Buildable today, no new data. *(slice 2)*
+- 🎯 **CB3 — Shot-type rules.** `shotsFor(conditions, kit)` → 1–3 kit-filtered shot prompts from the ADR §04 table. *(slice 3)*
+- 🎯 **CB4 — Surface it (additive).** The "quiet night" hero gains the brief: readiness line + shot prompts + rain warning; wire into Today/Detail. Fixes the empty-list collapse. *(slice 4)*
+- ◽ **CB5 — `weatherSealed` in the catalog** → personalize the rain warning. *(D3 v2, later)*
+- ◽ **CB6 — Conditions re-rank** → gray nights promote flat-light spots, inside the one Events scorer. *(D1, later, if earned)*

@@ -24,6 +24,32 @@ describe("lightTiming", () => {
   });
 });
 
+describe("weather tempers the verdict (P3)", () => {
+  // A prime golden evening: window live, so light leads the score.
+  const now = new Date(2026, 6, 13, 20, 30, 0);
+  const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+  const overcast = { fetchedAt: 0, at: () => 1 };
+  const clear = { fetchedAt: 0, at: () => 0 };
+
+  test("overcast lowers the pick's score vs. clear skies", () => {
+    const bright = tonightNudge(SPOTS, now, cam, kit, { cloud: clear }).score;
+    const socked = tonightNudge(SPOTS, now, cam, kit, { cloud: overcast }).score;
+    expect(socked).toBeLessThan(bright);
+  });
+
+  test("no forecast falls back to astronomical-only (matches a clear read within gear noise)", () => {
+    const bare = tonightNudge(SPOTS, now, cam, kit).score;
+    const bright = tonightNudge(SPOTS, now, cam, kit, { cloud: clear }).score;
+    expect(bare).toBeCloseTo(bright, 5);
+  });
+
+  test("the Light signal names the sky when a forecast is present", () => {
+    const v = tonightNudge(SPOTS, now, cam, kit, { cloud: overcast });
+    const light = v.signals.find((s) => s.key === "light");
+    expect(light?.detail).toMatch(/cloud/i);
+  });
+});
+
 describe("gearFitScore", () => {
   const cam = "fuji-x100vi";
   test("a dedicated lens for the genre scores highest", () => {

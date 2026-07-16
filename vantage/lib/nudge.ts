@@ -11,6 +11,7 @@
 import { Spot } from "./spots";
 import { getLightWindows, fmtTime, LightWindows } from "./light";
 import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
+import { cloudFactor, skyLabel, type CloudCover } from "./weather";
 import type { Genre } from "./gear";
 import type { JournalEntry } from "./journal";
 
@@ -62,18 +63,23 @@ export function gearFitScore(cameraId: string, lensIds: string[], genre: Genre):
 
 type ScoredSpot = { spot: Spot; score: number; signals: NudgeSignal[]; win: { start: Date; end: Date } };
 
-function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[]): ScoredSpot {
+function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], cloud?: CloudCover | null): ScoredSpot {
   const w = getLightWindows(now, spot.lat, spot.lon);
   const win = windowFor(spot, w);
   const timing = lightTiming(now, win.start, win.end);
-  const light = BASE_QUALITY[spot.windowType] * timing;
+  // Weather tempers the light HONESTLY: overcast knocks golden/blue down, leaves flat
+  // (soft-daylight) shooting alone. No forecast → astronomical-only (factor 1).
+  const sky = cloud ? cloud.at(win.start) : null;
+  const weather = sky === null ? 1 : cloudFactor(sky, spot.windowType);
+  const light = BASE_QUALITY[spot.windowType] * timing * weather;
   const gear = gearFitScore(cameraId, lensIds, spot.genre);
   const score = LIGHT_W * light + GEAR_W * gear; // activity weight 0 for now
 
   const windowLabel = `${spot.windowType === "blue" ? "Blue" : spot.windowType === "golden" ? "Golden" : "Day"} light ${fmtTime(win.start)}–${fmtTime(win.end)}`;
   const timingWord = timing === 1.0 ? "happening now" : now < win.start ? "still ahead" : "already gone today";
+  const skyWord = sky === null ? "" : ` · ${skyLabel(sky)}`;
   const signals: NudgeSignal[] = [
-    { key: "light", label: "Light", score: light, detail: `${windowLabel} — ${timingWord}.` },
+    { key: "light", label: "Light", score: light, detail: `${windowLabel} — ${timingWord}${skyWord}.` },
     // Activity (live events) is not built yet — omit the row rather than show a
     // "coming soon" IOU on the app's most persuasive moment (#T3). Re-add an
     // { key: "activity", … } entry here once events land (weight is still 0 above).
@@ -95,7 +101,7 @@ const VARIETY_W = 0.10;   // max day-rotation bump — only swaps near-ties, nev
 const RECENCY_W = 0.18;   // penalty for a just-shot spot (> VARIETY_W, so it always yields to an equal fresh one)
 const RECENCY_DAYS = 4;   // ...decaying to zero over this many days
 
-export type NudgeOpts = { journal?: JournalEntry[] };
+export type NudgeOpts = { journal?: JournalEntry[]; cloud?: CloudCover | null };
 
 // Day-of-year seed — rotates the order each evening, stable within a day (matches nudgeCopy).
 function daySeed(d: Date): number {
@@ -146,7 +152,7 @@ export const MAX_NEAR_YOU = 4;
 // hero, capped at MAX_NEAR_YOU.
 export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string, opts?: NudgeOpts): Spot[] {
   return spots
-    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
     .filter((s) => s.spot.id !== excludeId && s.base >= GO_THRESHOLD) // gate on real quality
     .sort((a, b) => b.rank - a.rank)                                  // order by the variety-aware rank
     .slice(0, MAX_NEAR_YOU)
@@ -156,7 +162,7 @@ export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds:
 // Decide tonight: rank every spot, pick the best, and say whether to nudge.
 export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[], opts?: NudgeOpts): NudgeVerdict {
   const scored = spots
-    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
     .sort((a, b) => b.rank - a.rank);
   const top = scored[0].ss;
   const go = top.score >= GO_THRESHOLD; // "worth going out?" reads off REAL quality, not variety

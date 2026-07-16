@@ -1,5 +1,6 @@
 // Light-timing helpers — real golden/blue-hour math via SunCalc (free, offline).
 import * as SunCalc from "suncalc";
+import { cloudFactor, type CloudCover } from "./weather";
 
 export type LightWindows = {
   goldenEvening: { start: Date; end: Date };
@@ -62,8 +63,10 @@ function qualityFromAltitude(altDeg: number): number {
 }
 
 // Bars every 30 min across the day (5am–9pm) — fine enough to capture BOTH
-// golden peaks and render a smooth ramp.
-export function hourlyLight(date: Date, lat: number, lon: number, startHour = 5, endHour = 21): LightBar[] {
+// golden peaks and render a smooth ramp. When a cloud forecast is supplied, each bar's
+// quality is tempered by the sky (overcast knocks golden/blue down; flat is left alone) —
+// so the chart shows the light you'll ACTUALLY get, not just the astronomical ideal.
+export function hourlyLight(date: Date, lat: number, lon: number, cloud?: CloudCover | null, startHour = 5, endHour = 21): LightBar[] {
   const nowMs = date.getTime();
   const bars: LightBar[] = [];
   for (let m = startHour * 60; m <= endHour * 60; m += 30) {
@@ -71,10 +74,13 @@ export function hourlyLight(date: Date, lat: number, lon: number, startHour = 5,
     t.setHours(Math.floor(m / 60), m % 60, 0, 0);
     // NOTE: this suncalc build returns altitude in DEGREES already (not radians).
     const altDeg = SunCalc.getPosition(t, lat, lon).altitude;
+    const type = typeFromAltitude(altDeg);
+    const base = qualityFromAltitude(altDeg);
+    const q = cloud ? Math.max(0.05, Math.min(1, base * cloudFactor(cloud.at(t), type))) : base;
     bars.push({
       hour: t.getHours(),
-      type: typeFromAltitude(altDeg),
-      quality: qualityFromAltitude(altDeg),
+      type,
+      quality: q,
       isNow: Math.abs(t.getTime() - nowMs) < 15 * 60 * 1000, // within 15 min of now
     });
   }

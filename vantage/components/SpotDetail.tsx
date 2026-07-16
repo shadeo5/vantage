@@ -4,16 +4,19 @@ import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
 import { Spot, spotImageSource, windowMeta } from "../lib/spots";
 import { getLightWindows, goldenWindowLabel, hourlyLight, fmtTime } from "../lib/light";
+import { skyLabel, type CloudCover } from "../lib/weather";
 import { LightChart } from "./LightChart";
 
 export function SpotDetail({
-  spot, isGoing, isSaved, onBack, onToggleGoing, onToggleSaved,
+  spot, isGoing, isSaved, cloud, onBack, onToggleGoing, onToggleSaved,
 }: {
-  spot: Spot; isGoing: boolean; isSaved: boolean; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
+  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: CloudCover | null; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
 }) {
   const now = new Date();
   const windows = getLightWindows(now, spot.lat, spot.lon);
-  const bars = hourlyLight(now, spot.lat, spot.lon);
+  // Chart tempered by the real sky (P3) — bars show the light you'll actually get.
+  const bars = hourlyLight(now, spot.lat, spot.lon, cloud);
+  const skyNow = cloud ? skyLabel(cloud.at(now)) : null;
   const wm = windowMeta(spot.windowType);
   const windowTime = spot.windowType === "blue" ? fmtTime(windows.blueEvening.start) : fmtTime(windows.goldenEvening.start);
 
@@ -54,7 +57,7 @@ export function SpotDetail({
         <View style={styles.body}>
           <Text style={styles.why}>{spot.why}</Text>
 
-          <View style={styles.secHead}><Text style={styles.secTitle}>When the light works</Text><Text style={styles.secTrail}>{goldenWindowLabel(windows)}</Text></View>
+          <View style={styles.secHead}><Text style={styles.secTitle}>When the light works</Text><Text style={styles.secTrail}>{goldenWindowLabel(windows)}{skyNow ? ` · ${skyNow}` : ""}</Text></View>
           <View style={styles.card}><LightChart bars={bars} /></View>
 
           <Text style={styles.secTitle}>What to look for here</Text>

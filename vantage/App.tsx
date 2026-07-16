@@ -11,6 +11,7 @@ import {
 import { colors, fonts, screen as scr } from "./theme";
 import { FALLBACK_SPOTS, findSpot, spotImageSource, HERO_ID, type Spot } from "./lib/spots";
 import { fetchCityPack, fetchCities, CITY_ID, type City } from "./lib/cityPack";
+import { fetchCloudCover, type CloudCover } from "./lib/weather";
 import { loadCityId, saveCityId } from "./lib/cityStorage";
 import { CitySwitcher } from "./components/CitySwitcher";
 import { getLightWindows, goldenWindowLabel, fmtTime } from "./lib/light";
@@ -51,6 +52,7 @@ export default function App() {
   // choice hydrates (GPS-based default is P2). `cities` feeds the header switcher.
   const [cityId, setCityId] = useState<string>(CITY_ID);
   const [cities, setCities] = useState<City[]>([]);
+  const [cloud, setCloud] = useState<CloudCover | null>(null);
   const [tab, setTab] = useState<Tab>("today");
   const [detailOpen, setDetailOpen] = useState(false);
   const [showLock, setShowLock] = useState(false);
@@ -103,6 +105,17 @@ export default function App() {
     fetchCities().then(setCities);
   }, []);
 
+  // Pull the sky (P3): hourly cloud cover for the loaded city, to temper the light. One
+  // forecast at the pack's location covers every spot (weather doesn't vary city-wide).
+  // Best-effort — a null cloud leaves the light astronomical-only, never blank.
+  useEffect(() => {
+    const here = spots[0];
+    if (!here) return;
+    let live = true;
+    fetchCloudCover(here.lat, here.lon).then((c) => { if (live) setCloud(c); });
+    return () => { live = false; };
+  }, [spots]);
+
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
     Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId()]).then(([ids, cam, pend, log, savedIds, savedCity]) => {
@@ -141,11 +154,11 @@ export default function App() {
   const now = new Date();
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
-  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal });
+  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud });
   const hero = verdict.spot;
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
   // quiet night this comes back short or empty, and the section hides entirely.
-  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id, { journal });
+  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id, { journal, cloud });
   const windows = getLightWindows(now, hero.lat, hero.lon);
   const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);
@@ -275,7 +288,7 @@ export default function App() {
       {detailOpen && (
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
-            spot={findSpot(spots, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)}
+            spot={findSpot(spots, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)} cloud={cloud}
             onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />
         </View>

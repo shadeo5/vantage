@@ -98,7 +98,18 @@ function windowFor(spot: Spot, date: Date): { start: Date; end: Date } {
 
 // ── the brain (mirror of nudge.ts) ───────────────────────────────────────────
 const LIGHT_W = 0.6, GEAR_W = 0.4, GO_THRESHOLD = 0.55;
-const BASE_QUALITY: Record<WindowType, number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+// Genre-dependent light quality (CB7) — mirror of vantage/lib/nudge.ts. Light is a set of
+// creative MODES, not a good/bad ladder; how much the window type gates a shoot depends on
+// the genre. REF_FIT is the reference fit for a fully light-sensitive genre (golden > blue
+// > flat); LIGHT_SENSITIVITY blends each genre toward neutral — street is light-flexible
+// (flat barely dents it), landscape lives by golden/blue. Keeps the push's pick in step
+// with the app instead of the old global BASE_QUALITY (which under-ranked flat street).
+const REF_FIT: Record<WindowType, number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+const LIGHT_SENSITIVITY: Record<Genre, number> = {
+  Landscape: 0.9, Wildlife: 0.65, Architecture: 0.7, Nature: 0.6,
+  Portraits: 0.5, Details: 0.4, Sports: 0.3, Street: 0.15,
+};
+const phaseScore = (genre: Genre, wt: WindowType) => 1 - (LIGHT_SENSITIVITY[genre] ?? 0.5) * (1 - REF_FIT[wt]);
 function lightTiming(now: Date, start: Date, end: Date): number {
   const n = now.getTime();
   if (n >= start.getTime() && n <= end.getTime()) return 1.0;
@@ -117,7 +128,7 @@ type Verdict = { go: boolean; score: number; confidence: "high" | "medium" | "lo
 function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): Verdict {
   const scored = spots.map((spot) => {
     const win = windowFor(spot, now);
-    const light = BASE_QUALITY[spot.windowType] * lightTiming(now, win.start, win.end);
+    const light = phaseScore(spot.genre, spot.windowType) * lightTiming(now, win.start, win.end);
     const gear = gearFitScore(cameraId, lensIds, spot.genre);
     return { spot, win, score: LIGHT_W * light + GEAR_W * gear };
   }).sort((a, b) => b.score - a.score);
@@ -132,23 +143,49 @@ function daySeed(d: Date): number { return Math.floor((d.getTime() - new Date(d.
 const pick = <T>(arr: T[], seed: number): T => arr[((seed % arr.length) + arr.length) % arr.length];
 function nudgeCopy(v: Verdict, lens: string, now: Date, tz: string): { title: string; body: string } {
   const seed = daySeed(now);
-  const win = WINDOW_WORD[v.spot.windowType];
-  const at = fmtTime(v.window.start, tz);
   const s = v.spot;
   if (!v.go) {
+    // Quiet night — honest, but never mournful about "lost" light (VOICE: light is an
+    // asset, never a miss). No "the good light's already behind us."
     return {
-      title: pick(["Quiet one tonight.", "Not the night to chase light.", "Rest the shutter tonight."], seed),
-      body: pick([`The good light's already behind us — scout ${s.name} for tomorrow.`, `Nothing's quite lining up this evening. ${s.name} will keep.`, `Save it — ${s.name} wants better light than tonight's got left.`], seed + 2),
+      title: pick(["A quiet one tonight.", "Nothing loud out there.", "Rest the shutter — or wander."], seed),
+      body: pick([
+        `No big light tonight, but ${s.name} keeps — a slow walk if you want it.`,
+        `Nothing's lining up loud. ${s.name}'s there whenever you are.`,
+        `Save the battery, or take ${s.name} at your own pace.`,
+      ], seed + 2),
     };
   }
   const titles = v.confidence === "high"
     ? [`Tonight's the night — ${s.name} is about to glow.`, `Drop what you're doing — ${s.name} is going to be special.`, `${s.name} is calling, and the light's on your side.`]
     : [`Worth heading out — ${s.name} should be good tonight.`, `${s.name} is a solid bet this evening.`, `Keep the ${lens} close — ${s.name} is worth a look tonight.`];
-  const bodies = [
-    `${win} hits ${at} and ${s.name} comes alive — grab your ${lens}.`,
-    `${lens} weather at ${s.name}. ${win} at ${at}.`,
-    `${win} at ${at} — ${s.name} was made for your ${lens}.`,
-  ];
+  // Phase-honest body (PH7). FLAT light is light-flexible — celebrate it without inventing a
+  // clock time (its window.start is sunrise, a MORNING time that would be wrong on an evening
+  // push). GOLDEN/BLUE name the evening window: "hits {time}" only while it's still ahead,
+  // else "on now" — never cite a window that's already passed (same rule as the app hero).
+  let bodies: string[];
+  if (s.windowType === "flat") {
+    bodies = [
+      `${s.name}'s good all evening — grab your ${lens} and go.`,
+      `${lens} weather at ${s.name} — the light's yours to work all evening.`,
+      `${s.name} was made for your ${lens}. Head out when you're ready.`,
+    ];
+  } else {
+    const win = WINDOW_WORD[s.windowType];
+    const ahead = v.window.start.getTime() > now.getTime();
+    const at = fmtTime(v.window.start, tz);
+    bodies = ahead
+      ? [
+          `${win} hits ${at} and ${s.name} comes alive — grab your ${lens}.`,
+          `${lens} weather at ${s.name}. ${win} at ${at}.`,
+          `${win} at ${at} — ${s.name} was made for your ${lens}.`,
+        ]
+      : [
+          `${win}'s on now at ${s.name} — grab your ${lens} and go.`,
+          `${lens} weather at ${s.name} — ${win.toLowerCase()}'s up right now.`,
+          `${s.name}'s in ${win.toLowerCase()} — made for your ${lens}.`,
+        ];
+  }
   return { title: pick(titles, seed), body: pick(bodies, seed + 1) };
 }
 

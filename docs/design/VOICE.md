@@ -20,6 +20,14 @@ An **enthusiast who already shoots sometimes** and wants a reason to do it more.
 5. **Never gatekeep.** No pro-snobbery, no jargon walls. A lapsing shooter should feel welcomed, not tested.
 6. **Honest.** Don't invent precise facts you can't be sure of (exact hours, "last entry," prices). Keep logistics general. Never let copy or imagery misrepresent a real place.
 
+## Light is an asset, never a miss
+The time-analogue of the gear rule (*ideal-for, never a limit*). **Name the light you have as something to shoot with — never mourn a window that's passed.** If a better window is still catchable today, surface it with a time and how long you've got, *alongside* the current light, never as a correction to it. Once the good windows are behind you, stop counting down and affirm the night. **Flat/harsh midday is a real creative mode** (graphic hard-shadow when clear; soft even light when overcast — see `LIGHT_QUALITY_GENRE.html`), not a lesser light to apologize for.
+| Do | Don't |
+|---|---|
+| "Night — the city's lit and yours" | "Golden gone 8:40 / blue closed 9:14 / not now" |
+| "Hard light — shoot the shadows, go graphic B&W" | "Harsh light — wait for golden" |
+| "Golden at 8:05 — 31 min out" | "Not golden yet" |
+
 ## Micro-rules
 - **Row reason:** ≤ ~7 words, a hook. *"Neon and spray paint after dark."*
 - **Tagline:** one line under a title, sets the scene. *"The classic downtown view."*

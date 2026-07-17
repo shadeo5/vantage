@@ -3,7 +3,11 @@ import { View, Text, StyleSheet, ImageBackground, Pressable, Animated } from "re
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts } from "../theme";
 import { Spot, spotImageSource } from "../lib/spots";
+import type { LightRead } from "../lib/light";
 import { NudgeSignal, Confidence } from "../lib/nudge";
+
+// Lowercase just the first character, for weaving heroPhrase mid-sentence.
+const lowerFirst = (s: string) => (s ? s[0].toLowerCase() + s.slice(1) : s);
 
 const SIG_COLOR: Record<NudgeSignal["key"], string> = {
   light: colors.golden,
@@ -12,10 +16,10 @@ const SIG_COLOR: Record<NudgeSignal["key"], string> = {
 };
 
 export function InspirationHero({
-  spot, goldenRange, isGoing, whyOpen, gearLens, confidence, go, whySignals,
+  spot, light, isGoing, whyOpen, gearLens, confidence, go, whySignals,
   onOpen, onGo, onToggleWhy,
 }: {
-  spot: Spot; goldenRange: string; isGoing: boolean; whyOpen: boolean; gearLens: string;
+  spot: Spot; light: LightRead; isGoing: boolean; whyOpen: boolean; gearLens: string;
   confidence: Confidence; go: boolean; whySignals: NudgeSignal[];
   onOpen: () => void; onGo: () => void; onToggleWhy: () => void;
 }) {
@@ -50,14 +54,14 @@ export function InspirationHero({
       <View style={styles.body}>
         <Text style={styles.lede}>
           {go ? (
-            <>Golden hour hits <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> — grab your <Text style={styles.gold}>{gearLens}</Text> and go.</>
+            <>{light.heroPhrase} — grab your <Text style={styles.gold}>{gearLens}</Text> and go.</>
           ) : (
-            <>Nothing loud tonight — but the light opens <Text style={styles.gold}>{goldenRange.split("–")[0]}</Text> if you want a slow walk with your <Text style={styles.gold}>{gearLens}</Text>.</>
+            <>Quiet night, but {lowerFirst(light.heroPhrase)} — bring your <Text style={styles.gold}>{gearLens}</Text> for a slow walk.</>
           )}
         </Text>
 
         <View style={styles.chips}>
-          <Text style={[styles.chip, styles.chipGold]}>☀ {goldenRange}</Text>
+          <Text style={[styles.chip, styles.chipGold]}>{light.icon} {light.chipLabel}</Text>
           {spot.distance ? <Text style={styles.chip}>{spot.distance} away</Text> : null}
           {spot.type ? <Text style={styles.chip}>{spot.type}</Text> : null}
         </View>

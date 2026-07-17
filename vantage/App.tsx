@@ -14,7 +14,7 @@ import { fetchCityPack, fetchCities, CITY_ID, type City } from "./lib/cityPack";
 import { fetchForecast, type Forecast } from "./lib/weather";
 import { loadCityId, saveCityId } from "./lib/cityStorage";
 import { CitySwitcher } from "./components/CitySwitcher";
-import { getLightWindows, goldenWindowLabel, fmtTime } from "./lib/light";
+import { getLightWindows, fmtTime, lightRead } from "./lib/light";
 import { GearBanner } from "./components/GearBanner";
 import { InspirationHero } from "./components/InspirationHero";
 import { ShootBriefCard } from "./components/ShootBriefCard";
@@ -28,7 +28,7 @@ import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
-import { tonightNudge, bestNearYou } from "./lib/nudge";
+import { tonightNudge, bestNearYou, goodInTheDark } from "./lib/nudge";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
@@ -161,14 +161,21 @@ export default function App() {
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
   // quiet night this comes back short or empty, and the section hides entirely.
   const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id, { journal, cloud });
+  // Quiet-night fallback (PH5): when nothing clears the go bar, don't blank the screen —
+  // surface evergreen after-dark spots instead (only returns anything once it's dark out).
+  const inTheDark = nearYou.length === 0 ? goodInTheDark(spots, now, cameraId, lenses, hero.id, { journal, cloud }) : [];
+  // Phase-honest read for the hero (PH1) — the light RIGHT NOW, never a passed golden window.
+  const heroLight = lightRead(now, hero.lat, hero.lon, cloud);
   const windows = getLightWindows(now, hero.lat, hero.lon);
   // The shoot brief (E8): given tonight's conditions + the kit — is the gear ready, and
-  // what to shoot. The constructive answer even on a quiet night. Read at the EVENING
-  // shoot moment (now, or tonight's golden window if it's still ahead) — not the spot's
-  // raw window.start, which for a flat (all-day) spot points at this morning.
-  const shootAt = now > windows.goldenEvening.start ? now : windows.goldenEvening.start;
+  // what to shoot. Read at the shoot MOMENT: while it's still flat daylight, preview
+  // tonight's evening golden (so a midday check speaks to the evening shoot); but once
+  // the light has turned — golden, blue, or night — read NOW, so a 10pm check gets
+  // tonight's real conditions, not tomorrow's golden. (E9 · phase-honest, pairs with PH1;
+  // getLightWindows rolls to the next solar day after midnight UTC, so the old
+  // max(now, goldenEvening.start) previewed *tomorrow's* golden late at night.)
+  const shootAt = heroLight.phase === "flat" && now < windows.goldenEvening.start ? windows.goldenEvening.start : now;
   const brief = shootBrief(shootAt, hero, cameraId, lenses, cloud);
-  const goldenRange = goldenWindowLabel(windows);
   const goldenStart = fmtTime(windows.goldenEvening.start);
   const blueStart = fmtTime(windows.blueEvening.start);
   const windowTimeFor = (t: string) => (t === "blue" ? blueStart : goldenStart);
@@ -246,7 +253,7 @@ export default function App() {
             </Pressable>
           </View>
           <InspirationHero
-            spot={hero} goldenRange={goldenRange} gearLens={gearLens}
+            spot={hero} light={heroLight} gearLens={gearLens}
             confidence={verdict.confidence} go={verdict.go} whySignals={verdict.signals}
             isGoing={going.includes(hero.id)} whyOpen={whyOpen}
             onOpen={() => openDetail(hero.id)} onGo={() => commit(hero.id)} onToggleWhy={() => setWhyOpen((v) => !v)}
@@ -262,6 +269,21 @@ export default function App() {
               </View>
               <View style={{ gap: 12 }}>
                 {nearYou.map((spot, i) => (
+                  <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
+                ))}
+              </View>
+            </>
+          )}
+          {/* Quiet night, but it's dark out (PH5): evergreen spots that shine after sunset,
+              instead of a blank where "best near you" would be. */}
+          {inTheDark.length > 0 && (
+            <>
+              <View style={styles.secHead}>
+                <Text style={styles.secTitle}>Good in the dark</Text>
+                <Text style={styles.secCount}>after sunset</Text>
+              </View>
+              <View style={{ gap: 12 }}>
+                {inTheDark.map((spot, i) => (
                   <SpotRow key={spot.id} spot={spot} rank={i + 2} windowTime={windowTimeFor(spot.windowType)} onPress={() => openDetail(spot.id)} />
                 ))}
               </View>
@@ -298,6 +320,7 @@ export default function App() {
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
             spot={findSpot(spots, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)} cloud={cloud}
+            cameraId={cameraId} lensIds={lenses}
             onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />
         </View>

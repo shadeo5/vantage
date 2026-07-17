@@ -1,0 +1,219 @@
+<title>Vantage — Never Say "Not Now": Phase-Honest Light</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:860px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,6.5vw,52px);line-height:1.04;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  section{margin-top:56px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  p{max-width:66ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .spot{color:var(--gold);font-weight:600;}
+
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  p code,td code,li code{background:var(--sunk);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;font-size:12.5px;}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);margin:14px 0;}
+  table{border-collapse:collapse;width:100%;min-width:540px;font-size:13.5px;}
+  th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  td.num{font-family:var(--mono);color:var(--gold);text-align:center;font-variant-numeric:tabular-nums;}
+  .no{color:var(--clay);} .yes{color:var(--green);}
+
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call.clay{border-left-color:var(--clay);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);} .call.clay .k{color:var(--clay);}
+  .call p{color:var(--ink);margin:0;font-size:15px;} .call p+p{margin-top:9px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:11px;padding:0;margin:14px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:66ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ul.open li::before{content:"?";color:var(--gold-deep);font-family:var(--serif);font-weight:700;}
+
+  .pill{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.3px;padding:3px 9px;border-radius:999px;border:1px solid;white-space:nowrap;}
+  .pill.proto{color:var(--green);border-color:color-mix(in srgb,var(--green) 45%,transparent);background:color-mix(in srgb,var(--green) 12%,transparent);}
+  .pill.plan{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 45%,transparent);background:color-mix(in srgb,var(--blue) 12%,transparent);}
+  .pill.hot{color:var(--clay);border-color:color-mix(in srgb,var(--clay) 45%,transparent);background:color-mix(in srgb,var(--clay) 12%,transparent);}
+
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Design · Engineering</div>
+    <h1>Never Say "Not Now"</h1>
+    <p class="lede">The scorer went genre-honest (<a href="./LIGHT_QUALITY_GENRE.html">CB7</a>) — but the <b>surfaces</b> the photographer actually reads still treat golden hour as the bar. At 9:30pm the hero cheerfully announces a golden window that closed an hour ago, and a quiet night goes blank. This ADR makes the hero and the detail page <b>phase-honest</b>: light is always <b>the light you have now</b>, never a window you missed.</p>
+    <div class="meta">
+      <span class="tag">Doc <b>ADR — phase-honest surfaces (E9)</b></span>
+      <span class="tag">Status <b>Accepted · PH1–PH5 shipped (working tree), PH6–7 later</b></span>
+      <span class="tag">Follows <b><a href="./LIGHT_QUALITY_GENRE.html">CB7</a> · <a href="./SHOOT_BRIEF.html">Shoot Brief</a></b></span>
+      <span class="tag">Wires <b>detail-light-wires (Option A)</b></span>
+      <span class="tag">Updated <b>Jul 16, 2026</b></span>
+    </div>
+  </header>
+
+  <!-- 01 -->
+  <section>
+    <div class="sec-head"><span class="n">01</span><h2>The problem — the surfaces never got the CB7 memo</h2></div>
+    <p>CB7 taught the <i>scorer</i> that golden hour isn't the bar. But two of the most-read surfaces still assume it is, and they contradict the <a href="./SHOOT_BRIEF.html">shoot brief</a> sitting inches away.</p>
+    <div class="call clay">
+      <div class="k">Bug — golden hour at 9:30pm</div>
+      <p>The hero lede and chip are hardcoded to the <i>evening</i> golden window and never check whether it's passed (<code>InspirationHero.tsx:53,60</code> → <code>goldenWindowLabel(windows)</code>, always <code>goldenEvening.start–end</code>). At 9:34pm in Atlanta — golden gone ~8:40 — it still reads <i>"Golden hour hits 8:05 — grab your lens and go."</i> It's telling you to catch a window that closed an hour ago.</p>
+      <p>The tell: the <b>ShootBriefCard directly below it is already correct</b> — <code>App.tsx:169</code> reads <code>shootAt = max(now, goldenEvening.start)</code>, so <code>conditionsFor(now)</code> returns <code>night</code> and the brief says "neon, light-trails, brace on a rail." The app knows it's night in one card and denies it in the card above.</p>
+    </div>
+    <div class="call clay">
+      <div class="k">Blank — the quiet night goes dark</div>
+      <p><code>bestNearYou()</code> is quality-gated and returns <code>[]</code> on a slow night, so the whole list hides (<code>App.tsx:257</code>). The app goes quiet exactly when its job is to inspire — leaving the ShootBriefCard as generic, place-less advice ("brace on <i>a</i> rail" — which rail?).</p>
+    </div>
+    <p>Both are the same disease: <b>golden-first, and mute after dark.</b> The cure is one principle applied across the surfaces.</p>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <div class="sec-head"><span class="n">02</span><h2>The principle — light is an asset you have, never a window you missed</h2></div>
+    <p>This is the time-analogue of the app's oldest rule — <b>gear is framed as ideal-for, never a limit</b> (see <a href="./VOICE.md">VOICE.md</a>). Applied to light:</p>
+    <div class="call">
+      <div class="k">The rule</div>
+      <p>Name the <b>current</b> light as something to shoot <i>with</i>. If a <b>better</b> window is still catchable today, surface it with a time and how long you've got. Once the good windows are behind you for the day, <b>stop counting down</b> — affirm the night. Never mourn light that's passed.</p>
+    </div>
+    <p>The whole light vocabulary flips from negative-and-past to positive-and-present. <b>Flat light matters most here</b> — it's the default state whenever the app opens in daytime, and the light street shooters most often dismiss. CB7 already proved it's a real creative mode; the copy has to say so.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Light now</th><th class="no">✗ Never</th><th class="yes">✓ Instead</th></tr></thead>
+      <tbody>
+        <tr><td><b>Flat · clear</b> (harsh midday)</td><td class="no">"harsh light / bad light / wait for golden"</td><td class="yes">"Hard light — shoot the shadows, go graphic B&amp;W"</td></tr>
+        <tr><td><b>Flat · overcast</b></td><td class="no">"flat / gray / dull"</td><td class="yes">"Soft even light — color pops, no harsh shadows"</td></tr>
+        <tr><td><b>Golden · now</b></td><td class="no">—</td><td class="yes">"Golden hour — till 8:40, go"</td></tr>
+        <tr><td><b>Golden · ahead</b></td><td class="no">"not golden yet"</td><td class="yes">"Golden at 8:05 — 31 min out"</td></tr>
+        <tr><td><b>Blue · now</b></td><td class="no">—</td><td class="yes">"Blue hour — sky and signs balance till 9:14"</td></tr>
+        <tr><td><b>Full night</b></td><td class="no">"blue closed 9:14 / golden gone 8:40 / not now"</td><td class="yes">"Night — the city's lit and yours"</td></tr>
+      </tbody>
+    </table></div>
+    <div class="call blue">
+      <div class="k">The trap to avoid</div>
+      <p>Don't let the countdown demote the present. <i>"Harsh now — but golden at 8:05"</i> quietly says <b>the light you have is wrong, wait.</b> The current-light line stands on its own as a real option; the golden countdown rides <i>alongside</i> it, not as a correction to it.</p>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <div class="sec-head"><span class="n">03</span><h2>The light module — forward-looking, three states</h2></div>
+    <p>The detail chart today draws the full astronomical day (<code>hourlyLight</code>, 5am–9pm). At night that strands "now" at the far-right edge with everything interesting behind it — which is <i>what makes</i> the app read "not now." Fix the window and the negativity mostly dissolves: <b>anchor at <code>now</code>, look forward ~6h.</b> The module then adapts to what's actually ahead.</p>
+    <div class="tw"><table>
+      <thead><tr><th>State</th><th>When</th><th>Shows</th></tr></thead>
+      <tbody>
+        <tr><td><b>Light ahead</b></td><td>Flat daytime — golden still coming</td><td>Current-light line <b>+</b> forward mini-curve ramping to golden <b>+</b> countdown ("Golden in 31 min"). The money view.</td></tr>
+        <tr><td><b>In the window</b></td><td>Golden or blue in progress</td><td>Name it and count it down ("Blue — till 9:14"). Curve centered on the live peak.</td></tr>
+        <tr><td><b>Full night</b></td><td>No catchable golden/blue left today</td><td><b>Line + morning peek</b> — one positive status line, plus a small forward curve of tomorrow's golden ramp ("next golden 6:31a") for the early risers. No chart of dead dark.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Biggest when there's light to chase, quietest when there isn't — the right energy. The engine already supports it: <code>hourlyLight()</code> takes <code>startHour</code>/<code>endHour</code>, so the forward window is just feeding it <code>now → now+6h</code>; the state check is "any golden/blue bars ahead today?"</p>
+    <div class="call">
+      <div class="k">Placement — Option A, the compact strip (see the wires)</div>
+      <p>On the detail page the module is a <b>slim strip</b>, not the full-width headline it is today: one glanceable label + a mini sparkline. Light stays visible and useful; it stops being the throne. (Options B "collapse-on-tap" and C "fold into the brief" were considered — see §06.)</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <div class="sec-head"><span class="n">04</span><h2>The detail page — re-ordered around "now"</h2></div>
+    <p>The new body leads with place, then <i>tonight</i>, then the evergreen craft. The location prose stays — it's the soul of the spot.</p>
+    <div class="tw"><table>
+      <thead><tr><th>#</th><th>Block</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1</td><td><b>Hero</b> — name, tagline, chips (phase chip, not a stale golden time)</td><td><span class="pill plan">Adjust</span></td></tr>
+        <tr><td class="num">2</td><td><b>Why</b> — the place's character, prose</td><td><span class="pill proto">Keep</span></td></tr>
+        <tr><td class="num">3</td><td><b>What to shoot now</b> — time-aware brief, the new body headline</td><td><span class="pill hot">New</span></td></tr>
+        <tr><td class="num">4</td><td><b>Light strip</b> — demoted, forward, phase-honest (§03)</td><td><span class="pill plan">Demote</span></td></tr>
+        <tr><td class="num">5</td><td><b>See it on Street View</b> — grounds the illustrated imagery</td><td><span class="pill hot">New</span></td></tr>
+        <tr><td class="num">6</td><td><b>What to look for here</b> → <b>Getting there</b></td><td><span class="pill proto">Keep</span></td></tr>
+      </tbody>
+    </table></div>
+    <p><b>"What to shoot now"</b> reuses the existing engine — <code>shootBrief(now, thisSpot, kit, cloud)</code> from <code>lib/shootBrief.ts</code>, already powering the Today hero — just fed <i>now</i> and <i>this spot</i>. <b>Street View</b> is a link off <code>spot.lat/lon</code> (<code>maps.google.com/?q=&layer=c&cbll={lat},{lon}</code>); because our imagery is deliberately illustrated (<a href="../design/ILLUSTRATION_STYLE.md">ILLUSTRATION_STYLE</a>), it's the one place a scout can see the real geography. It leaves the app to Google Maps — an accepted trade for scouting value.</p>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <div class="sec-head"><span class="n">05</span><h2>The quiet night — "Good in the dark," not a blank</h2></div>
+    <p>When <code>bestNearYou</code> comes back empty, don't hide the section — <b>swap it</b> for evergreen spots whose window works <i>right now</i>, gated by what the kit can handle. The photographer's own example: motion-blur on a bridge, neon districts, a lit skyline.</p>
+    <ul class="list">
+      <li><b>Source</b> — the same pack, filtered to spots live in the current phase (<code>lightPhaseAt</code> / <code>windowType</code>), ranked by kit-fit via the existing <code>kitReadiness</code>.</li>
+      <li><b>Honesty preserved</b> — this isn't padding the "best near you" list with weak picks; it's a <i>different</i>, explicitly-labeled shelf ("Good in the dark") that only appears after hours. The quality gate on the ranked list stays intact.</li>
+      <li><b>Anchors the brief</b> — with a spot attached, the generic "brace on a rail" becomes "brace on the Jackson Street Bridge rail."</li>
+    </ul>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <div class="sec-head"><span class="n">06</span><h2>Options considered</h2></div>
+    <p><b>Light placement on the detail page</b> (wired as A/B/C — see <code>detail-light-wires</code>):</p>
+    <div class="tw"><table>
+      <thead><tr><th>Option</th><th>Verdict</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><b>A · Compact strip</b></td><td><span class="pill proto">Chosen</span></td><td>Keeps a real light signal — a shooter <i>does</i> want to know how long the light holds — but strips its false primacy. Smallest change that honors CB7.</td></tr>
+        <tr><td><b>B · Collapse-on-tap</b></td><td><span class="pill hot">Rejected</span></td><td>Adds a tap without adding clarity. The point is that light shouldn't cost the reader a decision.</td></tr>
+        <tr><td><b>C · Fold into the brief</b></td><td><span class="pill plan">Fallback</span></td><td>Most aggressive demotion — light becomes one status line, chart lives only on Today. Right call only if the per-spot chart proves redundant once A ships.</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Full-night module behaviour:</b> chosen <b>line + morning peek</b> over collapse-to-a-line-only (loses the early-riser planning aid) and always-show-the-curve (a flat dark chart <i>is</i> "nothing here" — the thing we're removing).</p>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <div class="sec-head"><span class="n">07</span><h2>Consequences &amp; what it touches</h2></div>
+    <ul class="list">
+      <li><b>Resolves the hero/brief incoherence</b> — both surfaces finally read the current phase. The 9:30pm bug is gone by construction.</li>
+      <li><b>A new voice rule</b> lands in <a href="./VOICE.md">VOICE.md</a> ("Light is an asset, never a miss") — enforced everywhere light is named: hero, detail, push copy (<code>nudgeCopy.ts</code>), the light-chart caption.</li>
+      <li><b>Mostly reuse, little new logic</b> — <code>shootBrief</code>, <code>conditionsFor</code>, <code>hourlyLight</code>, <code>goldenCountdown</code>, <code>kitReadiness</code> all exist. The work is wiring + copy + a forward-window arg + one new "Good in the dark" filter.</li>
+      <li><b>Touches</b> <code>InspirationHero.tsx</code>, <code>SpotDetail.tsx</code>, <code>LightChart.tsx</code>, <code>App.tsx</code>, <code>lib/light.ts</code> (forward window + phase-honest labels), a small <code>lib/nudge.ts</code> filter, and <code>nudgeCopy.ts</code> for the push.</li>
+      <li><b>The nightly push</b> should get the same treatment so a 10pm nudge never says "golden at 8:05" — folds into the existing P3 follow-up (port the honest read into the Edge Function).</li>
+    </ul>
+  </section>
+
+  <!-- 08 -->
+  <section>
+    <div class="sec-head"><span class="n">08</span><h2>Open questions</h2></div>
+    <ul class="list open">
+      <li>The <b>forward-window length</b> — 6h is the starting point. Long enough to show an afternoon ramp into golden+blue; tune against how it feels.</li>
+      <li><b>"Good in the dark" ranking</b> — pure kit-fit, or fold in variety/recency like the main list? Start simple (phase-live × kit-fit), earn more later.</li>
+      <li><b>Street View coverage</b> — some spots (interiors, trailheads) have no panorama. Fall back to a map pin, or hide the link when coverage is unknown? (No cheap way to check coverage client-side — likely just label it "Map" when in doubt.)</li>
+      <li><b>Morning-peek reach</b> — does the night module also mention tonight's <i>next</i> real opportunity if it's within a few hours (late blue, moonrise), or strictly tomorrow's golden?</li>
+    </ul>
+  </section>
+
+  <footer>Vantage · ADR — phase-honest surfaces (E9) · follows LIGHT_QUALITY_GENRE.html + SHOOT_BRIEF.html · touches InspirationHero / SpotDetail / LightChart / light.ts / nudge.ts / nudgeCopy.ts</footer>
+</div>

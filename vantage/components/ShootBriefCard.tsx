@@ -15,11 +15,14 @@ const LEVEL_COLOR: Record<ReadyLevel, string> = {
   fine: colors.blueHour,
 };
 
-export function ShootBriefCard({ brief }: { brief: ShootBrief }) {
+export function ShootBriefCard({ brief, title = "TONIGHT'S SHOOT", trailing }: { brief: ShootBrief; title?: string; trailing?: string | null }) {
   const { readiness, rainWarning, shots } = brief;
   return (
     <View style={styles.card}>
-      <Text style={styles.eyebrow}>TONIGHT'S SHOOT</Text>
+      <View style={styles.head}>
+        <Text style={styles.eyebrow}>{title}</Text>
+        {trailing ? <Text style={styles.trailing}>{trailing}</Text> : null}
+      </View>
 
       {readiness.line && (
         <View style={styles.readyRow}>
@@ -48,7 +51,9 @@ export function ShootBriefCard({ brief }: { brief: ShootBrief }) {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: radius.card, borderWidth: 1, borderColor: colors.hairline, padding: 18, gap: 12, marginTop: 16 },
+  head: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" },
   eyebrow: { fontFamily: fonts.sansSemi, fontSize: 11, letterSpacing: 1.5, color: colors.golden },
+  trailing: { fontFamily: fonts.sansMed, fontSize: 11, letterSpacing: 0.3, color: colors.muted },
   readyRow: { flexDirection: "row", alignItems: "flex-start", gap: 9 },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 6 },
   ready: { flex: 1, fontFamily: fonts.sansMed, fontSize: 15, lineHeight: 21, color: colors.ink },

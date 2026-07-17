@@ -154,6 +154,9 @@ export default function App() {
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 
   const now = new Date();
+  // Greet by the actual time of day — the app is evening-first, but "good evening" at
+  // 10am is just wrong (same phase-honesty as E9: don't say a time it isn't).
+  const greeting = now.getHours() < 12 ? "good morning" : now.getHours() < 17 ? "good afternoon" : "good evening";
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
   const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud });
@@ -238,7 +241,7 @@ export default function App() {
           {gearBanner && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · good evening`.toUpperCase()}</Text>
+              <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${greeting}`.toUpperCase()}</Text>
               <Text style={styles.title}>Your shoot{"\n"}tonight</Text>
               <CitySwitcher cities={cities} currentId={cityId} currentName={currentCityName} onSelect={setCityId} />
               {kitEchoText && <Text style={styles.kitEcho}>Your kit's ideal for {kitEchoText}.</Text>}

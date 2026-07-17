@@ -1,4 +1,4 @@
-import { lightTiming, gearFitScore, tonightNudge, bestNearYou, MAX_NEAR_YOU } from "../lib/nudge";
+import { lightTiming, gearFitScore, tonightNudge, bestNearYou, MAX_NEAR_YOU, phaseScore } from "../lib/nudge";
 import { FALLBACK_SPOTS as SPOTS, type Spot } from "../lib/spots";
 import { getLightWindows } from "../lib/light";
 
@@ -21,6 +21,36 @@ describe("lightTiming", () => {
   });
   test("passed (0.2) after the window ends", () => {
     expect(lightTiming(new Date(2026, 6, 13, 16, 0, 0), start, end)).toBe(0.2);
+  });
+});
+
+describe("phaseScore — genre-dependent light (CB7)", () => {
+  test("golden is the reference top (~1.0) for every genre", () => {
+    for (const g of ["Street", "Landscape", "Portraits", "Architecture"] as const)
+      expect(phaseScore(g, "golden")).toBeCloseTo(1.0);
+  });
+  test("street is barely penalized in flat light (light is a mode, not a gate)", () => {
+    expect(phaseScore("Street", "flat")).toBeGreaterThan(0.9);
+  });
+  test("landscape is strongly penalized in flat light (golden genuinely matters there)", () => {
+    expect(phaseScore("Landscape", "flat")).toBeLessThan(0.65);
+  });
+  test("street tolerates flat far better than landscape does", () => {
+    expect(phaseScore("Street", "flat")).toBeGreaterThan(phaseScore("Landscape", "flat"));
+  });
+  test("low-sensitivity, not zero — street still orders golden above flat", () => {
+    expect(phaseScore("Street", "golden")).toBeGreaterThan(phaseScore("Street", "flat"));
+  });
+  test("the old landscape bias is gone: a flat street spot outscores a flat landscape spot on light", () => {
+    // Same window, same weather — only the genre differs. Street should win on the light term.
+    const now = new Date(2026, 6, 13, 20, 30, 0);
+    const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+    const flatSpot = (id: string, genre: "Street" | "Landscape"): Spot => ({
+      ...SPOTS[0], id, name: id, genre, genres: [genre], type: genre, windowType: "flat",
+    });
+    const street = tonightNudge([flatSpot("s", "Street")], now, cam, kit).score;
+    const land = tonightNudge([flatSpot("l", "Landscape")], now, cam, kit).score;
+    expect(street).toBeGreaterThan(land);
   });
 });
 

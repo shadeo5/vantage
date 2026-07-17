@@ -31,8 +31,26 @@ const LIGHT_W = 0.6;
 const GEAR_W = 0.4;
 const GO_THRESHOLD = 0.55;
 
-// Intrinsic photographic value of each window type.
-const BASE_QUALITY: Record<Spot["windowType"], number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+// --- Genre-dependent light quality (ADR: LIGHT_QUALITY_GENRE.html · CB7) -----------
+// Light is a set of creative MODES, not a good/bad ladder — and how much the window type
+// gates a shoot depends on the GENRE. REF_FIT is the reference "phase fit" for a fully
+// light-sensitive genre (landscape): golden > blue > flat. LIGHT_SENSITIVITY then blends
+// each genre toward neutral — landscape lives and dies by golden/blue light; street is
+// light-flexible (harsh/flat is a mode, per Fan Ho / Metzker / DPS "any light"), so flat
+// barely dents it. Low, NOT zero — color/light-forward street still times light (Webb).
+// Grounded in docs/engineering/LIGHT_GENRE_RESEARCH.md; the numbers are calibration.
+const REF_FIT: Record<Spot["windowType"], number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+const LIGHT_SENSITIVITY: Record<Genre, number> = {
+  Landscape: 0.9, Wildlife: 0.65, Architecture: 0.7, Nature: 0.6,
+  Portraits: 0.5, Details: 0.4, Sports: 0.3, Street: 0.15,
+};
+
+// phaseScore ∈ [REF_FIT[windowType], 1]. Insensitive genre (street) → near 1 in any light;
+// sensitive genre (landscape) → golden ≫ flat. phaseScore = 1 − sensitivity·(1 − REF_FIT).
+export function phaseScore(genre: Genre, windowType: Spot["windowType"]): number {
+  const s = LIGHT_SENSITIVITY[genre] ?? 0.5;
+  return 1 - s * (1 - REF_FIT[windowType]);
+}
 
 // The window a spot cares about tonight.
 function windowFor(spot: Spot, w: LightWindows): { start: Date; end: Date } {
@@ -71,7 +89,10 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], c
   // (soft-daylight) shooting alone. No forecast → astronomical-only (factor 1).
   const sky = cloud ? cloud.cloudAt(win.start) : null;
   const weather = sky === null ? 1 : cloudFactor(sky, spot.windowType);
-  const light = BASE_QUALITY[spot.windowType] * timing * weather;
+  // Light quality is genre-dependent (CB7): a flat-light street spot isn't down-ranked
+  // the way a flat-light landscape spot is. weather (current sky) and phaseScore (the
+  // genre's inherent light-dependence) are orthogonal — no double-count.
+  const light = phaseScore(spot.genre, spot.windowType) * timing * weather;
   const gear = gearFitScore(cameraId, lensIds, spot.genre);
   const score = LIGHT_W * light + GEAR_W * gear; // activity weight 0 for now
 

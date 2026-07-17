@@ -1,4 +1,4 @@
-import { FALLBACK_SPOTS, findSpot, windowMeta, spotImageSource, HERO_ID, type Spot } from "../lib/spots";
+import { FALLBACK_SPOTS, findSpot, windowMeta, spotImageSource, streetViewUrl, HERO_ID, type Spot } from "../lib/spots";
 
 describe("bundled fallback spots", () => {
   test("all carry the fields the UI needs", () => {
@@ -51,5 +51,17 @@ describe("spotImageSource", () => {
   test("falls back to the hero bundle for a spot with neither image", () => {
     const orphan: Spot = { ...FALLBACK_SPOTS[0], id: "unknown", img: "unknown", imageUrl: undefined };
     expect(spotImageSource(orphan)).toBe(spotImageSource({ ...FALLBACK_SPOTS[0], img: HERO_ID }));
+  });
+});
+
+describe("streetViewUrl (PH6)", () => {
+  test("builds a Maps URLs API pano link at the spot's coordinates", () => {
+    const s = FALLBACK_SPOTS[0];
+    const url = streetViewUrl(s);
+    expect(url).toContain("map_action=pano");
+    expect(url).toContain(`viewpoint=${s.lat},${s.lon}`);
+  });
+  test("returns null when the spot has no real coordinates (DB default 0,0) → row hides", () => {
+    expect(streetViewUrl({ ...FALLBACK_SPOTS[0], lat: 0, lon: 0 })).toBeNull();
   });
 });

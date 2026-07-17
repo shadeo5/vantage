@@ -59,6 +59,17 @@ export function findSpot(spots: Spot[], id: string): Spot {
   return spots.find((s) => s.id === id) ?? spots[0];
 }
 
+// Deep-link into Google Street View at a spot's coordinates (E9 · PH6). Our imagery is
+// deliberately illustrated (ILLUSTRATION_STYLE.md), so this is the one place a scout can
+// see the REAL geography. Uses the official cross-platform Maps URLs API (opens the
+// Google Maps app on a phone, a browser tab on web) → the panorama nearest the point.
+// Returns null when the spot has no real coordinates (the DB mapping defaults lat/lon to
+// 0), so the caller can hide the row rather than link into the ocean off West Africa.
+export function streetViewUrl(spot: Spot): string | null {
+  if (!spot.lat && !spot.lon) return null;
+  return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${spot.lat},${spot.lon}`;
+}
+
 export const HERO_ID = "sweetauburn";
 
 // The five hand-authored core Atlanta spots — the bundled fallback pack. The live

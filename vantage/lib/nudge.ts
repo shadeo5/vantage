@@ -9,7 +9,8 @@
 // WHEN the good light is (and whether it's already gone), not cloud cover; the
 // activity signal is a placeholder (weight 0) marking where events plug in later.
 import { Spot } from "./spots";
-import { getLightWindows, fmtTime, LightWindows } from "./light";
+import { getLightWindows, fmtTime, lightPhaseAt, LightWindows } from "./light";
+import { fastestAperture } from "./shootBrief";
 import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
 import { cloudFactor, skyLabel, type Forecast } from "./weather";
 import type { Genre } from "./gear";
@@ -31,8 +32,26 @@ const LIGHT_W = 0.6;
 const GEAR_W = 0.4;
 const GO_THRESHOLD = 0.55;
 
-// Intrinsic photographic value of each window type.
-const BASE_QUALITY: Record<Spot["windowType"], number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+// --- Genre-dependent light quality (ADR: LIGHT_QUALITY_GENRE.html · CB7) -----------
+// Light is a set of creative MODES, not a good/bad ladder — and how much the window type
+// gates a shoot depends on the GENRE. REF_FIT is the reference "phase fit" for a fully
+// light-sensitive genre (landscape): golden > blue > flat. LIGHT_SENSITIVITY then blends
+// each genre toward neutral — landscape lives and dies by golden/blue light; street is
+// light-flexible (harsh/flat is a mode, per Fan Ho / Metzker / DPS "any light"), so flat
+// barely dents it. Low, NOT zero — color/light-forward street still times light (Webb).
+// Grounded in docs/engineering/LIGHT_GENRE_RESEARCH.md; the numbers are calibration.
+const REF_FIT: Record<Spot["windowType"], number> = { golden: 1.0, blue: 0.85, flat: 0.55 };
+const LIGHT_SENSITIVITY: Record<Genre, number> = {
+  Landscape: 0.9, Wildlife: 0.65, Architecture: 0.7, Nature: 0.6,
+  Portraits: 0.5, Details: 0.4, Sports: 0.3, Street: 0.15,
+};
+
+// phaseScore ∈ [REF_FIT[windowType], 1]. Insensitive genre (street) → near 1 in any light;
+// sensitive genre (landscape) → golden ≫ flat. phaseScore = 1 − sensitivity·(1 − REF_FIT).
+export function phaseScore(genre: Genre, windowType: Spot["windowType"]): number {
+  const s = LIGHT_SENSITIVITY[genre] ?? 0.5;
+  return 1 - s * (1 - REF_FIT[windowType]);
+}
 
 // The window a spot cares about tonight.
 function windowFor(spot: Spot, w: LightWindows): { start: Date; end: Date } {
@@ -71,7 +90,10 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], c
   // (soft-daylight) shooting alone. No forecast → astronomical-only (factor 1).
   const sky = cloud ? cloud.cloudAt(win.start) : null;
   const weather = sky === null ? 1 : cloudFactor(sky, spot.windowType);
-  const light = BASE_QUALITY[spot.windowType] * timing * weather;
+  // Light quality is genre-dependent (CB7): a flat-light street spot isn't down-ranked
+  // the way a flat-light landscape spot is. weather (current sky) and phaseScore (the
+  // genre's inherent light-dependence) are orthogonal — no double-count.
+  const light = phaseScore(spot.genre, spot.windowType) * timing * weather;
   const gear = gearFitScore(cameraId, lensIds, spot.genre);
   const score = LIGHT_W * light + GEAR_W * gear; // activity weight 0 for now
 
@@ -157,6 +179,48 @@ export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds:
     .sort((a, b) => b.rank - a.rank)                                  // order by the variety-aware rank
     .slice(0, MAX_NEAR_YOU)
     .map((s) => s.spot);
+}
+
+// --- "Good in the dark" (E9 · PH5) ----------------------------------------------
+// The quiet-night answer: when "best near you" comes back empty (the go bar isn't met),
+// don't leave the screen blank — surface evergreen spots that genuinely SHINE after
+// sunset (bridges for light-trails, neon tunnels, lit skylines), ordered by what the kit
+// can handle in the dark. This is a SEPARATE, explicitly-labeled shelf — it never pads
+// the quality-gated "best near you" list; it only appears once it's actually dark out.
+
+// How well a spot reads after dark, independent of light-timing: a blue-hour/night spot
+// is made for it; cityscape/street thrive on lit signs, trails, neon; open nature/
+// landscape mostly doesn't (nothing to light). 0..1.
+function nightScore(spot: Spot): number {
+  if (spot.windowType === "blue") return 1.0;      // explicitly a blue-hour / after-dark spot
+  if (spot.genre === "Architecture") return 0.85;  // skylines, bridges — trails + lit towers
+  if (spot.genre === "Street") return 0.7;         // neon, lit pockets, wet-street color
+  return 0.35;                                     // meadows/landscape have little to work with
+}
+
+const NIGHT_BAR = 0.7; // a spot must clear this night-fit to make the shelf
+
+// Evergreen after-dark spots, gated by kit + ordered by night-fit. Empty unless it's
+// actually dark at the pack's location (so it never shows in daylight).
+export function goodInTheDark(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string, opts?: NudgeOpts): Spot[] {
+  const anchor = spots[0];
+  if (!anchor) return [];
+  const phase = lightPhaseAt(now, anchor.lat, anchor.lon);
+  if (phase !== "night" && phase !== "blue") return []; // only "in the dark"
+  // Faster glass → the kit handles the dark better, so it surfaces the best-matched first.
+  const fastest = fastestAperture(cameraId, lensIds);
+  const kitFactor = fastest <= 2.8 ? 1 : fastest <= 4 ? 0.92 : 0.85;
+  return spots
+    .filter((s) => s.id !== excludeId)
+    .map((s) => ({ s, night: nightScore(s) }))
+    .filter((x) => x.night >= NIGHT_BAR)
+    .map((x) => ({
+      s: x.s,
+      rank: x.night * kitFactor + VARIETY_W * hash01(`${x.s.id}:${daySeed(now)}:dark`) - recencyPenalty(x.s.id, now, opts?.journal),
+    }))
+    .sort((a, b) => b.rank - a.rank)
+    .slice(0, MAX_NEAR_YOU)
+    .map((x) => x.s);
 }
 
 // Decide tonight: rank every spot, pick the best, and say whether to nudge.

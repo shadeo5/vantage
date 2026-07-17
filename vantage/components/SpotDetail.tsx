@@ -2,23 +2,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
-import { Spot, spotImageSource, windowMeta } from "../lib/spots";
-import { getLightWindows, goldenWindowLabel, hourlyLight, fmtTime } from "../lib/light";
-import { skyLabel, type Forecast } from "../lib/weather";
-import { LightChart } from "./LightChart";
+import { Spot, spotImageSource } from "../lib/spots";
+import { lightStripModel } from "../lib/light";
+import { shootBrief } from "../lib/shootBrief";
+import { type Forecast } from "../lib/weather";
+import { LightStrip } from "./LightStrip";
+import { ShootBriefCard } from "./ShootBriefCard";
 
 export function SpotDetail({
-  spot, isGoing, isSaved, cloud, onBack, onToggleGoing, onToggleSaved,
+  spot, isGoing, isSaved, cloud, cameraId, lensIds, onBack, onToggleGoing, onToggleSaved,
 }: {
-  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
+  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; cameraId: string; lensIds: string[]; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
 }) {
   const now = new Date();
-  const windows = getLightWindows(now, spot.lat, spot.lon);
-  // Chart tempered by the real sky (P3) — bars show the light you'll actually get.
-  const bars = hourlyLight(now, spot.lat, spot.lon, cloud);
-  const skyNow = cloud ? skyLabel(cloud.cloudAt(now)) : null;
-  const wm = windowMeta(spot.windowType);
-  const windowTime = spot.windowType === "blue" ? fmtTime(windows.blueEvening.start) : fmtTime(windows.goldenEvening.start);
+  // The detail page is now-first (E9 · PH3/PH4): what the light's doing at THIS moment,
+  // what to shoot in it, and the kit's readiness — not a golden-hour countdown.
+  const strip = lightStripModel(now, spot.lat, spot.lon, cloud);
+  const brief = shootBrief(now, spot, cameraId, lensIds, cloud);
+  const nowLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).toLowerCase().replace(/\s/g, "");
 
   // Cross-fade the detail in over the current screen (it's an overlay above the pager,
   // so opacity 0 reveals Today underneath — never black). Hold the fade until the hero
@@ -47,7 +48,7 @@ export function SpotDetail({
           <View style={styles.heroBottom}>
             <View style={styles.heroChips}>
               <Text style={styles.hChip}>{spot.type}</Text>
-              <Text style={[styles.hChip, styles.hChipGold]}>{wm.icon} {wm.label} {windowTime}</Text>
+              <Text style={[styles.hChip, styles.hChipGold]}>{strip.read.icon} {strip.read.chipLabel}</Text>
             </View>
             <Text style={styles.title}>{spot.name}</Text>
             <Text style={styles.tagline}>{spot.tagline}</Text>
@@ -57,8 +58,10 @@ export function SpotDetail({
         <View style={styles.body}>
           <Text style={styles.why}>{spot.why}</Text>
 
-          <View style={styles.secHead}><Text style={styles.secTitle}>When the light works</Text><Text style={styles.secTrail}>{goldenWindowLabel(windows)}{skyNow ? ` · ${skyNow}` : ""}</Text></View>
-          <View style={styles.card}><LightChart bars={bars} /></View>
+          {/* What to shoot now (PH3) — the tactical headline of the body, this moment + this kit. */}
+          <ShootBriefCard brief={brief} title="WHAT TO SHOOT NOW" trailing={`${nowLabel} · ${strip.read.stripMain.toLowerCase()}`} />
+          {/* Light, demoted (PH4) — a slim, forward, phase-honest strip, not the headline. */}
+          <View style={styles.stripWrap}><LightStrip model={strip} /></View>
 
           <Text style={styles.secTitle}>What to look for here</Text>
           <Text style={styles.secSub}>Where the good frames hide</Text>
@@ -110,6 +113,7 @@ const styles = StyleSheet.create({
   secTrail: { color: colors.golden, fontFamily: fonts.sansSemi, fontSize: 12 },
   secSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12.5, marginTop: 2, marginBottom: 16 },
   card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.hairline, borderRadius: 18, padding: 16, marginBottom: 30 },
+  stripWrap: { marginTop: 14 },
   lookRow: { flexDirection: "row", gap: 13, alignItems: "flex-start" },
   lookNum: { width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: "rgba(233,184,114,0.4)", justifyContent: "center", alignItems: "center" },
   lookNumTxt: { color: colors.golden, fontFamily: fonts.serif, fontSize: 12 },

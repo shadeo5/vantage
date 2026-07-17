@@ -1,4 +1,4 @@
-import { lightTiming, gearFitScore, tonightNudge, bestNearYou, MAX_NEAR_YOU } from "../lib/nudge";
+import { lightTiming, gearFitScore, tonightNudge, bestNearYou, goodInTheDark, MAX_NEAR_YOU, phaseScore } from "../lib/nudge";
 import { FALLBACK_SPOTS as SPOTS, type Spot } from "../lib/spots";
 import { getLightWindows } from "../lib/light";
 
@@ -21,6 +21,36 @@ describe("lightTiming", () => {
   });
   test("passed (0.2) after the window ends", () => {
     expect(lightTiming(new Date(2026, 6, 13, 16, 0, 0), start, end)).toBe(0.2);
+  });
+});
+
+describe("phaseScore — genre-dependent light (CB7)", () => {
+  test("golden is the reference top (~1.0) for every genre", () => {
+    for (const g of ["Street", "Landscape", "Portraits", "Architecture"] as const)
+      expect(phaseScore(g, "golden")).toBeCloseTo(1.0);
+  });
+  test("street is barely penalized in flat light (light is a mode, not a gate)", () => {
+    expect(phaseScore("Street", "flat")).toBeGreaterThan(0.9);
+  });
+  test("landscape is strongly penalized in flat light (golden genuinely matters there)", () => {
+    expect(phaseScore("Landscape", "flat")).toBeLessThan(0.65);
+  });
+  test("street tolerates flat far better than landscape does", () => {
+    expect(phaseScore("Street", "flat")).toBeGreaterThan(phaseScore("Landscape", "flat"));
+  });
+  test("low-sensitivity, not zero — street still orders golden above flat", () => {
+    expect(phaseScore("Street", "golden")).toBeGreaterThan(phaseScore("Street", "flat"));
+  });
+  test("the old landscape bias is gone: a flat street spot outscores a flat landscape spot on light", () => {
+    // Same window, same weather — only the genre differs. Street should win on the light term.
+    const now = new Date(2026, 6, 13, 20, 30, 0);
+    const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+    const flatSpot = (id: string, genre: "Street" | "Landscape"): Spot => ({
+      ...SPOTS[0], id, name: id, genre, genres: [genre], type: genre, windowType: "flat",
+    });
+    const street = tonightNudge([flatSpot("s", "Street")], now, cam, kit).score;
+    const land = tonightNudge([flatSpot("l", "Landscape")], now, cam, kit).score;
+    expect(street).toBeGreaterThan(land);
   });
 });
 
@@ -148,6 +178,42 @@ describe("bestNearYou (capped, quality-gated)", () => {
   test("is deterministic for a fixed input", () => {
     const hero = tonightNudge(SPOTS, now, cam, kit).spot;
     expect(bestNearYou(SPOTS, now, cam, kit, hero.id)).toEqual(bestNearYou(SPOTS, now, cam, kit, hero.id));
+  });
+});
+
+describe("goodInTheDark (PH5 — the quiet-night, after-dark shelf)", () => {
+  const cam = "fuji-x100vi";
+  const kit = ["sony-fe35-18"];
+  const anchor = SPOTS[0];
+  // Derive dark vs. daylight moments from the computed windows (timezone-robust).
+  const w = getLightWindows(new Date(2026, 6, 13, 12, 0, 0), anchor.lat, anchor.lon);
+  const nightTime = new Date(w.blueEvening.end.getTime() + 60 * 60000);        // past dusk = dark
+  const dayTime = new Date(w.goldenMorning.end.getTime() + 3 * 60 * 60000);    // midday = light
+
+  test("is empty in daylight (only appears once it's dark out)", () => {
+    expect(goodInTheDark(SPOTS, dayTime, cam, kit, "")).toHaveLength(0);
+  });
+
+  test("after dark, surfaces evergreen night-worthy spots (blue-hour / cityscape / street), never a meadow", () => {
+    const dark = goodInTheDark(SPOTS, nightTime, cam, kit, "");
+    expect(dark.length).toBeGreaterThan(0);
+    for (const s of dark) {
+      const worthy = s.windowType === "blue" || s.genre === "Architecture" || s.genre === "Street";
+      expect(worthy).toBe(true);
+    }
+    // Piedmont (open Nature) has nothing to light after dark — it must not appear.
+    expect(dark.map((s) => s.id)).not.toContain("piedmont");
+  });
+
+  test("excludes the hero and never exceeds the cap", () => {
+    const excluded = "krog";
+    const dark = goodInTheDark(SPOTS, nightTime, cam, kit, excluded);
+    expect(dark.map((s) => s.id)).not.toContain(excluded);
+    expect(dark.length).toBeLessThanOrEqual(MAX_NEAR_YOU);
+  });
+
+  test("is deterministic for a fixed input", () => {
+    expect(goodInTheDark(SPOTS, nightTime, cam, kit, "")).toEqual(goodInTheDark(SPOTS, nightTime, cam, kit, ""));
   });
 });
 

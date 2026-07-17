@@ -1,0 +1,416 @@
+<title>Vantage — New-Hire Onboarding</title>
+<style>
+  :root {
+    --ground:#0F0F11; --surface:#161618; --sunk:#141416; --raised:#1d1d21;
+    --ink:#F4F1EA; --muted:#9a98a2; --faint:#6E6C75;
+    --gold:#E9B872; --gold-deep:#F2A93B; --blue:#7FA0CF; --green:#9DB89A; --clay:#D17A6B;
+    --hair:rgba(255,255,255,.09); --hair-strong:rgba(255,255,255,.16);
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Fira Code',ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --ground:#F4F1EA; --surface:#FBFAF6; --sunk:#efece3; --raised:#fff;
+    --ink:#211d17; --muted:#5f5a51; --faint:#8a857b;
+    --gold:#9a6e1e; --gold-deep:#b07f1a; --blue:#3f5c86; --green:#566f4c; --clay:#a8503f;
+    --hair:rgba(40,27,10,.13); --hair-strong:rgba(40,27,10,.24);
+    --shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);
+  }}
+  :root[data-theme="light"]{ --ground:#F4F1EA;--surface:#FBFAF6;--sunk:#efece3;--raised:#fff;--ink:#211d17;--muted:#5f5a51;--faint:#8a857b;--gold:#9a6e1e;--gold-deep:#b07f1a;--blue:#3f5c86;--green:#566f4c;--clay:#a8503f;--hair:rgba(40,27,10,.13);--hair-strong:rgba(40,27,10,.24);--shadow:0 1px 2px rgba(30,22,10,.05),0 12px 30px rgba(30,22,10,.06);}
+  :root[data-theme="dark"]{ --ground:#0F0F11;--surface:#161618;--sunk:#141416;--raised:#1d1d21;--ink:#F4F1EA;--muted:#9a98a2;--faint:#6E6C75;--gold:#E9B872;--gold-deep:#F2A93B;--blue:#7FA0CF;--green:#9DB89A;--clay:#D17A6B;--hair:rgba(255,255,255,.09);--hair-strong:rgba(255,255,255,.16);--shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(0,0,0,.35);}
+
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .page{max-width:880px;margin:0 auto;padding:66px 24px 100px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;}
+  header{border-bottom:1px solid var(--hair);padding-bottom:30px;margin-bottom:6px;}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(36px,7vw,56px);line-height:1.03;letter-spacing:-.01em;margin:14px 0 12px;text-wrap:balance;}
+  .lede{font-size:18px;color:var(--muted);max-width:64ch;} .lede b{color:var(--ink);font-weight:600;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .tag{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:999px;padding:5px 12px;background:var(--surface);}
+  .tag b{color:var(--ink);}
+
+  nav.toc{margin-top:30px;display:flex;flex-wrap:wrap;gap:8px;}
+  nav.toc a{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--hair);border-radius:8px;padding:6px 11px;text-decoration:none;background:var(--surface);}
+  nav.toc a:hover{color:var(--ink);border-color:var(--hair-strong);}
+  nav.toc a b{color:var(--faint);font-weight:600;margin-right:6px;}
+
+  section{margin-top:58px;scroll-margin-top:20px;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .sec-head h2{font-family:var(--serif);font-weight:500;font-size:27px;letter-spacing:-.01em;}
+  .sec-head .n{font-family:var(--mono);font-size:13px;color:var(--faint);border:1px solid var(--hair);border-radius:6px;padding:2px 8px;}
+  h3{font-family:var(--serif);font-weight:500;font-size:19px;margin:30px 0 12px;color:var(--ink);}
+  p{max-width:68ch;color:var(--muted);} p+p{margin-top:13px;} p b{color:var(--ink);font-weight:600;}
+  .lead-ink{color:var(--ink);}
+  .role{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:5px;border:1px solid var(--hair);color:var(--faint);}
+  .role.eng{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 40%,transparent);}
+  .role.prod{color:var(--blue);border-color:color-mix(in srgb,var(--blue) 40%,transparent);}
+
+  pre{background:var(--sunk);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;overflow-x:auto;margin:16px 0;}
+  code{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);}
+  p code,td code,li code{background:var(--sunk);border:1px solid var(--hair);border-radius:5px;padding:1px 5px;font-size:12.5px;}
+  .c-key{color:var(--gold);} .c-com{color:var(--faint);} .c-str{color:var(--green);} .c-blue{color:var(--blue);}
+
+  .tw{overflow-x:auto;border:1px solid var(--hair);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);margin:14px 0;}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px;}
+  th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--hair);vertical-align:top;}
+  thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);background:var(--raised);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td b{color:var(--ink);}
+  td.f{font-family:var(--mono);font-size:12px;color:var(--gold);white-space:nowrap;}
+  .cap{font-family:var(--mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);margin:26px 0 2px;}
+
+  .flow-wrap{overflow-x:auto;margin:20px 0;}
+  .flow{min-width:720px;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:0;}
+  .stage{background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+  .stage .lbl{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);margin-bottom:8px;}
+  .stage .item{font-size:13px;color:var(--ink);padding:2px 0;}
+  .stage .item.g{color:var(--gold);} .stage .item.b{color:var(--blue);}
+  .arrow{color:var(--faint);text-align:center;font-size:20px;padding:0 10px;align-self:center;}
+  .pipe{min-width:720px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0;}
+  .pcell{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:12px 13px;}
+  .pcell .s{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+  .pcell .d{font-size:12px;color:var(--muted);}
+  .pcell .h{font-size:11px;color:var(--clay);margin-top:6px;}
+
+  .call{border:1px solid var(--hair);border-left:3px solid var(--gold);border-radius:12px;padding:18px 20px;margin:16px 0;background:var(--surface);}
+  .call.blue{border-left-color:var(--blue);}
+  .call.clay{border-left-color:var(--clay);}
+  .call .k{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:7px;}
+  .call.blue .k{color:var(--blue);} .call.clay .k{color:var(--clay);}
+  .call p{color:var(--ink);margin:0;font-size:15px;}
+  .call p+p{margin-top:9px;}
+
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:11px;padding:0;margin:14px 0 0;}
+  ul.list li{padding-left:22px;position:relative;color:var(--muted);max-width:68ch;font-size:15px;}
+  ul.list li::before{content:"▸";position:absolute;left:0;color:var(--gold);}
+  ul.list li b{color:var(--ink);font-weight:600;}
+  ol.path{margin:14px 0 0;padding-left:0;list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:10px;}
+  ol.path li{position:relative;padding-left:34px;color:var(--muted);font-size:14.5px;max-width:70ch;counter-increment:step;}
+  ol.path li::before{content:counter(step);position:absolute;left:0;top:-1px;width:22px;height:22px;border-radius:50%;border:1px solid var(--hair-strong);color:var(--gold);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center;}
+  ol.path li b{color:var(--ink);}
+
+  footer{margin-top:70px;padding-top:24px;border-top:1px solid var(--hair);color:var(--faint);font-size:13px;font-family:var(--mono);}
+  a{color:var(--gold);}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px;}
+  @media (max-width:640px){ .pipe{grid-template-columns:1fr;} }
+</style>
+<div class="page">
+  <header>
+    <div class="eyebrow">Onboarding · All roles</div>
+    <h1>Welcome to Vantage</h1>
+    <p class="lede">Everything a new engineer, PM, marketer, or designer needs to get oriented — the product, the mental model, a map of every file, how to run it, and a guided path into the deeper docs. This is the <b>front door</b>; it leads into the decision records, it doesn't replace them.</p>
+    <div class="meta">
+      <span class="tag">Doc <b>Onboarding — start here</b></span>
+      <span class="tag">Audience <b>Eng · Product · Marketing · UX</b></span>
+      <span class="tag">Read time <b>~15 min</b></span>
+    </div>
+    <nav class="toc">
+      <a href="#s1"><b>01</b>What Vantage is</a>
+      <a href="#s2"><b>02</b>Mental model</a>
+      <a href="#s3"><b>03</b>Architecture</a>
+      <a href="#s4"><b>04</b>Codebase map</a>
+      <a href="#s5"><b>05</b>Engineer runbook</a>
+      <a href="#s6"><b>06</b>Product / Marketing / UX</a>
+      <a href="#s7"><b>07</b>Glossary</a>
+      <a href="#s8"><b>08</b>First-week paths</a>
+    </nav>
+  </header>
+
+  <!-- 01 -->
+  <section id="s1">
+    <div class="sec-head"><span class="n">01</span><h2>What Vantage is</h2></div>
+    <p><b>Vantage is a nudge-first street-photography scouting app.</b> Once each evening it quietly buzzes a photographer — but only when tonight's light and their gear actually line up — and tells them <i>where</i> to shoot, <i>why</i> it's worth it, and <i>how</i> to shoot it. The opposite of a directory you have to go dig through: it comes to you, and only when it has something real to say.</p>
+    <p><b>Who it's really for:</b> the <b>dormant camera owner</b> as much as the active street shooter — someone who owns good gear but hasn't picked it up in months. The North Star is blunt: <i>"the best camera is the one you actually pick up."</i> Vantage isn't serving existing intent (people already deciding where to go) — it's <b>creating</b> it, reaching out first with one reason to shoot today. The founder (Desha) is a street photographer himself, which shapes the taste; the strategic target is the person who needs a reason to <i>start again</i>.</p>
+    <p><b>Where it is today:</b> a built Expo/React-Native app on a live Supabase backend that pushes a real notification to a real phone, nightly, on its own. Two cities are live in the database — <b>Atlanta</b> (16 spots) and <b>Nashville</b> (13) — plus a growing curated event catalog. The north-star loop — <i>nudge → shoot → return → check-in</i> — is closed end-to-end.</p>
+    <div class="call">
+      <div class="k">The one-sentence pitch</div>
+      <p>"Your phone tells you the light's good tonight, points you at the right spot for the camera in your bag, and shows you the shot to make when you get there."</p>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section id="s2">
+    <div class="sec-head"><span class="n">02</span><h2>The mental model</h2></div>
+    <p>Four ideas explain most decisions in this codebase. Learn these and the rest reads easily.</p>
+
+    <h3>1 · Nudge-first, not browse-first</h3>
+    <p>The product's job is <b>inspiration, not search</b>. A "quiet night" honestly shows less (or nothing) rather than padding a list — the app would rather say nothing than nag. The home screen curates a single hero + a short, quality-gated set, never the whole pack.</p>
+
+    <h3>2 · A pure "brain", a thin UI</h3>
+    <p>All the real decision logic lives in <code>vantage/lib/</code> as <b>pure, testable functions</b> — no React, no I/O. "Is tonight worth it? Which spot? Which lens? What to shoot?" are all answered there and unit-tested. The React components are a thin skin that renders what the brain returns. When you're reasoning about behaviour, read <code>lib/</code>; when you're reasoning about pixels, read <code>components/</code>.</p>
+
+    <h3>3 · The "Opportunity" abstraction</h3>
+    <p>A <span class="role">spot</span> (evergreen — a place that's always there) and an <span class="role">event</span> (time-bound — here now, gone next week) are architecturally opposite, but to the ranker and the UI they're both just "a reason to shoot." They're normalised into one shape and run through <b>one scorer</b>. Everything is judged through a <b>photography lens</b>: attendance/magnitude never qualifies an event — only whether there's a real photo in it does.</p>
+
+    <h3>4 · Honesty is a feature, not a nicety</h3>
+    <p>This is the project's strongest through-line, and it's enforced in code and copy:</p>
+    <ul class="list">
+      <li><b>Never fake data.</b> No invented hours, no fabricated "0.8 mi away" distances when there's no GPS. If we don't know it, we don't say it.</li>
+      <li><b>Illustrations, not fake photos.</b> Spot imagery is honestly-stylised AI art, never stock passed off as a real photo of a real place.</li>
+      <li><b>Gear is "ideal-for", never a limit.</b> The app tells you what your kit is great at and how to make tonight work — it never tells you your gear "can't."</li>
+      <li><b>Inferred, not metered.</b> Light and weather are computed from sun position + forecast, so the copy hedges accordingly ("looks like a fast-glass night", never a fake lux reading).</li>
+    </ul>
+  </section>
+
+  <!-- 03 -->
+  <section id="s3">
+    <div class="sec-head"><span class="n">03</span><h2>Architecture at a glance</h2></div>
+    <p>Four moving parts. The app reads from Postgres; a nightly cloud job pushes the nudge; a content pipeline fills the database; and a pure brain decides everything in between.</p>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="stage">
+          <div class="lbl">The app · Expo / RN / TS</div>
+          <div class="item">Today · Plan · Bag</div>
+          <div class="item">Detail · Lock overlays</div>
+          <div class="item g">renders what the brain returns</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="stage">
+          <div class="lbl">The brain · vantage/lib</div>
+          <div class="item g">nudge · light · weather</div>
+          <div class="item g">conditions · shootBrief · gear</div>
+          <div class="item">pure &amp; unit-tested</div>
+        </div>
+        <div class="arrow">↔</div>
+        <div class="stage">
+          <div class="lbl">Backend · Supabase</div>
+          <div class="item b">Postgres: cities · spots</div>
+          <div class="item b">Edge Function: nudge (Deno)</div>
+          <div class="item">pg_cron nightly · Expo Push</div>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:22px">The database is filled by a five-stage <b>content pipeline</b> (Node scripts) with a human gate before any money is spent:</p>
+    <div style="overflow-x:auto">
+      <div class="pipe">
+        <div class="pcell"><div class="s">1 · Curate</div><div class="d">OSM/Overpass → genre-scored, diversity-capped candidates + a vet page</div></div>
+        <div class="pcell"><div class="s">2 · Vet 👤</div><div class="d">a human keeps/edits the shortlist → committed <code>vetted/*.json</code></div></div>
+        <div class="pcell"><div class="s">3 · Draft</div><div class="d">Claude writes on-voice copy → committed <code>content/*.json</code></div></div>
+        <div class="pcell"><div class="s">4 · Image</div><div class="d">GPT Image 1.5 → WebP &lt;300KB → Storage bucket</div></div>
+        <div class="pcell"><div class="s">5 · Serve</div><div class="d">importer → <code>seed.sql</code> → Postgres; app &amp; nudge read it</div></div>
+      </div>
+    </div>
+    <div class="call blue">
+      <div class="k">The both/and data model — worth internalising early</div>
+      <p><b>Git-committed per-city JSON is the source of truth</b> (PR-reviewable); <b>Postgres is the serving layer</b> (an importer loads the approved JSON); <b>Supabase Storage holds the images</b>. This killed an earlier duplication where spots were hand-synced in two places. Adding a published city needs <i>no app release</i> — the app and the nudge function both read the same <code>spots</code> table.</p>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section id="s4">
+    <div class="sec-head"><span class="n">04</span><h2>Codebase map — what each file does</h2></div>
+    <p>Requested reference: a file-by-file tour so you can navigate cold. The legend: <b>the brain</b> lives in <code>vantage/lib/</code> (pure, tested); <b>the UI</b> in <code>vantage/components/</code> + <code>App.tsx</code>; <b>the backend</b> in <code>vantage/supabase/</code>; <b>content tooling</b> in <code>content-pipeline/</code>; <b>the "why" of every decision</b> in <code>docs/</code>.</p>
+
+    <p class="cap">vantage/lib — the brain (pure, unit-tested)</p>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>What it does</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="f">nudge.ts</td><td><b>The nudge brain.</b> <code>tonightNudge()</code> scores every spot (light × gear, weather-tempered), picks the hero, and decides go/quiet; <code>bestNearYou()</code> returns the capped, quality-gated short list; <code>varietyRank()</code> rotates the pick day-to-day.</td><td>Start here to understand ranking.</td></tr>
+        <tr><td class="f">light.ts</td><td>Golden/blue/flat/night windows via SunCalc; <code>hourlyLight()</code> builds the detail chart's ramp; <code>lightPhaseAt()</code> gives the phase at a moment.</td><td>Offline, free. See the degrees gotcha below.</td></tr>
+        <tr><td class="f">weather.ts</td><td>Pulls hourly cloud + precipitation from Open-Meteo (free, no key); <code>cloudFactor()</code> tempers golden/blue light under overcast but leaves flat-day soft light alone.</td><td>Best-effort; null → astronomical-only.</td></tr>
+        <tr><td class="f">conditions.ts</td><td>Folds light phase × cloud × rain into one <code>Conditions</code> read for a moment + place — the input the shoot brief consumes.</td><td>New (E8).</td></tr>
+        <tr><td class="f">shootBrief.ts</td><td>The "shoot brief": <code>kitReadiness()</code> (fastest aperture vs. darkness → fast-glass / tripod / silhouette) + <code>shotsFor()</code> (conditions → 1–3 shot prompts) + rain seal-warning.</td><td>New (E8). Ideal-for framed.</td></tr>
+        <tr><td class="f">gear.ts</td><td>The gear <b>catalog</b> (19 cameras, 24 lenses, real specs) + the matching engine: focal-length + aperture → genres, crop-factor aware.</td><td>The heart of personalisation.</td></tr>
+        <tr><td class="f">gearProfile.ts</td><td>Higher-level kit helpers: <code>kitGenres()</code>, <code>bestLensForGenre()</code>, <code>fitLabel()</code> — the honest "fits your 35 / grab a tele" lines.</td><td>Wraps gear.ts for the UI.</td></tr>
+        <tr><td class="f">spots.ts</td><td>The <code>Spot</code> type, the bundled 5-core Atlanta <code>FALLBACK_SPOTS</code>, <code>spotImageSource()</code> (remote URL vs. bundled art), <code>findSpot()</code>.</td><td>Types + fallback only now.</td></tr>
+        <tr><td class="f">cityPack.ts</td><td>Reads a city's published spots from Postgres, maps rows → the app <code>Spot</code> shape, and falls back to the bundled core on any error.</td><td>Where the DB read happens.</td></tr>
+        <tr><td class="f">nudgeCopy.ts</td><td>Composes the fresh push title+body from confidence-tiered phrasing pools; variety is deterministic (day-of-year seed).</td><td>Voice per VOICE.md.</td></tr>
+        <tr><td class="f">journal.ts</td><td>The return loop: records an "I'm going" commitment, then on a later session asks "did you make it?" → a persisted journal entry + the "you've been out N times" stat.</td><td>On-device (AsyncStorage).</td></tr>
+        <tr><td class="f">supabase.ts</td><td>The Supabase client (anon key from <code>.env</code>, RN url-polyfill + AsyncStorage session storage).</td><td>One client, imported everywhere.</td></tr>
+        <tr><td class="f">sync.ts</td><td>Anonymous sign-in on launch + upserts the gear profile to <code>profiles</code> so the server can nudge.</td><td>App↔cloud sync.</td></tr>
+        <tr><td class="f">push.ts</td><td>Registers the device for Expo push, returns the token → saved to <code>profiles.push_token</code>.</td><td>No-op on web.</td></tr>
+        <tr><td class="f">gearStorage.ts</td><td>Persists the gear profile (camera + lenses) on-device, with corrupt-data guards.</td><td>AsyncStorage.</td></tr>
+        <tr><td class="f">savedStorage.ts</td><td>Persists hearted/saved spots on-device.</td><td>AsyncStorage.</td></tr>
+        <tr><td class="f">cityStorage.ts</td><td>Persists the last-chosen city so the switcher's pick wins over the default.</td><td>AsyncStorage.</td></tr>
+        <tr><td class="f">haptics.ts</td><td>Thin <code>expo-haptics</code> wrappers (native-only, fire-and-forget) — light tick on taps, medium bump on "I'm going".</td><td>No-op on web.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="cap">vantage/components + App.tsx — the UI</p>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="f">App.tsx</td><td>The root. Holds app state, runs the brain each render, and lays out the three tabs as a horizontal pager (Today / Plan / Bag) with Detail + Lock as absolute overlays. Loads the city pack, forecast, gear, journal on launch.</td></tr>
+        <tr><td class="f">InspirationHero.tsx</td><td>The Today hero card — the pick, confidence badge, "why this pick?", the primary CTA.</td></tr>
+        <tr><td class="f">ShootBriefCard.tsx</td><td>The "Tonight's shoot" card under the hero: gear-readiness line, rain warning, shot prompts (E8).</td></tr>
+        <tr><td class="f">SpotDetail.tsx</td><td>The full-screen spot view — hero image, the "why", the live light-ramp chart, "what to look for", getting there.</td></tr>
+        <tr><td class="f">LightChart.tsx</td><td>The light-quality bar chart (taller = better light; the gold-marked bar is "now"), weather-tempered.</td></tr>
+        <tr><td class="f">SpotRow.tsx</td><td>A compact row in the "best near you" list.</td></tr>
+        <tr><td class="f">PlanScreen.tsx</td><td>The this-week slate — day groups, event/light tags, "I'm going".</td></tr>
+        <tr><td class="f">BagScreen.tsx</td><td>Gear management — catalog-backed camera picker + lens chips + the "your kit's ideal for" panel.</td></tr>
+        <tr><td class="f">CitySwitcher.tsx</td><td>The Today-header city pill → a modal list of published cities (reads the <code>cities</code> table).</td></tr>
+        <tr><td class="f">GearBanner.tsx</td><td>The gentle "personalize your picks →" banner — shown only when no gear is set.</td></tr>
+        <tr><td class="f">CheckInCard.tsx</td><td>The return-loop moment — "did you make it to [spot]?" → I shot it / not this time.</td></tr>
+        <tr><td class="f">BottomNav.tsx</td><td>The Today / Plan / Bag tab bar (active pill, press ripple).</td></tr>
+        <tr><td class="f">LockScreen.tsx</td><td>The notification/lock-screen moment → tap to enter (the push mock).</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="cap">vantage/supabase — the backend</p>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="f">schema.sql</td><td><code>cities</code> + <code>spots</code> (genres <code>text[]</code>, <code>image_url</code>, public-read RLS on <code>published</code>) + <code>profiles</code> + <code>nudge_log</code>; RLS scoped to <code>auth.uid()</code>, anonymous-auth model.</td></tr>
+        <tr><td class="f">seed.sql</td><td>Generated by the importer — 29 spots (Nashville 13 + Atlanta 16). Idempotent, dollar-quoted (safe apostrophes).</td></tr>
+        <tr><td class="f">image_urls.sql</td><td>Generated — the <code>UPDATE</code>s that point each spot's <code>image_url</code> at its public Storage URL (core spots stay null = bundled art).</td></tr>
+        <tr><td class="f">functions/nudge/index.ts</td><td>The <b>Edge Function</b> — a Deno port of the nudge brain. Reads profiles + published spots, decides, and sends via Expo Push. Scheduled nightly by <code>pg_cron</code>.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="cap">content-pipeline — how the database gets filled</p>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td class="f">curate.mjs</td><td>Stage 1. Overpass/OSM → classifies + genre-scores + diversity-caps POIs → candidates JSON + a self-contained <code>review.&lt;city&gt;.html</code> vet page.</td></tr>
+        <tr><td class="f">generate.mjs</td><td>Stage 3. Reads the vetted list → Claude (opus, structured output = the Spot schema, voice baked in) → committed <code>content/&lt;city&gt;.json</code>.</td></tr>
+        <tr><td class="f">build-images.mjs</td><td>Stage 4. GPT Image 1.5 + the illustration style block → WebP &lt;300KB → <code>out/images/</code>.</td></tr>
+        <tr><td class="f">build-seed.mjs</td><td>Stage 5. Importer — loads the committed per-city JSON → <code>vantage/supabase/seed.sql</code>.</td></tr>
+        <tr><td class="f">build-image-urls.mjs</td><td>Stage 5. Emits <code>image_urls.sql</code> (deterministic public Storage URLs per spot).</td></tr>
+        <tr><td class="f">content/*.json</td><td>The reviewed source of truth: <code>nashville.json</code>, <code>atlanta.json</code> (new), <code>atlanta-core.json</code> (the 5 hand-authored gold-standard spots), <code>atlanta-events.json</code> (curated event catalog).</td></tr>
+        <tr><td class="f">vetted/*.json</td><td>The human-approved shortlists that <code>generate.mjs</code> drafts from.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="cap">docs — the "why" (decision records &amp; guides)</p>
+    <div class="tw"><table>
+      <thead><tr><th>File</th><th>What it holds</th></tr></thead>
+      <tbody>
+        <tr><td class="f">README.md</td><td>"Where we are today" + "pick up here next". The living status doc.</td></tr>
+        <tr><td class="f">BACKLOG.md</td><td>The epic log (E0–E8): every story, chronological, execution-lens. Dense — this guide is its on-ramp.</td></tr>
+        <tr><td class="f">engineering/CONTENT_PIPELINE.html</td><td>ADR — the content-at-scale architecture (the 5-stage assembly line + the both/and data model).</td></tr>
+        <tr><td class="f">engineering/EVENTS_ARCHITECTURE.html</td><td>ADR — spots vs. events, the Opportunity abstraction, the eclipse rule, the photo-value gate.</td></tr>
+        <tr><td class="f">engineering/GEAR_MATCHING.html</td><td>ADR — how a kit becomes a signal (focal + aperture → genres).</td></tr>
+        <tr><td class="f">engineering/PUSH_ARCHITECTURE.html</td><td>ADR — Supabase cron → the ported brain → Expo Push.</td></tr>
+        <tr><td class="f">engineering/SHOOT_BRIEF.html</td><td>ADR — conditions guidance: turning the go/quiet score into a brief (E8).</td></tr>
+        <tr><td class="f">engineering/EVENT_DATA_SOURCES.html</td><td>The events sourcing research — the golden-set trust test, Ticketmaster + CVB tiers.</td></tr>
+        <tr><td class="f">engineering/TECH_DECISIONS.html</td><td>The technical decision record — the companion to the ADRs.</td></tr>
+        <tr><td class="f">design/VOICE.md</td><td>The voice &amp; tone guide — how the app talks. Read before writing any user-facing copy.</td></tr>
+        <tr><td class="f">design/ILLUSTRATION_STYLE.md</td><td>The imagery direction + prompts (honest illustrations, not fake photos).</td></tr>
+        <tr><td class="f">BACKEND_FIELD_GUIDE.html</td><td>A plain-English map of the backend for non-engineers.</td></tr>
+        <tr><td class="f">UX_REVIEW.html</td><td>The Jul-13 UX review — the P0/P1/P2 findings that drove epic E7.</td></tr>
+        <tr><td class="f">strategy/NORTH_STAR.html</td><td>The "why" beneath the what: reactivate the dormant camera; the reframe from search tool → inspiration engine that reaches out; and <b>four product principles</b> (inspire don't nag · personal to the bag · we reach out · lower the barrier).</td></tr>
+        <tr><td class="f">strategy/PRODUCT_BRIEF.html</td><td>An honest customer <i>interrogation</i> — pressure-tests the core bet + each assumption with a confidence level (POI-density, the small-cities differentiator, "will people open the app", "a photo app with no photos", golden-hour-bias-for-street).</td></tr>
+        <tr><td class="f">strategy/COMPETITIVE_LANDSCAPE.html</td><td>The competitor scan (15+ apps). <b>Fotocast</b> is the closest threat — already ships gear + a "good day" score. Takeaway: <i>don't compete on the light, own the life</i> (activity/events + dormant-camera reactivation).</td></tr>
+      </tbody>
+    </table></div>
+    <p style="font-size:12.5px;color:var(--faint)">Config worth knowing: <code>vantage/package.json</code> (scripts), <code>app.json</code> (Expo/Android config), <code>eas.json</code> (build profiles), <code>tsconfig.json</code>, <code>theme.ts</code> (design tokens: colors/fonts/radius), <code>.env.example</code> (recreate <code>.env</code> from this), <code>AGENTS.md</code>/<code>CLAUDE.md</code> (agent instructions — note the "read the versioned Expo docs" rule), <code>index.ts</code> (Expo entry). Tests mirror the brain: one <code>__tests__/*.test.ts</code> per lib module (119 tests total).</p>
+  </section>
+
+  <!-- 05 -->
+  <section id="s5">
+    <div class="sec-head"><span class="n">05</span><h2>New-engineer runbook <span class="role eng">engineering</span></h2></div>
+    <h3>Get it running (web is fastest)</h3>
+    <pre><code><span class="c-com"># from the repo root</span>
+cd vantage
+cp .env.example .env        <span class="c-com"># then fill in Supabase URL + anon key</span>
+npm install
+npm run web                 <span class="c-com"># opens http://localhost:8081 — the whole app runs in a browser</span>
+npm test                    <span class="c-com"># the 119-test suite (jest-expo)</span>
+npx tsc --noEmit            <span class="c-com"># typecheck</span></code></pre>
+    <p>The web target is how the app has been verified throughout — it exercises the real brain and UI. Native builds go through <b>EAS</b> (<code>eas build --profile preview</code> → an Android APK); iOS needs an Apple Developer account.</p>
+
+    <h3>Where to start reading</h3>
+    <ul class="list">
+      <li><b>Behaviour</b> → <code>lib/nudge.ts</code> then <code>lib/light.ts</code>, <code>lib/shootBrief.ts</code>. The pure brain is the product.</li>
+      <li><b>Screens</b> → <code>App.tsx</code> (state + layout) then the component it renders for the tab you care about.</li>
+      <li><b>Data</b> → <code>lib/cityPack.ts</code> (the read) + <code>supabase/schema.sql</code> (the shape).</li>
+      <li><b>The "why"</b> → the matching ADR in <code>docs/engineering/</code> before you change a subsystem.</li>
+    </ul>
+
+    <h3>Conventions</h3>
+    <ul class="list">
+      <li><b>Docs travel with every commit.</b> Update <code>BACKLOG.md</code> / <code>README.md</code> / the relevant ADR when you change behaviour — it's part of "done" here, not an afterthought.</li>
+      <li><b>Decisions get an ADR.</b> Non-trivial forks are written up in <code>docs/engineering/*.html</code> with the options and the call made.</li>
+      <li><b>Tests on stable, regression-prone logic</b> — not everything. The pure <code>lib/</code> functions are the tested core; rigor scales as the product validates.</li>
+      <li><b>Copy follows <code>VOICE.md</code></b> and the honesty rules. Never invent facts the app doesn't know.</li>
+    </ul>
+
+    <div class="call clay">
+      <div class="k">Gotchas that will bite — read before your first real change</div>
+      <p><b>EAS builds from git, not your disk.</b> A gitignored <code>.env</code> never reaches the cloud build — Supabase creds must be set as <b>EAS env vars</b> (<code>eas env:create</code>, preview env). This cost a rebuild once.</p>
+      <p><b>SunCalc altitude is in <i>degrees</i> here, not radians.</b> There's a regression guard in <code>light.test.ts</code>; if a dependency bump flips it, midday stops reading as "flat" and the golden peak collapses.</p>
+      <p><b>Clock-skew → bundled fallback (ticket B6).</b> On some cold loads the anonymous session token is stamped with a future-set dev clock and Supabase rejects it ("JWT issued at future"); the app degrades to the 5 bundled Atlanta spots. Self-healing, an environment artifact, not a bug — but if you ever see 5 Atlanta spots instead of 16, this is why.</p>
+      <p><b>Weather is a city-proxy.</b> One forecast is fetched for <code>spots[0]</code> and used for the whole city — so a neighbouring grid cell's drizzle can read slightly differently from a specific spot's. Intentional simplification.</p>
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section id="s6">
+    <div class="sec-head"><span class="n">06</span><h2>Product / Marketing / UX lane <span class="role prod">non-eng</span></h2></div>
+    <p>You don't need the code to be effective here — you need the thesis, the voice, and the principles. Start with these.</p>
+
+    <h3>The thesis &amp; the strategic wedge</h3>
+    <p>The positioning is sharper than "a photography app," and it's easy to state wrong: <b>don't compete on the light — own the life.</b> Gear-matching and a "good day" score are <i>not</i> open space — <b>Fotocast</b> already ships both (~$30/yr), so leading with them puts us head-to-head and undifferentiated. The uncontested white space (per <code>COMPETITIVE_LANDSCAPE.html</code>) is two things: the <b>activity / event / street-energy</b> dimension (no rival answers "where are the people and moments?"), and <b>reactivating the dormant camera</b> (everyone else serves people who've already decided to shoot). Read <code>NORTH_STAR.html</code> for the vision + its <b>four product principles</b> (inspire don't nag · personal to the bag · we reach out · lower the barrier), and <code>PRODUCT_BRIEF.html</code> — an honest <i>interrogation</i> of our own assumptions, including a live one that touches the code: golden hour may be a landscape bias, so we shouldn't down-rank flat/overcast light for street.</p>
+
+    <h3>Voice — the brand's spine</h3>
+    <p><code>docs/design/VOICE.md</code> is required reading for anyone writing a word users see. The register is a knowledgeable friend who shoots: specific, grounded, never hype, never generic ("there'll be people there" is a failing sentence). The <b>honesty philosophy</b> (§02) is a marketing pillar as much as an engineering one — we don't fake photos, hours, or distances, and gear is always framed as what you <i>can</i> do.</p>
+
+    <h3>UX principles</h3>
+    <p><code>docs/UX_REVIEW.html</code> drove a full polish pass (epic E7): a calm gear manager (not a wizard), confidence shown as flourish for strong nights only, honest empty states, demoted secondary CTAs so one gold action leads. The recurring UX value: <b>curate, don't dump</b> — the home screen is an inspiration surface, not a directory.</p>
+
+    <h3>How the roadmap is framed</h3>
+    <p><code>docs/BACKLOG.md</code> is organised as epics (E0–E8). Stories are detailed <b>just-in-time</b> for the epic being built, not all upfront, because the product is pre-validation and requirements shift. That's deliberate — don't read the sparseness of a future epic as a gap.</p>
+  </section>
+
+  <!-- 07 -->
+  <section id="s7">
+    <div class="sec-head"><span class="n">07</span><h2>Glossary</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th>Term</th><th>Plain meaning</th></tr></thead>
+      <tbody>
+        <tr><td><b>Golden / blue / flat / night</b></td><td>The four light phases by sun altitude. Golden = warm low sun; blue = twilight; flat = harsh high midday; night = dark. Bar colour + quality on the light chart come from this.</td></tr>
+        <tr><td><b>windowType</b></td><td>A spot's best light window — <code>golden</code>, <code>blue</code>, or <code>flat</code> (usable across daylight). Drives when the spot is "live" tonight.</td></tr>
+        <tr><td><b>Opportunity</b></td><td>The unified shape a spot and an event both normalise into, so one scorer ranks both.</td></tr>
+        <tr><td><b>Eclipse rule</b></td><td>When an event and a spot share a location, the higher score headlines and the other becomes context (Dogwood Festival eclipses Piedmont Park in April, then reverts).</td></tr>
+        <tr><td><b>Photo-value gate</b></td><td>Every opportunity is judged on "is there a real photo here?" — magnitude/attendance amplifies but never qualifies.</td></tr>
+        <tr><td><b>The shoot brief</b></td><td>The E8 output under the hero: gear-readiness + shot-type guidance + rain warning — turns a "quiet night" into a plan.</td></tr>
+        <tr><td><b>genresForKit / gear-fit</b></td><td>Mapping a camera + lenses to the genres they shoot well (focal length + aperture, crop-factor aware).</td></tr>
+        <tr><td><b>Curate → Vet → Draft → Image → Serve</b></td><td>The five content-pipeline stages, with a human gate at Vet before any spend.</td></tr>
+        <tr><td><b>City pack</b></td><td>A city's set of published spots the app loads from Postgres (with a bundled fallback).</td></tr>
+        <tr><td><b>pg_cron</b></td><td>The Postgres scheduler that fires the nightly nudge Edge Function (~6pm Atlanta).</td></tr>
+        <tr><td><b>RLS / anon auth</b></td><td>Row-level security + anonymous sign-in — users get a device identity without an account; rows are scoped to it.</td></tr>
+        <tr><td><b>Expo / EAS</b></td><td>Expo = the React-Native framework/runtime; EAS = its cloud build service (produces the Android APK).</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- 08 -->
+  <section id="s8">
+    <div class="sec-head"><span class="n">08</span><h2>Your first week — guided paths</h2></div>
+    <p>Ordered routes into the deeper docs, by role. Read this guide first; then follow your lane.</p>
+
+    <h3><span class="role eng">Engineering</span></h3>
+    <ol class="path">
+      <li>Run it: <code>npm run web</code> + <code>npm test</code>, and click through Today / Plan / Bag.</li>
+      <li>Read the brain: <code>lib/nudge.ts</code> → <code>lib/light.ts</code> → <code>lib/shootBrief.ts</code>, with their tests alongside.</li>
+      <li>Read <b>TECH_DECISIONS</b> + <b>PUSH_ARCHITECTURE</b> to see how the app, DB, and nightly push fit together.</li>
+      <li>Trace one nudge end-to-end: <code>App.tsx</code> → <code>cityPack.ts</code> → <code>supabase/schema.sql</code> → <code>functions/nudge/index.ts</code>.</li>
+      <li>Skim <b>CONTENT_PIPELINE</b> + <b>GEAR_MATCHING</b> + <b>SHOOT_BRIEF</b> for the subsystems you'll touch.</li>
+      <li>Then read <code>BACKLOG.md</code> — now the shorthand makes sense.</li>
+    </ol>
+
+    <h3><span class="role prod">Product / Marketing</span></h3>
+    <ol class="path">
+      <li>This guide → <b>NORTH_STAR</b> → <b>PRODUCT_BRIEF</b> → <b>COMPETITIVE_LANDSCAPE</b>.</li>
+      <li><b>VOICE.md</b> — internalise the register before writing anything public.</li>
+      <li>Skim <b>EVENTS_ARCHITECTURE</b> + <b>EVENT_DATA_SOURCES</b> — events are the relevancy engine and the next frontier.</li>
+      <li><code>BACKLOG.md</code> epic headers for the roadmap shape (not every story).</li>
+    </ol>
+
+    <h3><span class="role prod">UX / Design</span></h3>
+    <ol class="path">
+      <li>This guide → <b>UX_REVIEW.html</b> (the findings + the bar we hold).</li>
+      <li><code>vantage/theme.ts</code> + <code>docs/design/</code> (VOICE, ILLUSTRATION_STYLE, the handoff) for the visual system.</li>
+      <li>Run the app on web and walk every screen with the "curate, don't dump" + honesty lenses.</li>
+      <li>Read <b>SHOOT_BRIEF</b> + <b>GEAR_MATCHING</b> — where product logic surfaces as copy and UI.</li>
+    </ol>
+
+    <div class="call">
+      <div class="k">The one thing to remember</div>
+      <p>This app earns trust by being honest — about the light, the weather, your gear, and what's worth shooting. Every role protects that. When a change would make the app fake, hype, or over-claim, that's the bug.</p>
+    </div>
+  </section>
+
+  <footer>Vantage · New-hire onboarding · the front door to <code>docs/</code> · pairs with README.md (where we are) + BACKLOG.md (what's next)</footer>
+</div>

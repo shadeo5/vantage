@@ -2,6 +2,8 @@
 
 Start here. Vantage is a mobile app that gives a photographer a personal reason to shoot **today** — the right place, right light, matched to their gear. An inspiration engine, not a utility.
 
+> **New to the project (any role)?** Read **`docs/ONBOARDING.html`** first — the role-based onboarding guide: what Vantage is, the mental model, a file-by-file codebase map, the setup runbook, and first-week reading paths into everything below.
+
 > **Anti-drift rule:** This README is the map. **Only the docs listed under "current" below are the plan.** Anything in `archive/` is history — kept for reference, but do **not** treat it as direction. If a doc isn't on this map, it's not current.
 
 ## The folders

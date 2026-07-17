@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated, Linking } from "react-native";
+import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors, fonts, screen } from "../theme";
-import { Spot, spotImageSource, streetViewUrl } from "../lib/spots";
+import { Spot, spotImageSource } from "../lib/spots";
 import { lightStripModel } from "../lib/light";
 import { shootBrief } from "../lib/shootBrief";
 import { type Forecast } from "../lib/weather";
-import { tapFeedback } from "../lib/haptics";
 import { LightStrip } from "./LightStrip";
 import { ShootBriefCard } from "./ShootBriefCard";
 
@@ -21,8 +20,6 @@ export function SpotDetail({
   const strip = lightStripModel(now, spot.lat, spot.lon, cloud);
   const brief = shootBrief(now, spot, cameraId, lensIds, cloud);
   const nowLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).toLowerCase().replace(/\s/g, "");
-  // Street View deep-link (PH6) — null when the spot has no real coordinates → hide the row.
-  const streetView = streetViewUrl(spot);
 
   // Cross-fade the detail in over the current screen (it's an overlay above the pager,
   // so opacity 0 reveals Today underneath — never black). Hold the fade until the hero
@@ -65,24 +62,6 @@ export function SpotDetail({
           <ShootBriefCard brief={brief} title="WHAT TO SHOOT NOW" trailing={`${nowLabel} · ${strip.read.stripMain.toLowerCase()}`} />
           {/* Light, demoted (PH4) — a slim, forward, phase-honest strip, not the headline. */}
           <View style={styles.stripWrap}><LightStrip model={strip} /></View>
-
-          {/* See the real place (PH6) — the imagery is illustrated, so ground it in Street View. */}
-          {streetView && (
-            <Pressable
-              onPress={() => { tapFeedback(); Linking.openURL(streetView); }}
-              android_ripple={{ color: "rgba(127,160,207,0.14)" }}
-              accessibilityRole="link"
-              accessibilityLabel={`See ${spot.name} on Google Street View`}
-              style={({ pressed }) => [styles.sv, pressed && { opacity: 0.85 }]}
-            >
-              <Text style={styles.svPin}>◉</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.svTitle}>See it on Street View</Text>
-                <Text style={styles.svSub}>The real place — our art is illustrated</Text>
-              </View>
-              <Text style={styles.svGo}>↗</Text>
-            </Pressable>
-          )}
 
           <Text style={styles.secTitle}>What to look for here</Text>
           <Text style={styles.secSub}>Where the good frames hide</Text>
@@ -135,11 +114,6 @@ const styles = StyleSheet.create({
   secSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12.5, marginTop: 2, marginBottom: 16 },
   card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.hairline, borderRadius: 18, padding: 16, marginBottom: 30 },
   stripWrap: { marginTop: 14 },
-  sv: { flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: colors.surfaceSubtle, borderWidth: 1, borderColor: "rgba(255,255,255,0.06)", borderRadius: 14, padding: 14, marginBottom: 30 },
-  svPin: { color: colors.blueHour, fontSize: 15 },
-  svTitle: { color: colors.ink, fontFamily: fonts.sansSemi, fontSize: 14 },
-  svSub: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12, marginTop: 2 },
-  svGo: { color: colors.blueHour, fontFamily: fonts.sansSemi, fontSize: 15 },
   lookRow: { flexDirection: "row", gap: 13, alignItems: "flex-start" },
   lookNum: { width: 26, height: 26, borderRadius: 13, borderWidth: 1, borderColor: "rgba(233,184,114,0.4)", justifyContent: "center", alignItems: "center" },
   lookNumTxt: { color: colors.golden, fontFamily: fonts.serif, fontSize: 12 },

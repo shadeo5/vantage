@@ -4,6 +4,7 @@ import Svg, { Rect, Circle, Path } from "react-native-svg";
 import { colors, fonts, screen } from "../theme";
 import { type Genre, getCamera, CAMERAS } from "../lib/gear";
 import { cameraLabel, cameraMeta } from "../lib/gearProfile";
+import { buildLabel } from "../lib/appVersion";
 
 const STYLES = ["Street", "Portraits", "Landscape", "Architecture", "Nature"];
 
@@ -88,6 +89,10 @@ export function BagScreen({
           })}
         </View>
       )}
+
+      {/* Build footer — glance here to know which build your phone is on. The build
+          number climbs every EAS build, so if it matches the newest, you're current. */}
+      <Text style={styles.buildLabel}>Vantage · {buildLabel()}</Text>
     </ScrollView>
   );
 }
@@ -120,4 +125,5 @@ const styles = StyleSheet.create({
   genreText: { color: "#F0D9AE", fontFamily: fonts.sansSemi, fontSize: 13 },
   dashed2: { alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.14)", borderStyle: "dashed", borderRadius: 14, padding: 14, marginTop: 22 },
   dashed2Text: { color: colors.muted3, fontFamily: fonts.sansMed, fontSize: 14 },
+  buildLabel: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12, textAlign: "center", marginTop: 28, letterSpacing: 0.3 },
 });

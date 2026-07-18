@@ -28,7 +28,8 @@ import { PlanScreen } from "./components/PlanScreen";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
-import { tonightNudge, bestNearYou, goodInTheDark } from "./lib/nudge";
+import { tonightNudge, bestNearYou, goodInTheDark, type ShownEntry } from "./lib/nudge";
+import { loadShown, saveShown, recordShown } from "./lib/shownStorage";
 import { nudgeCopy } from "./lib/nudgeCopy";
 import { CheckInCard } from "./components/CheckInCard";
 import { Commitment, JournalEntry, loadPending, savePending, loadJournal, saveJournal, shotCount } from "./lib/journal";
@@ -70,6 +71,7 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   const [pending, setPending] = useState<Commitment[]>([]);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
+  const [shownLog, setShownLog] = useState<ShownEntry[]>([]); // which spot Today headlined each day (anti-repeat)
   const [dueIds, setDueIds] = useState<string[]>([]);
 
   // Horizontal pager (N1): Today/Plan/Bag are three full-width pages; swipe and the
@@ -120,11 +122,12 @@ export default function App() {
 
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
-    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId()]).then(([ids, cam, pend, log, savedIds, savedCity]) => {
+    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId(), loadShown()]).then(([ids, cam, pend, log, savedIds, savedCity, shown]) => {
       if (ids) setLenses(ids);
       if (cam) setCameraId(cam);
       setPending(pend);
       setJournal(log);
+      setShownLog(shown);
       if (savedIds) setSaved(savedIds);
       if (savedCity) setCityId(savedCity); // last chosen city wins over the default
       setDueIds(pend.map((c) => c.spotId)); // commitments from a prior session → due to check in
@@ -137,10 +140,11 @@ export default function App() {
       saveCameraId(cameraId);
       savePending(pending);
       saveJournal(journal);
+      saveShown(shownLog);
       saveSavedIds(saved);
       saveCityId(cityId);
     }
-  }, [lenses, cameraId, pending, journal, saved, cityId, hydrated]);
+  }, [lenses, cameraId, pending, journal, shownLog, saved, cityId, hydrated]);
   // Mirror the gear profile to the cloud (anon sign-in + upsert) so the server can nudge.
   useEffect(() => {
     if (hydrated) saveProfile(cameraId, lenses);
@@ -150,6 +154,15 @@ export default function App() {
     if (!hydrated) return;
     registerForPush().then((token) => { if (token) savePushToken(token); });
   }, [hydrated]);
+  // Log today's hero so it steps aside for a day or two (anti-repeat, ADR HERO_ANTI_REPEAT).
+  // Recompute the pick here (cheap, pure) rather than read the render-scope value, which is
+  // defined after the fonts early-return below. recordShown is idempotent per day and uses
+  // the functional-update `prev`, so it only writes once/day and never loops with the pick.
+  useEffect(() => {
+    if (!hydrated || spots.length === 0) return;
+    const heroId = tonightNudge(spots, new Date(), cameraId, lenses, { journal, cloud, shownLog }).spot.id;
+    setShownLog((prev) => recordShown(prev, heroId, new Date()));
+  }, [hydrated, spots, cameraId, lenses, cloud, journal]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 
@@ -159,7 +172,7 @@ export default function App() {
   const greeting = now.getHours() < 12 ? "good morning" : now.getHours() < 17 ? "good afternoon" : "good evening";
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
-  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud });
+  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud, shownLog });
   const hero = verdict.spot;
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
   // quiet night this comes back short or empty, and the section hides entirely.

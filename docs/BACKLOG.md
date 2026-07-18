@@ -6,6 +6,11 @@
 
 ---
 
+## Fix · Hero anti-repeat  ✅ (2026-07-18) — ADR `docs/engineering/HERO_ANTI_REPEAT.md`
+**User report:** Today kept headlining the same spot (the "Look At Them Look At Us" mural) every day. **Root cause:** a side-effect of CB7 — a flat-light *street* spot scores a **permanent ~0.96** (street is light-flexible × flat = usable all day), so it wins any daytime check; the day-shuffle (±0.10) can't overcome its lead and the shot-recency penalty only fires if you actually *shot* it, not if you're merely *shown* it. **Fix (a rule, not a weight):** an on-device **shown-log** (`lib/shownStorage.ts`) records the day's hero; `tonightNudge` now skips a spot headlined in the last `HERO_COOLDOWN_DAYS (2)` days **as long as another spot clears the go bar** (else an honest repeat). Only prior days count, so the pick is stable within a day (no feedback loop). Yesterday's hero drops into "best near you," so the headline cycles. `App.tsx` wired (load/save + a record effect). 148 tests (+12). Type-clean. **Deferred (deeper):** whether a flat all-day spot should *structurally* outrank time-specific windows — a scoring recalibration that overlaps CB6.
+
+---
+
 ## DX · Build visibility  ✅ (2026-07-17)
 Answers "is my phone on the newest build?" without asking. Two parts: (1) **auto-increment the preview build number** (`eas.json` preview `autoIncrement: true`) so every EAS preview build gets a unique versionCode — before this, every preview reported the same `1.0.0 (1)`, so nothing on-device distinguished builds. (2) **In-app build footer** — `lib/appVersion.ts` (`buildLabel()` reads `expo-application`'s `nativeApplicationVersion` + `nativeBuildVersion`) rendered at the bottom of the **Bag** screen as `Vantage · v1.0.0 (build N)`. Glance at the phone, compare the build number to the newest EAS build → know if you're current. Null-safe on web/Expo Go (`· dev`). Added `expo-application@57.0.2`. Typecheck clean, 136 tests pass.
 

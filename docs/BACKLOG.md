@@ -11,6 +11,11 @@
 
 ---
 
+## DX · Build visibility  ✅ (2026-07-17)
+Answers "is my phone on the newest build?" without asking. Two parts: (1) **auto-increment the preview build number** (`eas.json` preview `autoIncrement: true`) so every EAS preview build gets a unique versionCode — before this, every preview reported the same `1.0.0 (1)`, so nothing on-device distinguished builds. (2) **In-app build footer** — `lib/appVersion.ts` (`buildLabel()` reads `expo-application`'s `nativeApplicationVersion` + `nativeBuildVersion`) rendered at the bottom of the **Bag** screen as `Vantage · v1.0.0 (build N)`. Glance at the phone, compare the build number to the newest EAS build → know if you're current. Null-safe on web/Expo Go (`· dev`). Added `expo-application@57.0.2`. Typecheck clean, 136 tests pass.
+
+---
+
 ## E0 · App shell & core UX  ✅ (built)
 The nudge-first app, rebuilt from the Claude Design handoff v2.
 - ✅ Today — gear banner, "your shoot tonight", inspiration hero + "why this pick?", ranked "best near you"

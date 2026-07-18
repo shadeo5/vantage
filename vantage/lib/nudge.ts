@@ -123,7 +123,38 @@ const VARIETY_W = 0.10;   // max day-rotation bump — only swaps near-ties, nev
 const RECENCY_W = 0.18;   // penalty for a just-shot spot (> VARIETY_W, so it always yields to an equal fresh one)
 const RECENCY_DAYS = 4;   // ...decaying to zero over this many days
 
-export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null };
+// A day's headline pick, logged on-device (persisted by lib/shownStorage) so the picker
+// can avoid repeating the same hero — see the anti-repeat rule below.
+export type ShownEntry = { spotId: string; at: string }; // at = ISO time it was headlined
+export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null; shownLog?: ShownEntry[] };
+
+// --- Anti-repeat (ADR HERO_ANTI_REPEAT) -----------------------------------------
+// The variety knobs above (day-shuffle + shot-recency) can't dislodge a PERMANENT
+// frontrunner: an always-on flat-light street spot scores ~0.96 all day and only loses
+// during golden/blue hour, so any daytime check headlines the same spot — its lead
+// exceeds the ±0.10 shuffle, and you never SHOT it so the recency penalty never fires.
+// The fix is a RULE, not a nudge: don't headline a spot we already headlined in the last
+// couple days *as long as another spot still clears the go bar* (else it's an honest
+// quiet-night repeat). Only PRIOR calendar days count — today's own record (written when
+// we show it) never disqualifies it, so the pick is stable within a day and there's no
+// feedback loop with recording.
+const HERO_COOLDOWN_DAYS = 2;
+
+function localMidnight(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+
+// Was this spot headlined on a prior calendar day within the cooldown window?
+function headlinedRecently(spotId: string, now: Date, shownLog?: ShownEntry[], cooldownDays = HERO_COOLDOWN_DAYS): boolean {
+  if (!shownLog?.length) return false;
+  const today = localMidnight(now);
+  for (const e of shownLog) {
+    if (e.spotId !== spotId) continue;
+    const dayDiff = Math.round((today - localMidnight(new Date(e.at))) / 86_400_000);
+    if (dayDiff >= 1 && dayDiff <= cooldownDays) return true; // a previous day, still cooling down
+  }
+  return false;
+}
 
 // Day-of-year seed — rotates the order each evening, stable within a day (matches nudgeCopy).
 function daySeed(d: Date): number {
@@ -228,7 +259,11 @@ export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds
   const scored = spots
     .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
     .sort((a, b) => b.rank - a.rank);
-  const top = scored[0].ss;
+  // Anti-repeat: take the top spot we did NOT headline in the last couple days — but only
+  // among spots that genuinely clear the go bar. If every worth-it spot is on cooldown (or
+  // it's a quiet night with none), fall back to the plain top — an honest repeat, not invented.
+  const fresh = scored.find((s) => s.ss.score >= GO_THRESHOLD && !headlinedRecently(s.ss.spot.id, now, opts?.shownLog));
+  const top = (fresh ?? scored[0]).ss;
   const go = top.score >= GO_THRESHOLD; // "worth going out?" reads off REAL quality, not variety
   return {
     go,

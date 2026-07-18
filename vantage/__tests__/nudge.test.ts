@@ -259,3 +259,49 @@ describe("variety (no repeating the same spot every night)", () => {
     }
   });
 });
+
+describe("anti-repeat hero (ADR HERO_ANTI_REPEAT)", () => {
+  const cam = "fuji-x100vi";
+  const kit = ["sony-fe35-18"];
+  // Two always-on flat-light street spots — both score ~0.96 and clear the go bar at any
+  // hour, the exact case (a permanent frontrunner) the day-shuffle can't dislodge.
+  const flatStreet = (id: string): Spot => ({ ...SPOTS[0], id, name: id, genre: "Street", genres: ["Street"], type: "Street", windowType: "flat" });
+  const mural = flatStreet("mural");
+  const other = flatStreet("other");
+  const now = new Date(2026, 3, 10, 13, 0, 0); // 1pm — outside any golden/blue window
+  const yesterday = new Date(2026, 3, 9, 19, 0, 0).toISOString();
+
+  test("both candidates genuinely clear the go bar (setup sanity)", () => {
+    expect(tonightNudge([mural], now, cam, kit).go).toBe(true);
+    expect(tonightNudge([other], now, cam, kit).go).toBe(true);
+  });
+
+  test("a spot headlined yesterday steps aside for another that clears the bar", () => {
+    const baseline = tonightNudge([mural, other], now, cam, kit).spot.id;
+    const shownLog = [{ spotId: baseline, at: yesterday }];
+    // With yesterday's winner on cooldown and an equally-good alternative available, the
+    // pick must change — this is what stops "the same mural every day".
+    expect(tonightNudge([mural, other], now, cam, kit, { shownLog }).spot.id).not.toBe(baseline);
+  });
+
+  test("falls back to the same spot when it's the only one worth showing (honest repeat)", () => {
+    // No alternative clears the bar, so an all-day flat street spot honestly repeats
+    // rather than the picker inventing a worse pick.
+    const shownLog = [{ spotId: "mural", at: yesterday }];
+    expect(tonightNudge([mural], now, cam, kit, { shownLog }).spot.id).toBe("mural");
+  });
+
+  test("today's own record never disqualifies the pick (stable within a day)", () => {
+    const baseline = tonightNudge([mural, other], now, cam, kit).spot.id;
+    // Same calendar day as `now` — must be ignored, so the pick is unchanged.
+    const shownLog = [{ spotId: baseline, at: new Date(2026, 3, 10, 9, 0, 0).toISOString() }];
+    expect(tonightNudge([mural, other], now, cam, kit, { shownLog }).spot.id).toBe(baseline);
+  });
+
+  test("cooldown expires: a spot shown 3+ days ago is eligible to headline again", () => {
+    const baseline = tonightNudge([mural, other], now, cam, kit).spot.id;
+    const longAgo = new Date(2026, 3, 6, 19, 0, 0).toISOString(); // 4 days before `now`
+    // Outside the 2-day cooldown, the old record no longer blocks it — it cycles back.
+    expect(tonightNudge([mural, other], now, cam, kit, { shownLog: [{ spotId: baseline, at: longAgo }] }).spot.id).toBe(baseline);
+  });
+});

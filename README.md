@@ -4,14 +4,9 @@
 
 Every evening it reads the sky, the sun, and your kit — and _only when they line up_ — buzzes your phone: here's where to be tonight, and why. No feed to scroll, no daily nag. The goal is to inspire a dormant shooter back out the door, not to add another notification.
 
-> 📸 **Screenshots coming soon** — see the [shot list](#screenshots) below.
-
-<!-- SCREENSHOTS: drop today.png, detail.png, nudge.png into docs/assets/, then uncomment
-     the table below (and delete the "coming soon" line above) to render them here.
 | Today — tonight's pick | Spot detail — what to shoot now | The nudge |
 |:--:|:--:|:--:|
 | ![Today](docs/assets/today.png) | ![Spot detail](docs/assets/detail.png) | ![The nudge](docs/assets/nudge.png) |
--->
 
 ---
 
@@ -55,12 +50,6 @@ Personal project, actively built. The core loop is **live end-to-end**: an Andro
 - **[The product thinking](docs/strategy/PRODUCT_BRIEF.html)** and **[the market gap](docs/strategy/COMPETITIVE_LANDSCAPE.html)** — who this serves and the open quadrant it aims at.
 - **[BACKLOG.md](docs/BACKLOG.md)** — what's shipped and what's next.
 
-## Screenshots
+---
 
-Drop three PNGs into `docs/assets/` and the table up top renders. Suggested shots:
-
-1. **`today.png`** — the Today screen with tonight's hero pick + the "why this pick?" reasons and the shoot brief.
-2. **`detail.png`** — a spot detail showing "what to shoot now" + the light strip.
-3. **`nudge.png`** — the actual push notification on the lock screen (the money shot — this is the whole product in one image).
-
-A short screen-recording GIF of opening a nudge → landing on Today would be even stronger than a still if you can grab one.
+<sub>Screens captured from the running app. A short screen-recording of a nudge → Today would be a strong addition if you want to grab one.</sub>

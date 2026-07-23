@@ -3,8 +3,9 @@
 // Runs on a schedule: read every profile with a push token, decide tonight's
 // pick with the SAME brain as the app (light-timing × gear-fit), and if it's a
 // "go", send a fresh push via Expo. The brain/copy/gear logic mirror vantage/lib/
-// {nudge,nudgeCopy,gear,gearProfile,light}.ts. Spots are now read from the `spots`
+// {nudge,nudgeCopy,gear,gearProfile,light,weather}.ts. Spots are now read from the `spots`
 // table (Atlanta, published) — no longer a hardcoded copy, retiring the duplication.
+// Weather-honest (P3 parity): cloud cover tempers the light so the push agrees with the app.
 //
 // Invoke with ?force=1 to send regardless of the go/no-go bar (for testing).
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -110,6 +111,60 @@ const LIGHT_SENSITIVITY: Record<Genre, number> = {
   Portraits: 0.5, Details: 0.4, Sports: 0.3, Street: 0.15,
 };
 const phaseScore = (genre: Genre, wt: WindowType) => 1 - (LIGHT_SENSITIVITY[genre] ?? 0.5) * (1 - REF_FIT[wt]);
+
+// ── weather (P3 parity) — cloud tempers the light, honestly. Mirror of vantage/lib/weather.ts.
+// The push scored astronomical-only, so a heavy-overcast evening still headlined a golden-hour
+// spot the (weather-aware) app knew was washed out — the two disagreed. We fetch once for the
+// city (spots[0] proxy, same simplification the app's Today uses) and sample each spot's window
+// at its start, exactly like the app's scoreSpot.
+//
+// TZ GOTCHA: the app keys cloud by LOCAL hour because the phone's clock IS the city's tz. This
+// function runs in UTC, so we query Open-Meteo with timezone=UTC and key on getUTC* — the spot
+// windows (SunCalc, absolute instants) then line up with the UTC-stamped forecast hours.
+type Forecast = { cloudAt(date: Date): number };
+function utcHourKey(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}`;
+}
+// Returns null on ANY failure — the caller degrades to astronomical-only light (same best-effort
+// pattern as the app). We only need cloud for the scorer; rain/wet drive the app's shoot brief,
+// not the push pick.
+async function fetchForecast(lat: number, lon: number): Promise<Forecast | null> {
+  try {
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}` +
+      `&hourly=cloud_cover&timezone=UTC&forecast_days=2`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = (await res.json()) as { hourly?: { time?: string[]; cloud_cover?: number[] } };
+    const times = json.hourly?.time;
+    const cover = json.hourly?.cloud_cover;
+    if (!times?.length || !cover?.length) return null;
+    const cloudBy = new Map<string, number>();
+    for (let i = 0; i < times.length; i++) {
+      // "2026-07-22T14:00" (UTC) → "2026-07-22T14"
+      if (typeof cover[i] === "number") cloudBy.set(times[i].slice(0, 13), clamp01(cover[i] / 100));
+    }
+    if (cloudBy.size === 0) return null;
+    return { cloudAt: (date) => cloudBy.get(utcHourKey(date)) ?? 0 }; // missing hour → clear (don't invent bad weather)
+  } catch {
+    return null;
+  }
+}
+const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
+function smoothstep(a: number, b: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+// THE multiplier on light quality for a cloud fraction + window type (mirror of weather.ts):
+// golden/blue decay to ~0.4 under overcast (the warm low light cloud blocks); flat lifts mildly
+// (overcast = soft even street/portrait light); never rewards cloud on golden. Monotonic.
+function cloudFactor(cloud: number, wt: WindowType): number {
+  const c = clamp01(cloud);
+  if (wt === "golden" || wt === "blue") return 1 - 0.6 * smoothstep(0.15, 1, c);
+  if (wt === "flat") return 1 + 0.12 * smoothstep(0.4, 1, c);
+  return 1;
+}
 function lightTiming(now: Date, start: Date, end: Date): number {
   const n = now.getTime();
   if (n >= start.getTime() && n <= end.getTime()) return 1.0;
@@ -125,10 +180,13 @@ function gearFitScore(cameraId: string, lensIds: string[], genre: Genre): number
   return LENS_CHIPS.some((c) => c.short === best) ? 1.0 : 0.7;
 }
 type Verdict = { go: boolean; score: number; confidence: "high" | "medium" | "low"; spot: Spot; window: { start: Date; end: Date } };
-function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[]): Verdict {
+function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[], cloud?: Forecast | null): Verdict {
   const scored = spots.map((spot) => {
     const win = windowFor(spot, now);
-    const light = phaseScore(spot.genre, spot.windowType) * lightTiming(now, win.start, win.end);
+    // Sample the sky at the window start (mirror of app scoreSpot). Null forecast → factor 1.
+    const sky = cloud ? cloud.cloudAt(win.start) : null;
+    const weather = sky === null ? 1 : cloudFactor(sky, spot.windowType);
+    const light = phaseScore(spot.genre, spot.windowType) * lightTiming(now, win.start, win.end) * weather;
     const gear = gearFitScore(cameraId, lensIds, spot.genre);
     return { spot, win, score: LIGHT_W * light + GEAR_W * gear };
   }).sort((a, b) => b.score - a.score);
@@ -208,6 +266,10 @@ Deno.serve(async (req) => {
   }));
   if (!SPOTS.length) return new Response(JSON.stringify({ error: "no published Atlanta spots in DB" }), { status: 500 });
 
+  // Weather once for the city (spots[0] proxy) — best-effort; null → astronomical-only, same as
+  // the app. Fetched before the profile loop so every user scores against the same sky.
+  const cloud = await fetchForecast(SPOTS[0].lat, SPOTS[0].lon);
+
   const { data: profiles, error } = await supabase
     .from("profiles").select("id, push_token, camera_id, lens_ids, timezone").not("push_token", "is", null);
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
@@ -221,7 +283,7 @@ Deno.serve(async (req) => {
     const cameraId = p.camera_id ?? "fuji-x100vi";
     const lensIds: string[] = p.lens_ids ?? [];
     const tz = p.timezone ?? "America/New_York";
-    const verdict = tonightNudge(SPOTS, now, cameraId, lensIds);
+    const verdict = tonightNudge(SPOTS, now, cameraId, lensIds, cloud);
     if (!verdict.go && !force) { skipped++; continue; }
     const lens = bestLensForGenre(cameraId, lensIds, verdict.spot.genre) ?? primaryLensLabel(lensIds);
     const copy = nudgeCopy(verdict, lens, now, tz);
@@ -237,7 +299,7 @@ Deno.serve(async (req) => {
     if (logs.length) await supabase.from("nudge_log").insert(logs);
   }
 
-  return new Response(JSON.stringify({ considered, sent, skipped, at: now.toISOString() }), {
+  return new Response(JSON.stringify({ considered, sent, skipped, weather: cloud ? "live" : "unavailable", at: now.toISOString() }), {
     headers: { "Content-Type": "application/json" },
   });
 });

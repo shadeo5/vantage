@@ -1,6 +1,7 @@
 import { lightTiming, gearFitScore, tonightNudge, bestNearYou, goodInTheDark, MAX_NEAR_YOU, phaseScore } from "../lib/nudge";
 import { FALLBACK_SPOTS as SPOTS, type Spot } from "../lib/spots";
 import { getLightWindows } from "../lib/light";
+import { ATLANTA_EVENTS } from "../lib/events";
 
 describe("lightTiming", () => {
   // All times same-day / same-zone, so comparisons are timezone-independent.
@@ -303,5 +304,42 @@ describe("anti-repeat hero (ADR HERO_ANTI_REPEAT)", () => {
     const longAgo = new Date(2026, 3, 6, 19, 0, 0).toISOString(); // 4 days before `now`
     // Outside the 2-day cooldown, the old record no longer blocks it — it cycles back.
     expect(tonightNudge([mural, other], now, cam, kit, { shownLog: [{ spotId: baseline, at: longAgo }] }).spot.id).toBe(baseline);
+  });
+});
+
+describe("event takeover (B4 · eclipse rule)", () => {
+  const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+  // Live events pulled from the real bundled catalog.
+  const dragonLive = new Date(2026, 8, 5, 11, 0);   // mid Dragon Con (10am–1pm Sep 5)
+  const prideLive = new Date(2026, 9, 10, 12, 0);   // Pride (venue: piedmont)
+  const noEventDay = new Date(2026, 7, 1, 19, 0);   // Aug 1 — nothing live
+
+  test("a live event takes the headline over the spots", () => {
+    const v = tonightNudge(SPOTS, dragonLive, cam, kit, { events: ATLANTA_EVENTS });
+    expect(v.event?.id).toBe("dragon-con-parade");
+    expect(v.spot.id).toBe("dragon-con-parade"); // adapted event rides the hero
+    expect(v.go).toBe(true);
+    expect(v.signals.some((s) => s.key === "activity")).toBe(true);
+  });
+
+  test("no live event → normal spot hero, no event on the verdict", () => {
+    const v = tonightNudge(SPOTS, noEventDay, cam, kit, { events: ATLANTA_EVENTS });
+    expect(v.event).toBeUndefined();
+    expect(SPOTS.some((s) => s.id === v.spot.id)).toBe(true);
+  });
+
+  test("events omitted → identical to the no-events path", () => {
+    const withEmpty = tonightNudge(SPOTS, noEventDay, cam, kit, { events: [] }).spot.id;
+    const without = tonightNudge(SPOTS, noEventDay, cam, kit).spot.id;
+    expect(withEmpty).toBe(without);
+  });
+
+  test("eclipse: a venue-backed event carries its venueSpotId so the venue can be dropped", () => {
+    const v = tonightNudge(SPOTS, prideLive, cam, kit, { events: ATLANTA_EVENTS });
+    expect(v.event?.id).toBe("atlanta-pride-festival-parade");
+    expect(v.event?.venueSpotId).toBe("piedmont");
+    // bestNearYou excluding hero + venue must not list piedmont
+    const near = bestNearYou(SPOTS, prideLive, cam, kit, [v.spot.id, "piedmont"]);
+    expect(near.some((s) => s.id === "piedmont")).toBe(false);
   });
 });

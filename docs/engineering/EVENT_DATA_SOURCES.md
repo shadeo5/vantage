@@ -236,6 +236,20 @@ Given a solo, pre-validation product — and consistent with how we deferred the
 
 ---
 
+## Update cadence (freshness) — added 2026-07-25
+
+The curated catalog (`content-pipeline/content/atlanta-events.json`) is hand-verified, so it needs a **refresh rhythm**, not a live feed (that's the eventual Ticketmaster/PredictHQ path). The rule:
+
+- **Re-verify a season's events ~6 weeks before the season starts** — that's when official dates for annually-recurring events are typically published. At that point, flip `needs-date-verify` → `high` (or correct the date) against the official source.
+- **`windowConfidence` is the freshness signal.** `needs-date-verify` = the recurrence is trusted but the exact date isn't confirmed for this cycle yet; `high` = confirmed against the official source for the upcoming instance.
+- **Drop or re-date passed one-offs.** An event whose window is in the past should be corrected to its next instance (recurring) or removed.
+- **A quick check-in on catalog health each quarter** — are the next ~6–8 weeks of events all `high`? Any dormant events to prune (e.g. Music Midtown, dropped 2023)?
+- **When a live feed lands** (Ticketmaster spine), this manual cadence applies only to the editorial tentpole layer the APIs miss — the long-tail marquee events (Dragon Con, state fairs) — not the API-fed bulk.
+
+As of 2026-07-25 the catalog is current: the 6 fall-2026 events are `high` (verified); the 6 spring/summer-2027 events are `needs-date-verify` and due for their pass ~Feb–Mar 2027.
+
+---
+
 ## Sources (primary)
 
 - Ticketmaster Discovery API v2 — `developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/`

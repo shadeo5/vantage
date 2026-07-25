@@ -103,10 +103,15 @@
     <p class="lede">How time-bound events (a festival, a state fair, a carnival) live alongside evergreen spots — and how the system reconciles them into one ranked answer to <b>"what should I shoot right now?"</b></p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — events layer</b></span>
-      <span class="tag">Status <b>Design (prototyped)</b></span>
-      <span class="tag">Updated <b>Jul 11, 2026</b></span>
+      <span class="tag">Status <b>App slice implemented (Jul 25, 2026)</b></span>
+      <span class="tag">Updated <b>Jul 25, 2026</b></span>
     </div>
   </header>
+
+  <div class="call blue">
+    <div class="k">Implemented — app slice (Jul 25, 2026)</div>
+    <p>The app now realizes this design: <code>vantage/lib/events.ts</code> (the <code>Opportunity</code> type, the bundled curated catalog, the live/upcoming time-gates, and the <b>Spot adapter</b> — a live event masquerades as a Spot so it rides the existing hero/brief/detail, inheriting its venue spot's imagery per the inherit/override seam in §05). Two surfaces ship: the <b>takeover</b> (§04 — a live event outscores spots and headlines, demoting a co-located venue via the eclipse rule) and a <b>“Coming up”</b> forward shelf (<code>components/ComingUp.tsx</code>). Catalog is <b>bundled + Atlanta-only</b>; the photo-lens gate (§04·5) is applied by curation, not yet an LLM step. <b>Deferred to slice 2:</b> push parity (events into the nudge Edge Function) + a Postgres <code>events</code> table (retiring the bundle) + a live source (Ticketmaster spine, §03).</p>
+  </div>
 
   <!-- 01 -->
   <section>

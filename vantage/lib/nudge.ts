@@ -15,6 +15,7 @@ import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
 import { cloudFactor, skyLabel, type Forecast } from "./weather";
 import type { Genre } from "./gear";
 import type { JournalEntry } from "./journal";
+import { type Opportunity, isLive, eventWindow, eventToSpot } from "./events";
 
 export type Confidence = "high" | "medium" | "low";
 export type NudgeSignal = { key: "light" | "activity" | "gear"; label: string; score: number; detail: string };
@@ -22,7 +23,9 @@ export type NudgeVerdict = {
   go: boolean;              // does tonight clear the bar to nudge?
   score: number;            // 0..1 — the winning spot's combined score
   confidence: Confidence;
-  spot: Spot;               // the pick (best spot even on a quiet night)
+  spot: Spot;               // the pick (best spot even on a quiet night). For an event
+                            // takeover this is the event adapted to a Spot (rides the hero).
+  event?: Opportunity;      // set when a LIVE event took the headline (the eclipse rule)
   signals: NudgeSignal[];   // the winning spot's breakdown — feeds "Why this pick?"
   window: { label: string; start: Date; type: Spot["windowType"] }; // tonight's window, for copy
 };
@@ -126,7 +129,22 @@ const RECENCY_DAYS = 4;   // ...decaying to zero over this many days
 // A day's headline pick, logged on-device (persisted by lib/shownStorage) so the picker
 // can avoid repeating the same hero — see the anti-repeat rule below.
 export type ShownEntry = { spotId: string; at: string }; // at = ISO time it was headlined
-export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null; shownLog?: ShownEntry[] };
+export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null; shownLog?: ShownEntry[]; events?: Opportunity[] };
+
+// --- Event takeover (B4 · the eclipse rule) --------------------------------------
+// A LIVE event ("here now, gone next week") can outrank an evergreen spot for the
+// headline. Its score = the same light×gear fit (via the Spot adapter) PLUS a
+// timeliness/scarcity boost by magnitude — that transience is exactly what makes a
+// great nudge. This isn't a hardcoded "events beat spots": a low-draw event with poor
+// fit can still lose to a strong spot. Only fires while now is inside the event window.
+const EVENT_MAGNITUDE_W: Record<Opportunity["magnitude"], number> = { high: 0.45, medium: 0.28, low: 0.15 };
+
+function scoreEvent(ev: Opportunity, pack: Spot[], now: Date, cameraId: string, lensIds: string[], cloud?: Forecast | null) {
+  const adapted = eventToSpot(ev, pack);
+  const ss = scoreSpot(adapted, now, cameraId, lensIds, cloud);
+  const score = Math.min(1, ss.score + EVENT_MAGNITUDE_W[ev.magnitude]); // scarcity boost, capped
+  return { adapted, ev, ss, score };
+}
 
 // --- Anti-repeat (ADR HERO_ANTI_REPEAT) -----------------------------------------
 // The variety knobs above (day-shuffle + shot-recency) can't dislodge a PERMANENT
@@ -203,10 +221,11 @@ export const MAX_NEAR_YOU = 4;
 // own (a QUALITY GATE — so every spot shown is genuinely worth it, and a quiet night
 // honestly shows fewer or none rather than padding to a fixed count), excluding the
 // hero, capped at MAX_NEAR_YOU.
-export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string, opts?: NudgeOpts): Spot[] {
+export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], exclude: string | string[], opts?: NudgeOpts): Spot[] {
+  const excluded = new Set(Array.isArray(exclude) ? exclude : [exclude]); // hero + any eclipsed venue
   return spots
     .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
-    .filter((s) => s.spot.id !== excludeId && s.base >= GO_THRESHOLD) // gate on real quality
+    .filter((s) => !excluded.has(s.spot.id) && s.base >= GO_THRESHOLD) // gate on real quality
     .sort((a, b) => b.rank - a.rank)                                  // order by the variety-aware rank
     .slice(0, MAX_NEAR_YOU)
     .map((s) => s.spot);
@@ -264,6 +283,33 @@ export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds
   // it's a quiet night with none), fall back to the plain top — an honest repeat, not invented.
   const fresh = scored.find((s) => s.ss.score >= GO_THRESHOLD && !headlinedRecently(s.ss.spot.id, now, opts?.shownLog));
   const top = (fresh ?? scored[0]).ss;
+
+  // Event takeover (eclipse rule): if a LIVE event outscores the best spot, it headlines.
+  // Its adapted Spot rides the existing hero/brief/detail; verdict.event flags it as an event.
+  const live = (opts?.events ?? []).filter((e) => isLive(e, now));
+  let best: ReturnType<typeof scoreEvent> | null = null;
+  for (const ev of live) {
+    const c = scoreEvent(ev, spots, now, cameraId, lensIds, opts?.cloud);
+    if (!best || c.score > best.score) best = c;
+  }
+  if (best && best.score > top.score) {
+    const ev = best.ev;
+    const w = eventWindow(ev);
+    const signals: NudgeSignal[] = [
+      { key: "activity", label: "Happening", score: 1, detail: `${ev.eventType} — on now.` },
+      ...best.ss.signals.filter((s) => s.key !== "activity"), // keep the light + gear rows
+    ];
+    return {
+      go: true,
+      score: best.score,
+      confidence: confidenceFor(best.score),
+      spot: best.adapted,
+      event: ev,
+      signals,
+      window: { label: `${fmtTime(w.start)}–${fmtTime(w.end)}`, start: w.start, type: ev.windowType },
+    };
+  }
+
   const go = top.score >= GO_THRESHOLD; // "worth going out?" reads off REAL quality, not variety
   return {
     go,

@@ -20,7 +20,9 @@ archive/           👉 Superseded / done-with stuff. History, not the plan.
 ## `vantage/` — the app
 The redesigned, nudge-first app (built from the Claude Design handoff v2): **Lock** (notification) → **Today** (gear banner + inspiration hero + "why this pick?" + ranked areas) → **Spot detail** (light-ramp chart + what-to-look-for + gallery) → **Plan** (this-week slate) + **Bag** (gear onboarding), with a bottom tab bar. Curated Atlanta content, live SunCalc light.
 - **Run it:** `cd vantage && npx expo start`, then press `w` for web (phone needs a dev build — store Expo Go is older than SDK 57).
-- **Test it:** `cd vantage && npm test` (unit tests on `lib/light.ts` + `lib/spots.ts`).
+- **Check it:** `cd vantage && npm run check` — the one command: **typecheck + lint + tests** (172 tests). Or `npm test` alone. A pre-commit hook runs this gate and blocks a failing commit; CI (`.github/workflows/ci.yml`) runs it on every PR.
+- **Agents / new contributors:** start at **`vantage/AGENTS.md`** (commands, architecture, conventions) and **`AGENTS.md`** at the repo root (routing). Engineering decisions are indexed in **`docs/engineering/ADRS.md`**.
+- **⚠ The scoring brain lives twice** — `lib/nudge.ts` (app) and `supabase/functions/nudge/index.ts` (Deno push) are hand-mirrored; change scoring in both. `__tests__/parity.test.ts` fails if they drift.
 
 ## `content-pipeline/` — the content generator
 Places (name + coords + genre) → Claude (`claude-opus-4-8`, structured output = the `Spot` shape, voice guide baked in) → reviewable `out/atlanta.json`.

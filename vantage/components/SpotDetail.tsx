@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, fonts, screen } from "../theme";
+import { colors, fonts } from "../theme";
 import { Spot, spotImageSource } from "../lib/spots";
 import { lightStripModel } from "../lib/light";
 import { shootBrief } from "../lib/shootBrief";

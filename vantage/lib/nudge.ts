@@ -8,6 +8,11 @@
 // HONEST about what it knows: with no weather/events wired yet, "light" scores
 // WHEN the good light is (and whether it's already gone), not cloud cover; the
 // activity signal is a placeholder (weight 0) marking where events plug in later.
+//
+// ⚠ MIRRORED IN THE NIGHTLY PUSH. The scoring weights/thresholds/curves below are also
+// hand-written in supabase/functions/nudge/index.ts (Deno) so the push matches the app.
+// If you change a weight, the go bar, REF_FIT, LIGHT_SENSITIVITY, cloudFactor, or the
+// lightTiming buckets, change BOTH files — __tests__/parity.test.ts fails if they drift.
 import { Spot } from "./spots";
 import { getLightWindows, fmtTime, lightPhaseAt, LightWindows } from "./light";
 import { fastestAperture } from "./shootBrief";

@@ -25,6 +25,8 @@ import { BottomNav } from "./components/BottomNav";
 import { LockScreen } from "./components/LockScreen";
 import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
+import { ComingUp } from "./components/ComingUp";
+import { ATLANTA_EVENTS, upcomingEvents, liveEvents, eventToSpot } from "./lib/events";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
@@ -160,7 +162,8 @@ export default function App() {
   // the functional-update `prev`, so it only writes once/day and never loops with the pick.
   useEffect(() => {
     if (!hydrated || spots.length === 0) return;
-    const heroId = tonightNudge(spots, new Date(), cameraId, lenses, { journal, cloud, shownLog }).spot.id;
+    const evs = cityId === "atlanta" ? ATLANTA_EVENTS : [];
+    const heroId = tonightNudge(spots, new Date(), cameraId, lenses, { journal, cloud, shownLog, events: evs }).spot.id;
     setShownLog((prev) => recordShown(prev, heroId, new Date()));
   }, [hydrated, spots, cameraId, lenses, cloud, journal]);
 
@@ -172,11 +175,22 @@ export default function App() {
   const greeting = now.getHours() < 12 ? "good morning" : now.getHours() < 17 ? "good afternoon" : "good evening";
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
-  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud, shownLog });
+  // Events are bundled + Atlanta-only for now — don't surface Atlanta events in Nashville.
+  const cityEvents = cityId === "atlanta" ? ATLANTA_EVENTS : [];
+  const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud, shownLog, events: cityEvents });
   const hero = verdict.spot;
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a
-  // quiet night this comes back short or empty, and the section hides entirely.
-  const nearYou = bestNearYou(spots, now, cameraId, lenses, hero.id, { journal, cloud });
+  // quiet night this comes back short or empty, and the section hides entirely. When a
+  // live event took the headline, also drop its venue spot (eclipse: it's the event's
+  // stage now, not a separate pick).
+  const nearExclude = verdict.event?.venueSpotId ? [hero.id, verdict.event.venueSpotId] : hero.id;
+  const nearYou = bestNearYou(spots, now, cameraId, lenses, nearExclude, { journal, cloud });
+  // Forward-looking events shelf (the value before any takeover fires) — next ~2 months.
+  const upcoming = upcomingEvents(cityEvents, now, { horizonDays: 60, limit: 4 });
+  // A live event that headlines is a Spot only via the adapter — so it isn't in `spots`.
+  // Merge the adapted live events into the pool used to RESOLVE a detail/commitment by id,
+  // or tapping the event hero would fall back to the wrong spot.
+  const resolvePack = [...spots, ...liveEvents(cityEvents, now).map((e) => eventToSpot(e, spots))];
   // Quiet-night fallback (PH5): when nothing clears the go bar, don't blank the screen —
   // surface evergreen after-dark spots instead (only returns anything once it's dark out).
   const inTheDark = nearYou.length === 0 ? goodInTheDark(spots, now, cameraId, lenses, hero.id, { journal, cloud }) : [];
@@ -232,7 +246,7 @@ export default function App() {
     setDueIds((d) => d.filter((id) => id !== spotId));
   };
   const dueCommitment = pending.find((c) => dueIds.includes(c.spotId));
-  const dueSpot = dueCommitment ? findSpot(spots, dueCommitment.spotId) : null;
+  const dueSpot = dueCommitment ? findSpot(resolvePack, dueCommitment.spotId) : null;
 
   return (
     <View style={styles.root}>
@@ -305,6 +319,9 @@ export default function App() {
               </View>
             </>
           )}
+          {/* Coming up (B4): forward-looking events — value in the lead-up, before any
+              live-event takeover fires. Atlanta-only + bundled for this slice. */}
+          <ComingUp events={upcoming} now={now} />
           {shotCount(journal) > 0 && (
             <View style={styles.journalSec}>
               <Text style={styles.secTitle}>Your shoots</Text>
@@ -335,7 +352,7 @@ export default function App() {
       {detailOpen && (
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
-            spot={findSpot(spots, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)} cloud={cloud}
+            spot={findSpot(resolvePack, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)} cloud={cloud}
             cameraId={cameraId} lensIds={lenses}
             onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />

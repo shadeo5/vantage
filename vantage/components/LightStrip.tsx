@@ -1,8 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { colors, fonts } from "../theme";
-import type { LightStripModel } from "../lib/light";
-import type { LightType } from "../lib/light";
+import type { LightStripModel , LightType } from "../lib/light";
 
 // The demoted, phase-honest light module (E9 · PH4, wire Option A). A slim strip — a
 // glanceable phase label + sub, and a mini forward sparkline — instead of the old

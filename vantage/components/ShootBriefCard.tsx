@@ -1,8 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { colors, fonts, radius } from "../theme";
-import type { ShootBrief } from "../lib/shootBrief";
-import type { ReadyLevel } from "../lib/shootBrief";
+import type { ShootBrief , ReadyLevel } from "../lib/shootBrief";
 
 // The honest answer to a quiet night (E8 · CB4): whatever the light, here's whether
 // your kit's up for it and what to shoot. Sits under the hero — where an empty "best

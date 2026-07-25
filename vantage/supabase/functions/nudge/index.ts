@@ -8,6 +8,12 @@
 // Weather-honest (P3 parity): cloud cover tempers the light so the push agrees with the app.
 //
 // Invoke with ?force=1 to send regardless of the go/no-go bar (for testing).
+//
+// ⚠ MIRROR OF THE APP BRAIN. The scoring weights/thresholds/curves below are re-implemented
+// from vantage/lib/{nudge,weather}.ts because Deno can't import the RN app modules. If you
+// change a weight, the go bar, REF_FIT, LIGHT_SENSITIVITY, cloudFactor, or the lightTiming
+// buckets here, change lib/nudge.ts / lib/weather.ts too — vantage/__tests__/parity.test.ts
+// reads both sources and fails the build if they drift out of sync.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import * as SunCalc from "npm:suncalc@2";
 

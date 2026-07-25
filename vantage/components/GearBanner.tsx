@@ -1,7 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, fonts } from "../theme";
+import { fonts } from "../theme";
 
 export function GearBanner({ onAdd, onDismiss }: { onAdd: () => void; onDismiss: () => void }) {
   return (

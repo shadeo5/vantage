@@ -1,0 +1,30 @@
+name: CI
+
+# Runs the app's one-command gate (typecheck + lint + tests) on every PR and on pushes to
+# main. If this is red, the change isn't safe to merge. Keep it fast and boring.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    name: vantage — typecheck · lint · test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vantage
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: vantage/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check (typecheck + lint + test)
+        run: npm run check

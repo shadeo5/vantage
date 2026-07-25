@@ -6,6 +6,18 @@
 
 ---
 
+## DX · Agentic-development readiness  ✅ (2026-07-25)
+Made the repo safe and fast for an AI agent (or a new contributor) to work in — closing the two gaps an agent leans on hardest: a way in, and a way to check its work. From an audit that scored the repo 5.8/10 (bones strong, front door thin, one drift landmine). **What shipped:**
+- **Parity guard for the two-headed brain** (the P0). The scoring brain is hand-mirrored across `lib/nudge.ts` (app) + `supabase/functions/nudge/index.ts` (Deno push); nothing checked they agreed, so a weight changed in one place would silently make the push disagree with the app. New `__tests__/parity.test.ts` reads both sources and fails if the weights, go bar, `REF_FIT`, `LIGHT_SENSITIVITY`, `cloudFactor`, or `lightTiming` buckets drift. ⚠ banners added to both files.
+- **A real agent front door.** `vantage/AGENTS.md` rewritten (commands, architecture map, the two-brain warning, conventions, doc links); new root `AGENTS.md` + `CLAUDE.md` that route to the right place; `docs/engineering/ADRS.md` index so the ADRs are discoverable.
+- **One-command gate + CI.** New `npm run check` (typecheck + lint + test). `npm run typecheck` (`tsc --noEmit`) is now green **across source *and* tests** for the first time (fixed a missing `types: [jest, node]` in tsconfig — tests had never been type-checked). New `.github/workflows/ci.yml` runs `check` on every PR + push to main.
+- **ESLint/Prettier** via `eslint-config-expo` (SDK 57 flat config). Green (0 errors). Deno function is ignored (its runtime); the web-DOM apostrophe rule is off (RN `<Text>` is fine, and the app is copy-heavy).
+- **Pre-commit hook upgraded from reminder → gate** (`.claude/hooks/precommit-check.sh`): runs `npm run check` and blocks a failing commit, with a `--no-verify` / `[skip-check]` escape hatch and a graceful skip on a fresh clone.
+
+**Follow-up (⬜, not blocking):** 18 lint **warnings** remain, mostly `react-hooks/refs` on the idiomatic `useRef(new Animated.Value()).current` animation pattern (shipped, tested, not bugs — the new React-Compiler-era rule is strict about it) plus one `set-state-in-effect` in `App.tsx`'s shown-log effect and a few `no-require-imports` in tests. Downgraded to warnings so they're visible guidance, not a blocker; revisit if we adopt the React Compiler.
+
+---
+
 ## Fix · Hero anti-repeat  ✅ (2026-07-18) — ADR `docs/engineering/HERO_ANTI_REPEAT.md`
 **User report:** Today kept headlining the same spot (the "Look At Them Look At Us" mural) every day. **Root cause:** a side-effect of CB7 — a flat-light *street* spot scores a **permanent ~0.96** (street is light-flexible × flat = usable all day), so it wins any daytime check; the day-shuffle (±0.10) can't overcome its lead and the shot-recency penalty only fires if you actually *shot* it, not if you're merely *shown* it. **Fix (a rule, not a weight):** an on-device **shown-log** (`lib/shownStorage.ts`) records the day's hero; `tonightNudge` now skips a spot headlined in the last `HERO_COOLDOWN_DAYS (2)` days **as long as another spot clears the go bar** (else an honest repeat). Only prior days count, so the pick is stable within a day (no feedback loop). Yesterday's hero drops into "best near you," so the headline cycles. `App.tsx` wired (load/save + a record effect). 148 tests (+12). Type-clean. **Deferred (deeper):** whether a flat all-day spot should *structurally* outrank time-specific windows — a scoring recalibration that overlaps CB6.
 

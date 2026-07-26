@@ -2,6 +2,10 @@ import { lightTiming, gearFitScore, tonightNudge, bestNearYou, goodInTheDark, MA
 import { FALLBACK_SPOTS as SPOTS, type Spot } from "../lib/spots";
 import { getLightWindows } from "../lib/light";
 import { ATLANTA_EVENTS } from "../lib/events";
+import type { LensSpec } from "../lib/gear";
+
+// A generic prime descriptor helper for the tests.
+const L = (min: number, ap: number, extra: Partial<LensSpec> = {}): LensSpec => ({ minFocal: min, maxFocal: min, maxAperture: ap, ...extra });
 
 describe("lightTiming", () => {
   // All times same-day / same-zone, so comparisons are timezone-independent.
@@ -45,7 +49,7 @@ describe("phaseScore — genre-dependent light (CB7)", () => {
   test("the old landscape bias is gone: a flat street spot outscores a flat landscape spot on light", () => {
     // Same window, same weather — only the genre differs. Street should win on the light term.
     const now = new Date(2026, 6, 13, 20, 30, 0);
-    const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+    const cam = "fuji-x100vi", kit = [L(35, 1.8)];
     const flatSpot = (id: string, genre: "Street" | "Landscape"): Spot => ({
       ...SPOTS[0], id, name: id, genre, genres: [genre], type: genre, windowType: "flat",
     });
@@ -58,7 +62,7 @@ describe("phaseScore — genre-dependent light (CB7)", () => {
 describe("weather tempers the verdict (P3)", () => {
   // A prime golden evening: window live, so light leads the score.
   const now = new Date(2026, 6, 13, 20, 30, 0);
-  const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+  const cam = "fuji-x100vi", kit = [L(35, 1.8)];
   const overcast = { fetchedAt: 0, cloudAt: () => 1, rainAt: () => 0, wetAt: () => false };
   const clear = { fetchedAt: 0, cloudAt: () => 0, rainAt: () => 0, wetAt: () => false };
 
@@ -82,21 +86,21 @@ describe("weather tempers the verdict (P3)", () => {
 });
 
 describe("gearFitScore", () => {
-  const cam = "fuji-x100vi";
-  test("a dedicated lens for the genre scores highest", () => {
-    expect(gearFitScore(cam, ["sony-fe35-18"], "Street")).toBe(1.0);
+  const ILC = "sony-a7-iv"; // interchangeable full-frame
+  test("a lens that covers the genre → full fit", () => {
+    expect(gearFitScore(ILC, [L(35, 1.8)], "Street")).toBe(1.0);
   });
-  test("falling back to the body scores lower (but not a stretch)", () => {
-    // A 70-200 doesn't cover Street, so the street-capable X100VI body carries it.
-    expect(gearFitScore(cam, ["sony-fe-70-200-28gm2"], "Street")).toBe(0.7);
+  test("a fixed-lens body's built-in lens that covers the genre → full fit", () => {
+    expect(gearFitScore("fuji-x100vi", [], "Street")).toBe(1.0); // X100VI 35mm covers Street
   });
   test("a genre nothing in the kit covers is a stretch", () => {
-    expect(gearFitScore(cam, ["sony-fe90-macro"], "Wildlife")).toBe(0.35);
+    expect(gearFitScore(ILC, [{ minFocal: 70, maxFocal: 200, maxAperture: 2.8 }], "Street")).toBe(0.35);
+    expect(gearFitScore(ILC, [L(90, 2.8, { macro: true })], "Wildlife")).toBe(0.35);
   });
 });
 
 describe("tonightNudge", () => {
-  const v = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
+  const v = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", [L(35, 1.8)]);
 
   test("returns a real spot and the Why-signals in order (no unbuilt Activity row)", () => {
     expect(SPOTS.some((s) => s.id === v.spot.id)).toBe(true);
@@ -117,7 +121,7 @@ describe("tonightNudge", () => {
   });
   test("picks the highest-scoring spot (deterministic for a fixed input)", () => {
     // Re-running with the same inputs yields the same pick — no hidden randomness.
-    const again = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", ["sony-fe35-18"]);
+    const again = tonightNudge(SPOTS, new Date(2026, 6, 13, 19, 0, 0), "fuji-x100vi", [L(35, 1.8)]);
     expect(again.spot.id).toBe(v.spot.id);
     expect(again.score).toBe(v.score);
   });
@@ -125,7 +129,7 @@ describe("tonightNudge", () => {
 
 describe("bestNearYou (capped, quality-gated)", () => {
   const cam = "fuji-x100vi";
-  const kit = ["sony-fe35-18"];
+  const kit = [L(35, 1.8)];
   const now = new Date(2026, 6, 13, 19, 0, 0);
 
   test("caps at MAX_NEAR_YOU and excludes the hero, even when many spots clear", () => {
@@ -184,7 +188,7 @@ describe("bestNearYou (capped, quality-gated)", () => {
 
 describe("goodInTheDark (PH5 — the quiet-night, after-dark shelf)", () => {
   const cam = "fuji-x100vi";
-  const kit = ["sony-fe35-18"];
+  const kit = [L(35, 1.8)];
   const anchor = SPOTS[0];
   // Derive dark vs. daylight moments from the computed windows (timezone-robust).
   const w = getLightWindows(new Date(2026, 6, 13, 12, 0, 0), anchor.lat, anchor.lon);
@@ -220,7 +224,7 @@ describe("goodInTheDark (PH5 — the quiet-night, after-dark shelf)", () => {
 
 describe("variety (no repeating the same spot every night)", () => {
   const cam = "fuji-x100vi";
-  const kit = ["sony-fe35-18"];
+  const kit = [L(35, 1.8)];
   const golden = SPOTS.find((s) => s.windowType === "golden")!;
 
   test("is stable within a day (no jitter on re-render)", () => {
@@ -263,7 +267,7 @@ describe("variety (no repeating the same spot every night)", () => {
 
 describe("anti-repeat hero (ADR HERO_ANTI_REPEAT)", () => {
   const cam = "fuji-x100vi";
-  const kit = ["sony-fe35-18"];
+  const kit = [L(35, 1.8)];
   // Two always-on flat-light street spots — both score ~0.96 and clear the go bar at any
   // hour, the exact case (a permanent frontrunner) the day-shuffle can't dislodge.
   const flatStreet = (id: string): Spot => ({ ...SPOTS[0], id, name: id, genre: "Street", genres: ["Street"], type: "Street", windowType: "flat" });
@@ -308,7 +312,7 @@ describe("anti-repeat hero (ADR HERO_ANTI_REPEAT)", () => {
 });
 
 describe("event takeover (B4 · eclipse rule)", () => {
-  const cam = "fuji-x100vi", kit = ["sony-fe35-18"];
+  const cam = "fuji-x100vi", kit = [L(35, 1.8)];
   // Live events pulled from the real bundled catalog.
   const dragonLive = new Date(2026, 8, 5, 11, 0);   // mid Dragon Con (10am–1pm Sep 5)
   const prideLive = new Date(2026, 9, 10, 12, 0);   // Pride (venue: piedmont)

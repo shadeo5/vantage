@@ -28,8 +28,9 @@ import { PlanScreen } from "./components/PlanScreen";
 import { ComingUp } from "./components/ComingUp";
 import { ATLANTA_EVENTS, upcomingEvents, liveEvents, eventToSpot, type Opportunity } from "./lib/events";
 import { fetchEvents } from "./lib/eventPack";
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
-import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
+import { DEFAULT_CAMERA_ID, DEFAULT_LENSES, LENS_PRESETS, kitGenres, primaryLensLabel, bestLensForGenre, specKey } from "./lib/gearProfile";
+import { getCamera, type LensSpec } from "./lib/gear";
+import { loadLenses, saveLenses, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
 import { tonightNudge, bestNearYou, goodInTheDark, type ShownEntry } from "./lib/nudge";
 import { loadShown, saveShown, recordShown } from "./lib/shownStorage";
@@ -69,7 +70,7 @@ export default function App() {
   const [saved, setSaved] = useState<string[]>(["piedmont"]);
   const [gearBanner, setGearBanner] = useState(true);
   const [whyOpen, setWhyOpen] = useState(false);
-  const [lenses, setLenses] = useState<string[]>(DEFAULT_LENS_IDS);
+  const [lenses, setLenses] = useState<LensSpec[]>(DEFAULT_LENSES);
   const [cameraId, setCameraId] = useState<string>(DEFAULT_CAMERA_ID);
   const [styleOpen, setStyleOpen] = useState(false);
   const [stylePick, setStylePick] = useState<string | null>(null);
@@ -133,8 +134,8 @@ export default function App() {
 
   // Load the saved profile + journal once on launch, then persist on every change (G1/N4).
   useEffect(() => {
-    Promise.all([loadLensIds(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId(), loadShown()]).then(([ids, cam, pend, log, savedIds, savedCity, shown]) => {
-      if (ids) setLenses(ids);
+    Promise.all([loadLenses(), loadCameraId(), loadPending(), loadJournal(), loadSavedIds(), loadCityId(), loadShown()]).then(([savedLenses, cam, pend, log, savedIds, savedCity, shown]) => {
+      if (savedLenses) setLenses(savedLenses);
       if (cam) setCameraId(cam);
       setPending(pend);
       setJournal(log);
@@ -147,7 +148,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (hydrated) {
-      saveLensIds(lenses);
+      saveLenses(lenses);
       saveCameraId(cameraId);
       savePending(pending);
       saveJournal(journal);
@@ -219,8 +220,9 @@ export default function App() {
   const blueStart = fmtTime(windows.blueEvening.start);
   const windowTimeFor = (t: string) => (t === "blue" ? blueStart : goldenStart);
 
+  const cam = getCamera(cameraId);
   // Lens to name in the lede — the one that actually fits the hero's genre.
-  const gearLens = bestLensForGenre(cameraId, lenses, hero.genre) ?? primaryLensLabel(lenses);
+  const gearLens = bestLensForGenre(cameraId, lenses, hero.genre) ?? primaryLensLabel(cameraId, lenses);
   // Fresh, personal push copy for the lock screen (N3).
   const lockCopy = nudgeCopy(verdict, gearLens, now);
 
@@ -236,7 +238,12 @@ export default function App() {
     setter((arr) => (arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]));
   const toggleGoing = toggle(setGoing);
   const toggleSaved = toggle(setSaved);
-  const toggleLens = toggle(setLenses);
+  // Lenses are descriptors, toggled/removed by their spec key (not an id).
+  const toggleLensSpec = (spec: LensSpec) =>
+    setLenses((arr) => (arr.some((s) => specKey(s) === specKey(spec)) ? arr.filter((s) => specKey(s) !== specKey(spec)) : [...arr, spec]));
+  const addLens = (spec: LensSpec) =>
+    setLenses((arr) => (arr.some((s) => specKey(s) === specKey(spec)) ? arr : [...arr, spec]));
+  const removeLens = (spec: LensSpec) => setLenses((arr) => arr.filter((s) => specKey(s) !== specKey(spec)));
   const openDetail = (id: string) => { setOpenId(id); setDetailOpen(true); };
 
   // Display name for the current city (from the fetched list; falls back to the slug).
@@ -274,7 +281,7 @@ export default function App() {
         {/* Today */}
         <ScrollView style={{ width, height }} contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
           {dueSpot && <CheckInCard spotName={dueSpot.name} onWent={() => checkIn(dueSpot.id, true)} onSkipped={() => checkIn(dueSpot.id, false)} />}
-          {gearBanner && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
+          {gearBanner && !cam.fixedLens && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
               <Text style={styles.eyebrow}>{`${now.toLocaleDateString("en-US", { weekday: "short" })} · ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })} · ${greeting}`.toUpperCase()}</Text>
@@ -341,16 +348,19 @@ export default function App() {
 
         {/* Plan */}
         <View style={{ width, height }}>
-          <PlanScreen spots={spots} going={going} cameraId={cameraId} lensIds={lenses} windowTimeFor={windowTimeFor} onOpen={openDetail} onToggleGoing={commit} />
+          <PlanScreen spots={spots} going={going} cameraId={cameraId} lenses={lenses} windowTimeFor={windowTimeFor} onOpen={openDetail} onToggleGoing={commit} />
         </View>
 
         {/* Bag */}
         <View style={{ width, height }}>
           <BagScreen
             cameraId={cameraId} onPickCamera={(id) => { tapFeedback(); setCameraId(id); }}
-            lensChips={LENS_CHIPS} selectedLensIds={lenses} kitGenres={kitGenres(cameraId, lenses)}
+            lenses={lenses} kitGenres={kitGenres(cameraId, lenses)}
+            onToggleLens={(spec) => { tapFeedback(); toggleLensSpec(spec); }}
+            onAddLens={(spec) => { tapFeedback(); addLens(spec); }}
+            onRemoveLens={(spec) => { tapFeedback(); removeLens(spec); }}
             styleOpen={styleOpen} stylePick={stylePick}
-            onToggleLens={(id) => { tapFeedback(); toggleLens(id); }} onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={(s) => { tapFeedback(); setStylePick(s); }}
+            onToggleStyle={() => setStyleOpen((v) => !v)} onPickStyle={(s) => { tapFeedback(); setStylePick(s); }}
           />
         </View>
       </ScrollView>
@@ -362,7 +372,7 @@ export default function App() {
         <View style={StyleSheet.absoluteFill}>
           <SpotDetail
             spot={findSpot(resolvePack, openId)} isGoing={going.includes(openId)} isSaved={saved.includes(openId)} cloud={cloud}
-            cameraId={cameraId} lensIds={lenses}
+            cameraId={cameraId} lenses={lenses}
             onBack={() => setDetailOpen(false)} onToggleGoing={() => { commitFeedback(); toggleGoing(openId); }} onToggleSaved={() => { tapFeedback(); toggleSaved(openId); }}
           />
         </View>

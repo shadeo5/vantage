@@ -11,9 +11,17 @@ create table if not exists public.profiles (
   push_token  text,
   timezone    text,
   camera_id   text,
-  lens_ids    text[] not null default '{}',
+  -- Lenses are GENERIC descriptors {minFocal,maxFocal,maxAperture,macro?} (gear overhaul);
+  -- the push reads them directly, no catalog lookup.
+  lenses      jsonb not null default '[]',
   updated_at  timestamptz not null default now()
 );
+
+-- Migration for existing deployments (idempotent): the profile lens column moved from a
+-- text[] of catalog ids (lens_ids) to a jsonb array of generic descriptors (lenses). The
+-- app re-syncs the active kit on launch, so old lens_ids can be dropped safely.
+alter table public.profiles add column if not exists lenses jsonb not null default '[]';
+alter table public.profiles drop column if exists lens_ids;
 
 alter table public.profiles enable row level security;
 
@@ -88,6 +96,8 @@ create table if not exists public.events (
   event_type        text,                          -- display label: "Costume parade / spectacle"
   genres            text[] not null default '{}',  -- photo genres, primary first
   neighborhood      text,
+  lat               double precision,
+  lon               double precision,
   venue_spot_id     text,                          -- soft ref to a spot id (no FK: matches the
                                                    -- app's pack.find lookup; null for standalone)
   recurrence        text,                          -- human-readable ("Second weekend of April")

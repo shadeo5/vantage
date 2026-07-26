@@ -20,6 +20,7 @@ import * as path from "path";
 
 const APP_NUDGE = read("lib/nudge.ts");
 const APP_WEATHER = read("lib/weather.ts");
+const APP_GEAR = read("lib/gear.ts");
 const PUSH = read("supabase/functions/nudge/index.ts");
 
 function read(rel: string): string {
@@ -95,5 +96,39 @@ describe("app brain ⟷ push brain parity (lib/nudge.ts + lib/weather.ts ⟷ sup
 
   test("lightTiming buckets (happening / imminent / later / gone) match", () => {
     expect(fnNumbers(PUSH, "lightTiming")).toBe(fnNumbers(APP_NUDGE, "lightTiming"));
+  });
+});
+
+// The GEAR catalog + matching also live in two runtimes: the app authors the camera
+// catalog (lib/cameras.catalog.json) and matches on it; the push reads a GENERATED copy
+// (cameras.gen.ts, via content-pipeline/build-gear.mjs). These guards fail if the JSON
+// was edited without re-running the generator, or if a matching threshold drifts.
+describe("gear catalog + matching parity (lib/cameras.catalog.json ⟷ cameras.gen.ts, lib/gear.ts ⟷ push)", () => {
+  const CATALOG = (JSON.parse(read("lib/cameras.catalog.json")) as { cameras: any[] }).cameras;
+  const GEN = read("supabase/functions/nudge/cameras.gen.ts");
+
+  // Normalize both to `id=crop:min/max/ap` rows (fixedLens "-" when absent).
+  const catalogMap = (cams: any[]) =>
+    cams.map((c) => `${c.id}=${c.cropFactor}:${c.fixedLens ? `${c.fixedLens.minFocal}/${c.fixedLens.maxFocal}/${c.fixedLens.maxAperture}` : "-"}`).sort().join(",");
+  const genMap = (src: string) =>
+    [...src.matchAll(/"([\w-]+)":\s*\{\s*id:\s*"[\w-]+",\s*model:\s*(?:"[^"]*"|[^,]+),\s*cropFactor:\s*([0-9.]+)(?:,\s*fixedLens:\s*\{\s*minFocal:\s*([0-9.]+),\s*maxFocal:\s*([0-9.]+),\s*maxAperture:\s*([0-9.]+)\s*\})?\s*\}/g)]
+      .map((m) => `${m[1]}=${Number(m[2])}:${m[3] !== undefined ? `${Number(m[3])}/${Number(m[4])}/${Number(m[5])}` : "-"}`).sort().join(",");
+
+  test("the generated push camera catalog matches the authored JSON (re-run build-gear.mjs)", () => {
+    const gen = genMap(GEN);
+    expect(gen).not.toBe(""); // extractor sanity
+    expect(gen).toBe(catalogMap(CATALOG));
+  });
+
+  test("FAST aperture threshold matches", () => {
+    expect(scalar(PUSH, "FAST")).toBe(scalar(APP_GEAR, "FAST"));
+  });
+
+  test("classifyFocal genre thresholds match", () => {
+    expect(fnNumbers(PUSH, "classifyFocal")).toBe(fnNumbers(APP_GEAR, "classifyFocal"));
+  });
+
+  test("gearFitScore literals match", () => {
+    expect(fnNumbers(PUSH, "gearFitScore")).toBe(fnNumbers(APP_NUDGE, "gearFitScore"));
   });
 });

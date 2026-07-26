@@ -15,7 +15,7 @@ type PlanMeta = { id: string; when: When; tag: string; reason: string };
 const PLAN: PlanMeta[] = [
   { id: "sweetauburn", when: { offset: 0 }, tag: "The light", reason: "Golden light straight down Auburn Ave." },
   { id: "krog", when: { dow: 0 }, tag: "The crowd", reason: "The Sunday market crowd fills the strip." },
-  { id: "jackson", when: { offset: 3 }, tag: "The light", reason: "Clear skies line up behind the towers." },
+  { id: "jackson", when: { offset: 3 }, tag: "The view", reason: "The downtown skyline stacks up behind the interstate." },
   { id: "ponce", when: { dow: 5 }, tag: "Happening", reason: "BeltLine art walk after work." },
 ];
 const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);

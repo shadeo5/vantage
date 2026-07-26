@@ -15,7 +15,6 @@ export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank:
         <Text style={styles.reason} numberOfLines={1}>{spot.reason}</Text>
         <View style={styles.meta}>
           <Text style={[styles.window, { color: wm.color }]}>{wm.icon} {wm.label} · {windowTime}</Text>
-          {spot.distance ? <Text style={styles.dist}>{spot.distance}</Text> : null}
         </View>
       </View>
     </Pressable>
@@ -33,5 +32,4 @@ const styles = StyleSheet.create({
   reason: { color: colors.muted3, fontFamily: fonts.sans, fontSize: 13, marginTop: 2 },
   meta: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 7 },
   window: { fontFamily: fonts.sansSemi, fontSize: 12 },
-  dist: { color: colors.muted, fontFamily: fonts.sans, fontSize: 12 },
 });

@@ -21,7 +21,6 @@ export type Spot = {
   genre: Genre;       // the matching genre (primary), for gear-fit checks
   genres?: Genre[];   // multi-genre, primary first (from the DB `genres text[]`)
   windowType: WindowType;
-  distance?: string;  // only the bundled core carries this; DB spots have no GPS yet
   reason: string;      // one-line for list rows
   tagline: string;     // under the detail title
   why: string;
@@ -67,7 +66,7 @@ export const HERO_ID = "sweetauburn";
 export const FALLBACK_SPOTS: Spot[] = [
   {
     id: "sweetauburn", name: "Sweet Auburn", type: "Street", genre: "Street", windowType: "golden",
-    distance: "6 min", reason: "Historic district, alive at dusk",
+    reason: "Historic district, alive at dusk",
     tagline: "Historic district · street & portraits",
     why: "The heart of Atlanta's historic Black business district hums on a warm evening — market stalls, front-porch talk, and low sun raking down Auburn Avenue. It's a street room where everyone's a little more open.",
     look: [
@@ -76,12 +75,12 @@ export const FALLBACK_SPOTS: Spot[] = [
       "The old marquee signs catch the last warm light near 8:20.",
     ],
     img: "sweetauburn",
-    getting: "6 min drive · evening street parking on Edgewood · MARTA King Memorial, a short walk.",
+    getting: "Evening street parking on Edgewood · MARTA King Memorial, a short walk.",
     lat: 33.7550, lon: -84.3720,
   },
   {
     id: "krog", name: "Krog Street Tunnel", type: "Street art", genre: "Street", windowType: "blue",
-    distance: "9 min", reason: "Neon and spray paint after dark",
+    reason: "Neon and spray paint after dark",
     tagline: "Ever-changing murals · night color",
     why: "A quarter-mile of layered graffiti that repaints itself weekly. As blue hour settles, the tunnel lights turn the walls electric and the color balance falls right into place.",
     look: [
@@ -90,12 +89,12 @@ export const FALLBACK_SPOTS: Spot[] = [
       "Puddles after rain double the color underfoot.",
     ],
     img: "krog",
-    getting: "9 min drive · park at Krog Street Market · tunnel is a 2-min walk north.",
+    getting: "Park at Krog Street Market · tunnel is a short walk north.",
     lat: 33.7540, lon: -84.3620,
   },
   {
     id: "jackson", name: "Jackson Street Bridge", type: "Cityscape", genre: "Architecture", windowType: "golden",
-    distance: "12 min", reason: "The skyline shot, glowing",
+    reason: "The skyline shot, glowing",
     tagline: "The classic downtown view",
     why: "Atlanta's postcard: the full downtown skyline stacked behind the interstate, warm light on glass and taillights streaking below. Simple, and it never misses.",
     look: [
@@ -104,12 +103,12 @@ export const FALLBACK_SPOTS: Spot[] = [
       "Step to the north rail for a cleaner foreground.",
     ],
     img: "jackson",
-    getting: "12 min drive · limited street parking — arrive early · sidewalk shooting only, mind traffic.",
+    getting: "Limited street parking — arrive early · sidewalk shooting only, mind traffic.",
     lat: 33.7545, lon: -84.3710,
   },
   {
     id: "piedmont", name: "Piedmont Park", type: "Nature", genre: "Nature", windowType: "golden",
-    distance: "8 min", reason: "Open sky over Midtown",
+    reason: "Open sky over Midtown",
     tagline: "Meadow foreground · Midtown backdrop",
     why: "Oak Hill's open lawn gives you an unobstructed western sky with the Midtown towers as a backdrop — golden grass in front, glowing glass behind.",
     look: [
@@ -118,12 +117,12 @@ export const FALLBACK_SPOTS: Spot[] = [
       "The lake mirrors the skyline once the wind drops.",
     ],
     img: "piedmont",
-    getting: "8 min drive · park at 12th & Piedmont · Oak Hill is a 6-min walk in.",
+    getting: "Park at 12th & Piedmont · Oak Hill is a short walk in.",
     lat: 33.7850, lon: -84.3730,
   },
   {
     id: "ponce", name: "Ponce City Market Roof", type: "Cityscape", genre: "Architecture", windowType: "blue",
-    distance: "11 min", reason: "Rooftops and bridges light up",
+    reason: "Rooftops and bridges light up",
     tagline: "Elevated blue-hour panorama",
     why: "From the roof the whole east side spreads out — the BeltLine, distant downtown, and a sky that deepens to cobalt as the city switches its lights on.",
     look: [
@@ -132,7 +131,7 @@ export const FALLBACK_SPOTS: Spot[] = [
       "Steady the camera on the rail for the long blue-hour frames.",
     ],
     img: "ponce",
-    getting: "11 min drive · rooftop entry via the elevator · check posted rooftop hours.",
+    getting: "Rooftop entry via the elevator · check posted rooftop hours.",
     lat: 33.7720, lon: -84.3650,
   },
 ];

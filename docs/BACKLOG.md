@@ -27,6 +27,8 @@
 - **App reader** `lib/eventPack.ts` (`fetchEvents` + `rowToOpportunity`) — mirrors `lib/cityPack.ts`; DB read with **bundled `ATLANTA_EVENTS` fallback** on any error/empty/throw. Kept separate from `lib/events.ts` so that module stays free of the Supabase client. `App.tsx` loads events into state per city.
 - **178 tests** (+6, `__tests__/eventPack.test.ts` — the mapper + fallback, Supabase mocked). `npm run check` green.
 
+**Fix (2026-07-25):** the first cut SELECTed `lat`/`lon` but the `events` table + seed omitted them, so every DB read errored and silently fell back to the bundle (caught by running the app — the console showed `column events.lat does not exist`). Added `lat`/`lon` to the table (`schema.sql`) and the seed generator, and a **schema-drift guard test** that asserts every column `eventPack` SELECTs exists in the `events` table — so a reader/schema mismatch fails `npm run check` instead of silently degrading to the fallback.
+
 **To go live:** run the `events` DDL (schema.sql) + `events_seed.sql` in the Supabase SQL editor. Until then the app uses the bundled fallback (no breakage). After that, edit events in the dashboard → live on next app load, no release. **Next (Phase 2, ⬜):** teach the nightly push Edge Function to read the same `events` table (so the buzz can headline a live event), guarded by extending `parity.test.ts` — see the plan; touches the live push, so verify with a `?force=1` test invoke.
 
 ---

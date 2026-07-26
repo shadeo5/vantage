@@ -33,6 +33,12 @@ export const radius = { card: 20, chip: 20, pill: 999 };
 
 export const screen = { padTop: 64, padSide: 20, padBottom: 40 };
 
+// Cap for OS font-scaling on compact chrome (badges, tab labels, pills) that must
+// stay a single line inside a fixed footprint — lets the text grow with the user's
+// accessibility text size, but not so far it clips or wraps out of its container.
+// Reading text (bodies, titles in scrollable content) is left uncapped on purpose.
+export const MAX_FONT_SCALE = 1.3;
+
 // Tonal gradients used behind photo-less area cards (varied by index).
 export const cardGradients: [string, string][] = [
   ["#3a2a18", "#1c1610"],

@@ -46,8 +46,8 @@ export function SpotDetail({
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
-            <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back" style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.14)", borderless: true, radius: 24 }}><Text style={styles.circleGlyph}>‹</Text></Pressable>
-            <Pressable onPress={onToggleSaved} accessibilityRole="button" accessibilityLabel={isSaved ? `Saved — remove ${spot.name} from saved` : `Save ${spot.name}`} accessibilityState={{ selected: isSaved }} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(224,122,139,0.24)", borderless: true, radius: 24 }}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]}>{isSaved ? "♥" : "♡"}</Text></Pressable>
+            <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back" style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.14)", borderless: true, radius: 24 }}><Text style={styles.circleGlyph} allowFontScaling={false}>‹</Text></Pressable>
+            <Pressable onPress={onToggleSaved} accessibilityRole="button" accessibilityLabel={isSaved ? `Saved — remove ${spot.name} from saved` : `Save ${spot.name}`} accessibilityState={{ selected: isSaved }} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(224,122,139,0.24)", borderless: true, radius: 24 }}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]} allowFontScaling={false}>{isSaved ? "♥" : "♡"}</Text></Pressable>
           </View>
           <View style={styles.heroBottom}>
             <View style={styles.heroChips}>
@@ -72,14 +72,14 @@ export function SpotDetail({
           <View style={{ gap: 14, marginBottom: 30 }}>
             {spot.look.map((t, i) => (
               <View key={i} style={styles.lookRow}>
-                <View style={styles.lookNum}><Text style={styles.lookNumTxt}>{i + 1}</Text></View>
+                <View style={styles.lookNum}><Text style={styles.lookNumTxt} allowFontScaling={false}>{i + 1}</Text></View>
                 <Text style={styles.lookText}>{t}</Text>
               </View>
             ))}
           </View>
 
           <View style={styles.getting}>
-            <Text style={styles.gArrow}>➤</Text>
+            <Text style={styles.gArrow} allowFontScaling={false}>➤</Text>
             <View style={{ flex: 1 }}>
               <Text style={styles.gLabel}>GETTING THERE</Text>
               <Text style={styles.gText}>{spot.getting}</Text>
@@ -99,7 +99,7 @@ export function SpotDetail({
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.canvas },
-  hero: { height: 340, justifyContent: "space-between", paddingHorizontal: 18, paddingBottom: 18 },
+  hero: { minHeight: 340, justifyContent: "space-between", paddingHorizontal: 18, paddingBottom: 18 },
   heroTop: { flexDirection: "row", justifyContent: "space-between" },
   circle: { width: 38, height: 38, borderRadius: 19, backgroundColor: "rgba(10,9,11,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)", justifyContent: "center", alignItems: "center" },
   circlePressed: { opacity: 0.6, transform: [{ scale: 0.92 }] },

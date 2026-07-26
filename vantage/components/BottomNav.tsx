@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Line, Rect, Path } from "react-native-svg";
-import { colors, fonts } from "../theme";
+import { colors, fonts, MAX_FONT_SCALE } from "../theme";
 import { safeBottom } from "../lib/safeArea";
 
 type Tab = "today" | "plan" | "bag";
@@ -34,7 +34,7 @@ function Item({ label, active, onPress, icon: Icon }: { label: string; active: b
       hitSlop={8}
     >
       <View style={[styles.iconWrap, active && styles.iconWrapActive]}>{Icon(color)}</View>
-      <Text style={[styles.label, { color }]}>{label}</Text>
+      <Text style={[styles.label, { color }]} numberOfLines={1} maxFontSizeMultiplier={MAX_FONT_SCALE}>{label}</Text>
     </Pressable>
   );
 }

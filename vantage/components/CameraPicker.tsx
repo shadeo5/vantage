@@ -28,7 +28,7 @@ export function CameraPicker({
   }, [query]);
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           <View style={styles.header}>
@@ -50,6 +50,7 @@ export function CameraPicker({
             sections={sections}
             keyExtractor={(c) => c.id}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
             stickySectionHeadersEnabled={false}
             contentContainerStyle={{ paddingBottom: 24 }}
             ListEmptyComponent={<Text style={styles.empty}>No match — try a model name.</Text>}
@@ -78,8 +79,12 @@ export function CameraPicker({
 }
 
 const styles = StyleSheet.create({
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: colors.canvas, borderTopLeftRadius: 22, borderTopRightRadius: 22, maxHeight: "88%", paddingHorizontal: screen.padSide, paddingTop: 18 },
+  // Full-height sheet (a peek of dimmed backdrop at the very top): the search pins to the
+  // top so the soft keyboard never covers it, and the results list fills the whole screen
+  // above the keyboard (dismiss-on-drag reveals the rest). Avoids the bottom-sheet + keyboard
+  // clash where the keyboard ate the list.
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)", paddingTop: 48 },
+  sheet: { flex: 1, backgroundColor: colors.canvas, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: screen.padSide, paddingTop: 18 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 24 },
   close: { color: colors.golden, fontFamily: fonts.sansSemi, fontSize: 15 },

@@ -69,8 +69,11 @@ export function cameraMeta(cam: Camera): string {
 }
 
 // Genres a kit (one camera + its generic lenses) can cover — the matcher on the real kit.
+// A fixed-lens body's kit IS its built-in lens: separate lenses (perhaps lingering from a
+// previous ILC selection) don't physically apply, so they must not pollute the coverage.
 export function kitGenres(cameraId: string, lenses: LensSpec[]): Genre[] {
-  return genresForKit([getCamera(cameraId)], lenses);
+  const cam = getCamera(cameraId);
+  return genresForKit([cam], cam.fixedLens ? [] : lenses);
 }
 
 // A short label for the kit's primary lens — the fixed built-in for a compact, else the

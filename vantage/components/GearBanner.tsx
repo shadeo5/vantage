@@ -10,7 +10,7 @@ export function GearBanner({ onAdd, onDismiss }: { onAdd: () => void; onDismiss:
         <Text style={styles.title}>Personalize your picks →</Text>
         <Text style={styles.sub}>Add your camera + lenses so we match shoots to your kit.</Text>
       </Pressable>
-      <Pressable style={styles.x} onPress={onDismiss} hitSlop={8} accessibilityRole="button" accessibilityLabel="Dismiss"><Text style={styles.xText}>×</Text></Pressable>
+      <Pressable style={styles.x} onPress={onDismiss} hitSlop={8} accessibilityRole="button" accessibilityLabel="Dismiss"><Text style={styles.xText} allowFontScaling={false}>×</Text></Pressable>
     </LinearGradient>
   );
 }

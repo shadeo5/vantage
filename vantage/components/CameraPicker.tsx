@@ -73,7 +73,7 @@ export function CameraPicker({
                     <Text style={[styles.rowName, on && { color: "#F0D9AE" }]}>{cameraLabel(item)}</Text>
                     <Text style={styles.rowMeta}>{cameraMeta(item)}{item.year ? ` · ${item.year}` : ""}</Text>
                   </View>
-                  {on && <Text style={styles.check}>✓</Text>}
+                  {on && <Text style={styles.check} allowFontScaling={false}>✓</Text>}
                 </Pressable>
               );
             }}

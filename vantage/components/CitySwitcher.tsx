@@ -39,7 +39,7 @@ export function CitySwitcher({ cities, currentId, currentName, onSelect }: {
       >
         <PinIcon color={colors.golden} />
         <Text style={styles.pillText}>{currentName}</Text>
-        {canSwitch && <Text style={styles.chev}>▾</Text>}
+        {canSwitch && <Text style={styles.chev} allowFontScaling={false}>▾</Text>}
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
@@ -66,7 +66,7 @@ export function CitySwitcher({ cities, currentId, currentName, onSelect }: {
                       <Text style={[styles.cityName, active && { color: colors.golden }]}>{c.name}</Text>
                       {c.region ? <Text style={styles.cityRegion}>{c.region}</Text> : null}
                     </View>
-                    {active && <Text style={styles.check}>✓</Text>}
+                    {active && <Text style={styles.check} allowFontScaling={false}>✓</Text>}
                   </Pressable>
                 );
               })}

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, fonts } from "../theme";
+import { colors, fonts, MAX_FONT_SCALE } from "../theme";
 import { Spot, spotImageSource } from "../lib/spots";
 import type { LightRead } from "../lib/light";
 import { NudgeSignal, Confidence } from "../lib/nudge";
@@ -45,7 +45,7 @@ export function InspirationHero({
             {/* Confidence never shown as a raw grade (#T2): a ✦ flourish is reserved
                 for HIGH, MEDIUM reads as a plain confident label, and a genuinely
                 weak night becomes an honest "quiet night" — never a "MEDIUM". */}
-            <Text style={styles.badgeText}>{go ? (confidence === "high" ? "TONIGHT'S PICK  ✦" : "TONIGHT'S PICK") : "A QUIET NIGHT"}</Text>
+            <Text style={styles.badgeText} numberOfLines={1} maxFontSizeMultiplier={MAX_FONT_SCALE}>{go ? (confidence === "high" ? "TONIGHT'S PICK  ✦" : "TONIGHT'S PICK") : "A QUIET NIGHT"}</Text>
           </View>
           <Text style={styles.heroName}>{go ? <>{spot.name} is{"\n"}alive tonight.</> : <>{spot.name},{"\n"}if you head out.</>}</Text>
         </ImageBackground>
@@ -76,7 +76,7 @@ export function InspirationHero({
 
         <Pressable onPress={onToggleWhy} accessibilityRole="button" accessibilityLabel="Why this pick?" accessibilityState={{ expanded: whyOpen }} style={styles.whyRow}>
           <Text style={styles.whyLabel}>Why this pick?</Text>
-          <Text style={styles.whyChev}>{whyOpen ? "▲" : "▼"}</Text>
+          <Text style={styles.whyChev} allowFontScaling={false}>{whyOpen ? "▲" : "▼"}</Text>
         </Pressable>
         {whyOpen && (
           <View style={styles.whyBody}>
@@ -102,7 +102,7 @@ function WhyLine({ color, k, v }: { color: string; k: string; v: string }) {
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: 24, overflow: "hidden", borderWidth: 1, borderColor: colors.hairline, marginBottom: 30 },
   pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
-  banner: { height: 230, justifyContent: "flex-end", padding: 18 },
+  banner: { minHeight: 230, justifyContent: "flex-end", padding: 18 },
   badge: { position: "absolute", top: 14, left: 14, flexDirection: "row", alignItems: "center", gap: 7,
     backgroundColor: "rgba(10,9,11,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)", paddingHorizontal: 11, paddingVertical: 6, borderRadius: 20 },
   badgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.goldenBright },

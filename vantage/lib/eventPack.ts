@@ -46,7 +46,9 @@ type EventRow = {
   source: string | null;
 };
 
-const EVENT_COLUMNS =
+// The columns fetched, in DB (snake_case) form. Exported so a test can assert every one
+// exists in the events table — the mismatch that silently drops us to the bundled fallback.
+export const EVENT_COLUMNS =
   "id,name,event_type,genres,neighborhood,lat,lon,venue_spot_id,recurrence,window_start,window_end," +
   "window_confidence,admission,ticketing,magnitude,window_type,tagline,reason,why,look,kit_angles,getting,source";
 

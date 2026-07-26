@@ -44,10 +44,10 @@ for (const [key, city] of Object.entries(CITIES)) {
       if (seen.has(e.id)) console.warn(`  ! duplicate event id "${e.id}" (${e.name}) — later one wins`);
       seen.add(e.id);
       out.push(
-        `insert into public.events (id, city_id, name, event_type, genres, neighborhood, venue_spot_id, recurrence, window_start, window_end, window_confidence, admission, ticketing, magnitude, window_type, tagline, reason, why, look, kit_angles, getting, source, published) values (`,
-        `  ${dq(e.id)}, ${dq(key)}, ${dq(e.name)}, ${dq(e.eventType)}, ${arr(e.genres)}, ${dq(e.neighborhood)}, ${dq(e.venueSpotId)}, ${dq(e.recurrence)}, ${dq(e.window?.start)}, ${dq(e.window?.end)}, ${dq(e.windowConfidence)}, ${dq(e.admission)}, ${dq(e.ticketing)}, ${dq(e.magnitude)}, ${dq(e.windowType)}, ${dq(e.tagline)}, ${dq(e.reason)}, ${dq(e.why)}, ${arr(e.look)}, ${jb(e.kitAngles)}, ${dq(e.getting)}, ${dq(e.source)}, true)`,
+        `insert into public.events (id, city_id, name, event_type, genres, neighborhood, lat, lon, venue_spot_id, recurrence, window_start, window_end, window_confidence, admission, ticketing, magnitude, window_type, tagline, reason, why, look, kit_angles, getting, source, published) values (`,
+        `  ${dq(e.id)}, ${dq(key)}, ${dq(e.name)}, ${dq(e.eventType)}, ${arr(e.genres)}, ${dq(e.neighborhood)}, ${num(e.lat)}, ${num(e.lon)}, ${dq(e.venueSpotId)}, ${dq(e.recurrence)}, ${dq(e.window?.start)}, ${dq(e.window?.end)}, ${dq(e.windowConfidence)}, ${dq(e.admission)}, ${dq(e.ticketing)}, ${dq(e.magnitude)}, ${dq(e.windowType)}, ${dq(e.tagline)}, ${dq(e.reason)}, ${dq(e.why)}, ${arr(e.look)}, ${jb(e.kitAngles)}, ${dq(e.getting)}, ${dq(e.source)}, true)`,
         `  on conflict (id) do update set city_id=excluded.city_id, name=excluded.name, event_type=excluded.event_type, ` +
-        `genres=excluded.genres, neighborhood=excluded.neighborhood, venue_spot_id=excluded.venue_spot_id, ` +
+        `genres=excluded.genres, neighborhood=excluded.neighborhood, lat=excluded.lat, lon=excluded.lon, venue_spot_id=excluded.venue_spot_id, ` +
         `recurrence=excluded.recurrence, window_start=excluded.window_start, window_end=excluded.window_end, ` +
         `window_confidence=excluded.window_confidence, admission=excluded.admission, ticketing=excluded.ticketing, ` +
         `magnitude=excluded.magnitude, window_type=excluded.window_type, tagline=excluded.tagline, reason=excluded.reason, ` +

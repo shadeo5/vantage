@@ -1,7 +1,9 @@
 // eventPack — the DB→Opportunity mapper and the bundled-fallback behavior.
 // The Supabase client is mocked so these never hit the network; `mockResult` is what
 // the query resolves to (the jest.mock factory may only reference vars prefixed "mock").
-import { fetchEvents, rowToOpportunity } from "../lib/eventPack";
+import * as fs from "fs";
+import * as path from "path";
+import { fetchEvents, rowToOpportunity, EVENT_COLUMNS } from "../lib/eventPack";
 import { ATLANTA_EVENTS } from "../lib/events";
 
 let mockResult: { data: unknown; error: unknown } = { data: null, error: null };
@@ -74,6 +76,24 @@ describe("rowToOpportunity", () => {
     expect(o.venueSpotId).toBe("piedmont");
     expect(o.windowConfidence).toBe("needs-date-verify");
     expect(o.magnitude).toBe("low");
+  });
+});
+
+describe("schema drift guard", () => {
+  // Catches the class of bug where eventPack SELECTs a column the events table doesn't have
+  // (e.g. a missing lat/lon) — which fails the query and silently drops us to the bundle.
+  test("every column eventPack SELECTs exists in the events table (schema.sql)", () => {
+    const schema = fs.readFileSync(path.join(__dirname, "..", "supabase", "schema.sql"), "utf8");
+    const block = schema.match(/create table if not exists public\.events \(([\s\S]*?)\n\);/);
+    if (!block) throw new Error("could not find the events table in schema.sql");
+    const tableCols = new Set(
+      block[1]
+        .split("\n")
+        .map((l) => l.trim().match(/^([a-z_]+)\s/)?.[1])
+        .filter((c): c is string => Boolean(c)),
+    );
+    const missing = EVENT_COLUMNS.split(",").map((c) => c.trim()).filter((c) => !tableCols.has(c));
+    expect(missing).toEqual([]);
   });
 });
 

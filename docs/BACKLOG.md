@@ -29,7 +29,11 @@
 
 **Fix (2026-07-25):** the first cut SELECTed `lat`/`lon` but the `events` table + seed omitted them, so every DB read errored and silently fell back to the bundle (caught by running the app — the console showed `column events.lat does not exist`). Added `lat`/`lon` to the table (`schema.sql`) and the seed generator, and a **schema-drift guard test** that asserts every column `eventPack` SELECTs exists in the `events` table — so a reader/schema mismatch fails `npm run check` instead of silently degrading to the fallback.
 
-**To go live:** run the `events` DDL (schema.sql) + `events_seed.sql` in the Supabase SQL editor. Until then the app uses the bundled fallback (no breakage). After that, edit events in the dashboard → live on next app load, no release. **Next (Phase 2, ⬜):** teach the nightly push Edge Function to read the same `events` table (so the buzz can headline a live event), guarded by extending `parity.test.ts` — see the plan; touches the live push, so verify with a `?force=1` test invoke.
+**To go live:** run the `events` DDL (schema.sql) + `events_seed.sql` in the Supabase SQL editor. Until then the app uses the bundled fallback (no breakage). After that, edit events in the dashboard → live on next app load, no release. ✅ **Done on the live DB (2026-07-25)** — verified in-browser that the app reads events from Postgres.
+
+**⬜ Reminder — device build:** the DB-read code (`lib/eventPack.ts` `fetchEvents`) shipped 2026-07-25, so **the phone won't reflect dashboard edits until an EAS build newer than that ships** (current device build predates it and still uses the bundled catalog). No urgency — fold it into the next batched build (don't rebuild just for this). Note: on device the app re-reads events on a **fresh launch** (or a city switch), not live while open.
+
+**Next (Phase 2, ⬜):** teach the nightly push Edge Function to read the same `events` table (so the buzz can headline a live event), guarded by extending `parity.test.ts` — see the plan; touches the live push, so verify with a `?force=1` test invoke.
 
 ---
 

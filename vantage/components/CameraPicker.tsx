@@ -36,7 +36,7 @@ export function CameraPicker({
         <View style={styles.sheet}>
           <View style={styles.header}>
             <Text style={styles.title}>Your camera</Text>
-            <Pressable onPress={onClose} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.1)", borderless: true, radius: 20 }}>
+            <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Done" hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.1)", borderless: true, radius: 20 }}>
               <Text style={styles.close}>Done</Text>
             </Pressable>
           </View>
@@ -63,6 +63,9 @@ export function CameraPicker({
               return (
                 <Pressable
                   onPress={() => { onPick(item.id); onClose(); }}
+                  accessibilityRole="button"
+                  accessibilityLabel={cameraLabel(item)}
+                  accessibilityState={{ selected: on }}
                   android_ripple={{ color: "rgba(233,184,114,0.12)" }}
                   style={({ pressed }) => [styles.row, on && styles.rowOn, pressed && { opacity: 0.7 }]}
                 >

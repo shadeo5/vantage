@@ -45,7 +45,7 @@ export function CitySwitcher({ cities, currentId, currentName, onSelect }: {
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
           {/* Stop taps inside the card from closing the sheet. */}
-          <Pressable style={styles.sheet} onPress={() => {}}>
+          <Pressable style={styles.sheet} onPress={() => {}} accessibilityViewIsModal>
             <Text style={styles.sheetTitle}>Choose your city</Text>
             <Text style={styles.sheetHint}>More cities are on the way.</Text>
             <View style={{ marginTop: 6 }}>
@@ -55,6 +55,9 @@ export function CitySwitcher({ cities, currentId, currentName, onSelect }: {
                   <Pressable
                     key={c.id}
                     onPress={() => pick(c.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={c.region ? `${c.name}, ${c.region}` : c.name}
+                    accessibilityState={{ selected: active }}
                     android_ripple={{ color: "rgba(255,255,255,0.06)" }}
                     style={({ pressed }) => [styles.row, active && styles.rowActive, pressed && { opacity: 0.7 }]}
                   >

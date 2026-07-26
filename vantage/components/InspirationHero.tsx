@@ -33,7 +33,7 @@ export function InspirationHero({
 
   return (
     <View style={styles.card}>
-      <Pressable onPress={onOpen}>
+      <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`${spot.name} — open details`}>
         <ImageBackground source={spotImageSource(spot)} style={styles.banner}>
           {/* warm golden wash + bottom scrim */}
           <LinearGradient colors={["rgba(246,185,94,0.55)", "rgba(214,138,60,0.5)", "rgba(138,90,82,0.55)"]}
@@ -66,15 +66,15 @@ export function InspirationHero({
         </View>
 
         <View style={styles.actions}>
-          <Pressable onPress={onGo} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && styles.pressed]}>
+          <Pressable onPress={onGo} accessibilityRole="button" accessibilityLabel={isGoing ? `You're going to ${spot.name} — tap to cancel` : `I'm going to ${spot.name}`} accessibilityState={{ selected: isGoing }} android_ripple={{ color: "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && styles.pressed]}>
             <Text style={[styles.goLabel, { color: isGoing ? colors.crowdLow : "#1a1408" }]}>
               {isGoing ? "✓ You're going" : "I'm going"}
             </Text>
           </Pressable>
-          <Pressable onPress={onOpen} android_ripple={{ color: "rgba(255,255,255,0.08)" }} style={({ pressed }) => [styles.detailsBtn, pressed && styles.pressed]}><Text style={styles.detailsLabel}>Details</Text></Pressable>
+          <Pressable onPress={onOpen} accessibilityRole="button" accessibilityLabel={`Details for ${spot.name}`} android_ripple={{ color: "rgba(255,255,255,0.08)" }} style={({ pressed }) => [styles.detailsBtn, pressed && styles.pressed]}><Text style={styles.detailsLabel}>Details</Text></Pressable>
         </View>
 
-        <Pressable onPress={onToggleWhy} style={styles.whyRow}>
+        <Pressable onPress={onToggleWhy} accessibilityRole="button" accessibilityLabel="Why this pick?" accessibilityState={{ expanded: whyOpen }} style={styles.whyRow}>
           <Text style={styles.whyLabel}>Why this pick?</Text>
           <Text style={styles.whyChev}>{whyOpen ? "▲" : "▼"}</Text>
         </Pressable>

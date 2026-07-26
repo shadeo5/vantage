@@ -46,8 +46,8 @@ export function SpotDetail({
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
-            <Pressable onPress={onBack} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.14)", borderless: true, radius: 24 }}><Text style={styles.circleGlyph}>‹</Text></Pressable>
-            <Pressable onPress={onToggleSaved} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(224,122,139,0.24)", borderless: true, radius: 24 }}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]}>{isSaved ? "♥" : "♡"}</Text></Pressable>
+            <Pressable onPress={onBack} accessibilityRole="button" accessibilityLabel="Back" style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(255,255,255,0.14)", borderless: true, radius: 24 }}><Text style={styles.circleGlyph}>‹</Text></Pressable>
+            <Pressable onPress={onToggleSaved} accessibilityRole="button" accessibilityLabel={isSaved ? `Saved — remove ${spot.name} from saved` : `Save ${spot.name}`} accessibilityState={{ selected: isSaved }} style={({ pressed }) => [styles.circle, pressed && styles.circlePressed]} hitSlop={10} android_ripple={{ color: "rgba(224,122,139,0.24)", borderless: true, radius: 24 }}><Text style={[styles.circleGlyph, { fontSize: 17, color: isSaved ? colors.saved : colors.ink }]}>{isSaved ? "♥" : "♡"}</Text></Pressable>
           </View>
           <View style={styles.heroBottom}>
             <View style={styles.heroChips}>
@@ -89,7 +89,7 @@ export function SpotDetail({
       </ScrollView>
 
       <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={[styles.bottomBar, { paddingBottom: safeBottom(insets, 12, 30) }]}>
-        <Pressable onPress={onToggleGoing} android_ripple={{ color: isGoing ? "rgba(127,176,122,0.18)" : "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && { opacity: 0.9, transform: [{ scale: 0.985 }] }]}>
+        <Pressable onPress={onToggleGoing} accessibilityRole="button" accessibilityLabel={isGoing ? `You're going to ${spot.name} — tap to cancel` : `I'm going to ${spot.name}`} accessibilityState={{ selected: isGoing }} android_ripple={{ color: isGoing ? "rgba(127,176,122,0.18)" : "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && { opacity: 0.9, transform: [{ scale: 0.985 }] }]}>
           <Text style={[styles.goLabel, { color: isGoing ? colors.crowdLow : "#1a1408" }]}>{isGoing ? "✓ You're going" : "I'm going"}</Text>
         </Pressable>
       </LinearGradient>

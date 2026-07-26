@@ -13,13 +13,17 @@ const fc = (cloud: number, rain = 0, wet = false): Forecast =>
   ({ fetchedAt: 0, cloudAt: () => cloud, rainAt: () => rain, wetAt: () => wet });
 
 describe("fastestAperture", () => {
-  test("takes the brightest across body + lenses", () => {
-    // X100VI fixed f/2.0 + a 35 f/1.8 → 1.8 is the fastest.
-    expect(fastestAperture("fuji-x100vi", [L(35, 1.8)])).toBeCloseTo(1.8);
+  test("takes the brightest across an ILC's lenses", () => {
+    // a7 IV + a 35 f/1.8 and a 50 f/1.4 → 1.4 is the fastest.
+    expect(fastestAperture("sony-a7-iv", [L(35, 1.8), L(50, 1.4)])).toBeCloseTo(1.4);
   });
   test("a slow tele-only kit reads slow", () => {
     // a7 IV (no fixed lens) + 200-600 f/5.6 → 5.6.
     expect(fastestAperture("sony-a7-iv", [{ minFocal: 200, maxFocal: 600, maxAperture: 5.6 }])).toBeCloseTo(5.6);
+  });
+  test("a fixed-lens body ignores lingering separate lenses", () => {
+    // Q3 is f/1.7 built-in; a phantom f/5.6 tele must not change it.
+    expect(fastestAperture("leica-q3", [{ minFocal: 200, maxFocal: 600, maxAperture: 5.6 }])).toBeCloseTo(1.7);
   });
 });
 

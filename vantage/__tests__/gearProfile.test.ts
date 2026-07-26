@@ -39,6 +39,14 @@ describe("gear profile", () => {
     expect(more).toContain("Details");
   });
 
+  test("a fixed-lens body ignores lingering separate lenses (no phantom coverage)", () => {
+    // A Q3's built-in 28mm is the whole kit — a leftover 70–200 + macro must NOT count.
+    const g = kitGenres("leica-q3", [tele, macro]);
+    expect([...g].sort()).toEqual(["Architecture", "Landscape", "Street"]);
+    expect(g).not.toContain("Sports");
+    expect(g).not.toContain("Details");
+  });
+
   describe("lensLabel", () => {
     test("prime → focal; zoom → range; macro flagged", () => {
       expect(lensLabel(l50)).toBe("50mm");

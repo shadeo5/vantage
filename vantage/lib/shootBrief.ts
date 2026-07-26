@@ -18,9 +18,9 @@ export type Readiness = { level: ReadyLevel; line: string | null; fastest: numbe
 // lens (if any) + every selected lens. Lower = better in the dark.
 export function fastestAperture(cameraId: string, lenses: LensSpec[]): number {
   const cam = getCamera(cameraId);
-  const fs: number[] = [];
-  if (cam.fixedLens) fs.push(cam.fixedLens.maxAperture);
-  for (const spec of lenses) fs.push(spec.maxAperture);
+  // Fixed-lens body: the built-in IS the kit — ignore any lingering separate lenses.
+  if (cam.fixedLens) return cam.fixedLens.maxAperture;
+  const fs = lenses.map((spec) => spec.maxAperture);
   return fs.length ? Math.min(...fs) : 4.0; // no data → assume a middling zoom
 }
 

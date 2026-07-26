@@ -20,7 +20,7 @@ export function LockScreen({ onEnter, title, body, heroImg }: {
         <Text style={styles.time}>{time}</Text>
       </View>
 
-      <Pressable style={styles.notif} onPress={onEnter}>
+      <Pressable style={styles.notif} onPress={onEnter} accessibilityRole="button" accessibilityLabel={`Vantage notification: ${title}. ${body}. Tap to open.`}>
         <View style={styles.notifHead}>
           <View style={styles.appIcon}><Text style={styles.appIconText}>V</Text></View>
           <Text style={styles.appName}>VANTAGE</Text>

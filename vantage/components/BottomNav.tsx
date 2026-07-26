@@ -27,6 +27,9 @@ function Item({ label, active, onPress, icon: Icon }: { label: string; active: b
     <Pressable
       style={({ pressed }) => [styles.item, pressed && styles.pressed]}
       onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityLabel={`${label} tab`}
+      accessibilityState={{ selected: active }}
       android_ripple={{ color: "rgba(233,184,114,0.18)", borderless: true, radius: 44 }}
       hitSlop={8}
     >

@@ -51,7 +51,7 @@ export function BagScreen({
       <Text style={styles.sub}>What you shoot with, so we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
 
       <Text style={styles.section}>CAMERA</Text>
-      <Pressable style={({ pressed }) => [styles.camCard, pressed && { opacity: 0.75 }]} onPress={() => setPickerOpen(true)}>
+      <Pressable style={({ pressed }) => [styles.camCard, pressed && { opacity: 0.75 }]} onPress={() => setPickerOpen(true)} accessibilityRole="button" accessibilityLabel={`Change camera — currently ${cameraLabel(cam)}`}>
         <View style={styles.camIcon}>
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.golden} strokeWidth={1.6}>
             <Rect x={3} y={7} width={18} height={13} rx={3} /><Circle cx={12} cy={13.5} r={3.4} /><Path d="M8.5 7l1.4-2.4h4.2L15.5 7" />
@@ -81,7 +81,7 @@ export function BagScreen({
             {LENS_PRESETS.map((p) => {
               const on = selectedKeys.has(specKey(p.spec));
               return (
-                <Pressable key={p.label} onPress={() => onToggleLens(p.spec)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
+                <Pressable key={p.label} onPress={() => onToggleLens(p.spec)} accessibilityRole="button" accessibilityLabel={`${p.label} lens`} accessibilityState={{ selected: on }} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                   <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{p.label}</Text>
                 </Pressable>
               );
@@ -91,7 +91,7 @@ export function BagScreen({
           {customLenses.length > 0 && (
             <View style={[styles.chips, { marginTop: 9 }]}>
               {customLenses.map((l) => (
-                <Pressable key={specKey(l)} onPress={() => onRemoveLens(l)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, styles.chipOn, pressed && styles.chipPressed]}>
+                <Pressable key={specKey(l)} onPress={() => onRemoveLens(l)} accessibilityRole="button" accessibilityLabel={`Remove ${lensLabel(l)} f/${l.maxAperture} lens`} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, styles.chipOn, pressed && styles.chipPressed]}>
                   <Text style={[styles.chipText, { color: "#F0D9AE" }]}>{lensLabel(l)} · f/{l.maxAperture}  ✕</Text>
                 </Pressable>
               ))}
@@ -107,18 +107,18 @@ export function BagScreen({
               </View>
               <View style={styles.addRow}>
                 <TextInput style={styles.addInput} placeholder="Max f/ (e.g. 1.8)" placeholderTextColor={colors.muted} keyboardType="numeric" value={aperture} onChangeText={setAperture} />
-                <Pressable onPress={() => setMacro((v) => !v)} style={({ pressed }) => [styles.chip, macro ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
+                <Pressable onPress={() => setMacro((v) => !v)} accessibilityRole="button" accessibilityLabel="Macro lens" accessibilityState={{ selected: macro }} style={({ pressed }) => [styles.chip, macro ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                   <Text style={[styles.chipText, { color: macro ? "#F0D9AE" : colors.muted3 }]}>Macro</Text>
                 </Pressable>
               </View>
               <View style={styles.addActions}>
                 <View style={{ flex: 1 }} />
-                <Pressable onPress={() => { setAddOpen(false); setFocal(""); setFocalTo(""); setAperture(""); setMacro(false); }}><Text style={styles.cancel}>Cancel</Text></Pressable>
-                <Pressable onPress={submitLens} android_ripple={{ color: "rgba(233,184,114,0.2)" }} style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.8 }]}><Text style={styles.addBtnText}>Add</Text></Pressable>
+                <Pressable onPress={() => { setAddOpen(false); setFocal(""); setFocalTo(""); setAperture(""); setMacro(false); }} accessibilityRole="button" accessibilityLabel="Cancel adding a lens"><Text style={styles.cancel}>Cancel</Text></Pressable>
+                <Pressable onPress={submitLens} accessibilityRole="button" accessibilityLabel="Add this lens" android_ripple={{ color: "rgba(233,184,114,0.2)" }} style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.8 }]}><Text style={styles.addBtnText}>Add</Text></Pressable>
               </View>
             </View>
           ) : (
-            <Pressable onPress={() => setAddOpen(true)} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.addLens, pressed && { opacity: 0.7 }]}>
+            <Pressable onPress={() => setAddOpen(true)} accessibilityRole="button" accessibilityLabel="Add a lens with any focal length and aperture" android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.addLens, pressed && { opacity: 0.7 }]}>
               <Text style={styles.addLensText}>+ Add a lens (any focal + aperture)</Text>
             </Pressable>
           )}
@@ -138,13 +138,13 @@ export function BagScreen({
         </View>
       </View>
 
-      <Pressable onPress={onToggleStyle} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.dashed2, pressed && { opacity: 0.7 }]}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
+      <Pressable onPress={onToggleStyle} accessibilityRole="button" accessibilityLabel="Pick your style instead" accessibilityState={{ expanded: styleOpen }} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.dashed2, pressed && { opacity: 0.7 }]}><Text style={styles.dashed2Text}>Not sure? Pick your style instead →</Text></Pressable>
       {styleOpen && (
         <View style={styles.chips}>
           {STYLES.map((s) => {
             const on = stylePick === s;
             return (
-              <Pressable key={s} onPress={() => onPickStyle(s)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
+              <Pressable key={s} onPress={() => onPickStyle(s)} accessibilityRole="button" accessibilityLabel={`${s} style`} accessibilityState={{ selected: on }} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.chip, on ? styles.chipOn : styles.chipOff, pressed && styles.chipPressed]}>
                 <Text style={[styles.chipText, { color: on ? "#F0D9AE" : colors.muted3 }]}>{s}</Text>
               </Pressable>
             );

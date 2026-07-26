@@ -6,7 +6,7 @@ import { Spot, spotImageSource, windowMeta } from "../lib/spots";
 export function SpotRow({ spot, rank, windowTime, onPress }: { spot: Spot; rank: number; windowTime: string; onPress: () => void }) {
   const wm = windowMeta(spot.windowType);
   return (
-    <Pressable onPress={onPress} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${spot.name} — ${spot.reason}. Open details.`} android_ripple={{ color: "rgba(255,255,255,0.06)" }} style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}>
       <ImageBackground source={spotImageSource(spot)} style={styles.thumb} imageStyle={styles.thumbImg}>
         <Text style={styles.rank}>{rank}</Text>
       </ImageBackground>

@@ -59,7 +59,7 @@ export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOp
                 <View style={styles.dayLine} />
               </View>
               <View style={styles.card}>
-                <Pressable style={({ pressed }) => [styles.cardTop, pressed && { opacity: 0.7 }]} onPress={() => onOpen(m.id)}>
+                <Pressable style={({ pressed }) => [styles.cardTop, pressed && { opacity: 0.7 }]} onPress={() => onOpen(m.id)} accessibilityRole="button" accessibilityLabel={`${spot.name} — open details`}>
                   <ImageBackground source={spotImageSource(spot)} style={styles.thumb} imageStyle={{ borderRadius: 13 }} />
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={[styles.tag, { color: tagColor(m.tag) }]}>{m.tag.toUpperCase()}</Text>
@@ -74,7 +74,7 @@ export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOp
                 {/* Secondary, compact outline pill (#P2) — solid gold is reserved for
                     the one primary CTA (the Today hero), so four cards don't each shout. */}
                 <View style={styles.goWrap}>
-                  <Pressable onPress={() => onToggleGoing(m.id)} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.goPill, on ? styles.goPillOn : styles.goPillOff, pressed && { opacity: 0.7 }]}>
+                  <Pressable onPress={() => onToggleGoing(m.id)} accessibilityRole="button" accessibilityLabel={on ? `You're going to ${spot.name} — tap to cancel` : `I'm going to ${spot.name}`} accessibilityState={{ selected: on }} android_ripple={{ color: "rgba(233,184,114,0.14)" }} style={({ pressed }) => [styles.goPill, on ? styles.goPillOn : styles.goPillOff, pressed && { opacity: 0.7 }]}>
                     <Text style={[styles.goPillText, { color: on ? colors.crowdLow : colors.golden }]}>{on ? "✓ Going" : "I'm going"}</Text>
                   </Pressable>
                 </View>

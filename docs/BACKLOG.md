@@ -6,6 +6,17 @@
 
 ---
 
+## B4 · Events into the database (app slice)  ✅ (2026-07-25) — ADR `docs/engineering/EVENTS_ARCHITECTURE.html`
+**Why:** the events catalog was **baked into the app** (`assets/events/atlanta.json`), so changing an event meant an app release — and the nightly push couldn't see events at all. **Goal:** move events to Postgres so they're editable from the Supabase dashboard with **no app build**, mirroring how spots already work (DB read + bundled fallback). **Shipped (app + DB only — does not touch the live push):**
+- **`events` table + RLS** in `supabase/schema.sql` (public read of `published` rows), wider than spots for the event shape. Dates kept as **text** (`window_start`/`window_end`) to preserve the date-only-as-all-day, local-time semantics; `kit_angles` as `jsonb`; no image column (art inherits from the venue spot).
+- **Seed generator** `content-pipeline/build-events-seed.mjs` (`npm run seed:events`) → `supabase/events_seed.sql`, same idempotent `$vtg$` / `on conflict do update` pattern as the spots seed. Emits the 12 curated Atlanta events from `content/atlanta-events.json`.
+- **App reader** `lib/eventPack.ts` (`fetchEvents` + `rowToOpportunity`) — mirrors `lib/cityPack.ts`; DB read with **bundled `ATLANTA_EVENTS` fallback** on any error/empty/throw. Kept separate from `lib/events.ts` so that module stays free of the Supabase client. `App.tsx` loads events into state per city.
+- **178 tests** (+6, `__tests__/eventPack.test.ts` — the mapper + fallback, Supabase mocked). `npm run check` green.
+
+**To go live:** run the `events` DDL (schema.sql) + `events_seed.sql` in the Supabase SQL editor. Until then the app uses the bundled fallback (no breakage). After that, edit events in the dashboard → live on next app load, no release. **Next (Phase 2, ⬜):** teach the nightly push Edge Function to read the same `events` table (so the buzz can headline a live event), guarded by extending `parity.test.ts` — see the plan; touches the live push, so verify with a `?force=1` test invoke.
+
+---
+
 ## DX · Agentic-development readiness  ✅ (2026-07-25)
 Made the repo safe and fast for an AI agent (or a new contributor) to work in — closing the two gaps an agent leans on hardest: a way in, and a way to check its work. From an audit that scored the repo 5.8/10 (bones strong, front door thin, one drift landmine). **What shipped:**
 - **Parity guard for the two-headed brain** (the P0). The scoring brain is hand-mirrored across `lib/nudge.ts` (app) + `supabase/functions/nudge/index.ts` (Deno push); nothing checked they agreed, so a weight changed in one place would silently make the push disagree with the app. New `__tests__/parity.test.ts` reads both sources and fails if the weights, go bar, `REF_FIT`, `LIGHT_SENSITIVITY`, `cloudFactor`, or `lightTiming` buckets drift. ⚠ banners added to both files.

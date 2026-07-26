@@ -42,7 +42,7 @@ Each links a short architecture-decision write-up:
 
 ## Status
 
-Personal project, actively built. The core loop is **live end-to-end**: an Android build runs on a real device and the nightly push has been verified firing on its own. **172 unit tests** cover the scoring, gear, light, and weather logic — including a parity test that keeps the on-device brain and the server-side push brain from drifting apart. A single `npm run check` (typecheck + lint + tests) gates every commit and runs in CI. iOS is pending an Apple Developer account; everything else was built at $0 infra.
+Personal project, actively built. The core loop is **live end-to-end**: an Android build runs on a real device and the nightly push has been verified firing on its own. **178 unit tests** cover the scoring, gear, light, and weather logic — including a parity test that keeps the on-device brain and the server-side push brain from drifting apart. A single `npm run check` (typecheck + lint + tests) gates every commit and runs in CI. iOS is pending an Apple Developer account; everything else was built at $0 infra.
 
 ## Go deeper
 

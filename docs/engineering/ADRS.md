@@ -18,7 +18,7 @@ area** — most of these encode a non-obvious trade-off that's easy to undo by a
 | [HERO_ANTI_REPEAT.md](HERO_ANTI_REPEAT.md) | ✅ shipped | Why Today stopped headlining the same spot daily — an anti-repeat rule (not a weight), plus the deeper flat-spot scoring issue it defers. |
 | [SHOOT_BRIEF.html](SHOOT_BRIEF.html) | ✅ shipped (E8) | The additive "shoot brief" — turning a quiet/overcast night into a gear-readiness + shot-type plan. |
 | [CONTENT_PIPELINE.html](CONTENT_PIPELINE.html) | ✅ built/run | The LLM content pipeline: OSM curate → human vet → Claude draft → image → serve from Postgres. Lives in `content-pipeline/`. |
-| [EVENTS_ARCHITECTURE.html](EVENTS_ARCHITECTURE.html) | ▶ partial (B4) | How events and spots reconcile (the `Opportunity` model, the photo-lens gate, the eclipse/takeover rule). App slice shipped; push parity + a live feed pending. |
+| [EVENTS_ARCHITECTURE.html](EVENTS_ARCHITECTURE.html) | ▶ partial (B4) | How events and spots reconcile (the `Opportunity` model, the photo-lens gate, the eclipse/takeover rule). App slice + **events-in-Postgres** shipped (`events` table, `lib/eventPack.ts`, dashboard-editable, bundled fallback); **push parity** (the nightly Edge Function reading events) + a live feed pending. |
 | [EVENT_DATA_SOURCES.md](EVENT_DATA_SOURCES.md) | reference | The golden-set sourcing strategy for real events (Ticketmaster spine + CVB trust tier + permits), with the per-city acceptance test and the freshness rule. |
 
 ## Cross-cutting invariants (not a single ADR, but load-bearing)

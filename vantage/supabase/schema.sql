@@ -17,11 +17,12 @@ create table if not exists public.profiles (
   updated_at  timestamptz not null default now()
 );
 
--- Migration for existing deployments (idempotent): the profile lens column moved from a
--- text[] of catalog ids (lens_ids) to a jsonb array of generic descriptors (lenses). The
--- app re-syncs the active kit on launch, so old lens_ids can be dropped safely.
+-- Migration for existing deployments (idempotent + ADDITIVE): the profile lens column
+-- moved from a text[] of catalog ids (lens_ids) to a jsonb array of generic descriptors
+-- (lenses). We ADD `lenses` and KEEP `lens_ids` through the transition so the old app +
+-- old push keep working; drop `lens_ids` only AFTER a new app build ships that writes
+-- `lenses` (then run: alter table public.profiles drop column if exists lens_ids;).
 alter table public.profiles add column if not exists lenses jsonb not null default '[]';
-alter table public.profiles drop column if exists lens_ids;
 
 alter table public.profiles enable row level security;
 

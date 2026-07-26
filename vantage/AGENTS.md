@@ -37,7 +37,7 @@ The scoring brain lives in **two runtimes** — `lib/nudge.ts` (app) and `supaba
 
 ## How we work here
 
-- **Tests for regression-prone logic** (scoring, gear, light, weather) — not every line, but the stuff that quietly breaks. Add/adjust tests with the code.
+- **Test-first for the logic we test** (scoring, gear, light, weather — the regression-prone core). The order matters: **write the failing test from the story's acceptance criteria first, run it, watch it fail for the right reason, then write the code to make it pass.** A test written *after* the code tends to just confirm whatever the code already does — bugs included — so it never really challenged anything. This does **not** mean test every line: UI tweaks, copy, and one-off wiring stay exempt, same as before. Rigor scales with the stage (see BACKLOG's "how we work"). If a story has no acceptance criteria to write a test against, that's the signal to pin them down first — don't start with code.
 - **Strict TypeScript.** `npm run check` must be green before a commit.
 - **Decisions get an ADR** in `../docs/engineering/` and an index entry in `../docs/engineering/ADRS.md`. Record *why*, not just what.
 - **Docs move with the code.** A pre-commit hook reminds you to update `../docs/BACKLOG.md`, the README, any affected ADR, and memory. Keep them current.

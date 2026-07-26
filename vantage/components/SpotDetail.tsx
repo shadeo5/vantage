@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable, Animated } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, fonts } from "../theme";
+import { safeTop, safeBottom } from "../lib/safeArea";
 import { Spot, spotImageSource } from "../lib/spots";
 import { lightStripModel } from "../lib/light";
 import { shootBrief } from "../lib/shootBrief";
@@ -15,6 +17,7 @@ export function SpotDetail({
 }: {
   spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; cameraId: string; lenses: LensSpec[]; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const now = new Date();
   // The detail page is now-first (E9 · PH3/PH4): what the light's doing at THIS moment,
   // what to shoot in it, and the kit's readiness — not a golden-hour countdown.
@@ -38,8 +41,8 @@ export function SpotDetail({
 
   return (
     <Animated.View style={[styles.root, { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} alwaysBounceVertical overScrollMode="always">
-        <ImageBackground source={spotImageSource(spot)} style={styles.hero} onLoadEnd={() => setImgReady(true)}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 + insets.bottom }} alwaysBounceVertical overScrollMode="always">
+        <ImageBackground source={spotImageSource(spot)} style={[styles.hero, { paddingTop: safeTop(insets, 14, 52) }]} onLoadEnd={() => setImgReady(true)}>
           <LinearGradient colors={["rgba(246,185,94,0.5)", "rgba(214,138,60,0.45)", "rgba(122,85,96,0.5)"]} start={{ x: 0.1, y: 0 }} end={{ x: 0.9, y: 1 }} style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(16,13,13,0.4)", "rgba(20,15,13,0.05)", colors.canvas]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
           <View style={styles.heroTop}>
@@ -85,7 +88,7 @@ export function SpotDetail({
         </View>
       </ScrollView>
 
-      <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={styles.bottomBar}>
+      <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={[styles.bottomBar, { paddingBottom: safeBottom(insets, 12, 30) }]}>
         <Pressable onPress={onToggleGoing} android_ripple={{ color: isGoing ? "rgba(127,176,122,0.18)" : "rgba(26,20,8,0.12)" }} style={({ pressed }) => [styles.goBtn, isGoing ? styles.goOn : styles.goOff, pressed && { opacity: 0.9, transform: [{ scale: 0.985 }] }]}>
           <Text style={[styles.goLabel, { color: isGoing ? colors.crowdLow : "#1a1408" }]}>{isGoing ? "✓ You're going" : "I'm going"}</Text>
         </Pressable>
@@ -96,7 +99,7 @@ export function SpotDetail({
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.canvas },
-  hero: { height: 340, justifyContent: "space-between", paddingTop: 52, paddingHorizontal: 18, paddingBottom: 18 },
+  hero: { height: 340, justifyContent: "space-between", paddingHorizontal: 18, paddingBottom: 18 },
   heroTop: { flexDirection: "row", justifyContent: "space-between" },
   circle: { width: 38, height: 38, borderRadius: 19, backgroundColor: "rgba(10,9,11,0.5)", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)", justifyContent: "center", alignItems: "center" },
   circlePressed: { opacity: 0.6, transform: [{ scale: 0.92 }] },
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
   gArrow: { color: colors.golden, fontSize: 16, marginTop: 1 },
   gLabel: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 0.5, marginBottom: 5 },
   gText: { color: colors.muted3, fontFamily: fonts.sans, fontSize: 14, lineHeight: 21 },
-  bottomBar: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 30 },
+  bottomBar: { position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: 18, paddingTop: 14 },
   goBtn: { alignItems: "center", paddingVertical: 16, borderRadius: 16, borderWidth: 1 },
   goOff: { backgroundColor: colors.golden, borderColor: "transparent" },
   goOn: { backgroundColor: "rgba(127,176,122,0.16)", borderColor: "rgba(127,176,122,0.4)" },

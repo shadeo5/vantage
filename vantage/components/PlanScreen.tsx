@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, fonts, screen } from "../theme";
+import { safeTop } from "../lib/safeArea";
 import { findSpot, spotImageSource, windowMeta, type Spot } from "../lib/spots";
 import { fitGapLabel } from "../lib/gearProfile";
 import type { LensSpec } from "../lib/gear";
@@ -23,6 +25,7 @@ const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "T
 export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOpen, onToggleGoing }: {
   spots: Spot[]; going: string[]; cameraId: string; lenses: LensSpec[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
+  const insets = useSafeAreaInsets();
   const now = new Date();
   const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const dateFor = (w: When) => {
@@ -39,7 +42,7 @@ export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOp
   };
   const week = PLAN.map((m) => ({ ...m, date: dateFor(m.when) })).sort((a, b) => a.date.getTime() - b.date.getTime());
   return (
-    <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
+    <ScrollView contentContainerStyle={[styles.content, { paddingTop: safeTop(insets, 20, screen.padTop), paddingBottom: 118 + insets.bottom }]} alwaysBounceVertical overScrollMode="always">
       <Text style={styles.eyebrow}>YOUR PLAN · {going.length} GOING</Text>
       <Text style={styles.title}>This week</Text>
 
@@ -85,7 +88,7 @@ export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOp
 }
 
 const styles = StyleSheet.create({
-  content: { paddingTop: screen.padTop, paddingHorizontal: screen.padSide, paddingBottom: 118 },
+  content: { paddingHorizontal: screen.padSide },
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, marginTop: 6, marginBottom: 24 },
   dayRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },

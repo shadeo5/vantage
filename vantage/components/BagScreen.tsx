@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from "react-native";
 import Svg, { Rect, Circle, Path } from "react-native-svg";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, fonts, screen } from "../theme";
+import { safeTop } from "../lib/safeArea";
 import { type Genre, type LensSpec, getCamera } from "../lib/gear";
 import { cameraLabel, cameraMeta, fixedLensLabel, lensLabel, specKey, LENS_PRESETS } from "../lib/gearProfile";
 import { CameraPicker } from "./CameraPicker";
@@ -19,6 +21,7 @@ export function BagScreen({
   styleOpen: boolean; stylePick: string | null;
   onToggleStyle: () => void; onPickStyle: (s: string) => void;
 }) {
+  const insets = useSafeAreaInsets();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [focal, setFocal] = useState("");
@@ -42,7 +45,7 @@ export function BagScreen({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
+    <ScrollView contentContainerStyle={[styles.content, { paddingTop: safeTop(insets, 20, screen.padTop), paddingBottom: 118 + insets.bottom }]} alwaysBounceVertical overScrollMode="always">
       <Text style={styles.eyebrow}>YOUR GEAR · SAVES AS YOU GO</Text>
       <Text style={styles.title}>Your bag</Text>
       <Text style={styles.sub}>What you shoot with, so we only suggest shoots your gear can nail — and tell you <Text style={styles.gold}>which lens to grab.</Text></Text>
@@ -157,7 +160,7 @@ export function BagScreen({
 }
 
 const styles = StyleSheet.create({
-  content: { paddingTop: screen.padTop, paddingHorizontal: screen.padSide, paddingBottom: 118 },
+  content: { paddingHorizontal: screen.padSide },
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, lineHeight: 32, marginTop: 6 },
   sub: { color: colors.muted3, fontFamily: fonts.sans, fontSize: 15, lineHeight: 23, marginTop: 12 },

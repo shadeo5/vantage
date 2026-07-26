@@ -74,8 +74,50 @@ create index if not exists spots_city_idx on public.spots (city_id);
 alter table public.cities enable row level security;
 alter table public.spots  enable row level security;
 
+-- ── Content: events (per the EVENTS_ARCHITECTURE ADR) ────────────────────────
+-- Time-bound, photographable happenings (festivals, parades). Same public-read,
+-- pipeline-written model as spots. Wider than spots for the event shape.
+-- Dates are kept as TEXT on purpose: the catalog mixes date-only ("2027-04-09",
+-- an all-day event) and datetime ("2026-09-05T10:00"), both read in the city's
+-- LOCAL time by lib/events.ts parseLocal — storing timestamps would lose that.
+-- No image column: events inherit art from their venue spot via venue_spot_id.
+create table if not exists public.events (
+  id                text primary key,              -- slug: 'dragon-con-parade'
+  city_id           text not null references public.cities(id) on delete cascade,
+  name              text not null,
+  event_type        text,                          -- display label: "Costume parade / spectacle"
+  genres            text[] not null default '{}',  -- photo genres, primary first
+  neighborhood      text,
+  venue_spot_id     text,                          -- soft ref to a spot id (no FK: matches the
+                                                   -- app's pack.find lookup; null for standalone)
+  recurrence        text,                          -- human-readable ("Second weekend of April")
+  window_start      text,                          -- "2026-09-05T10:00" or date-only "2027-04-09"
+  window_end        text,
+  window_confidence text,                          -- 'high' | 'needs-date-verify'
+  admission         text,
+  ticketing         text,
+  magnitude         text,                          -- 'high' | 'medium' | 'low' (draw amplifier)
+  window_type       text,                          -- 'golden' | 'blue' | 'flat'
+  tagline           text,
+  reason            text,
+  why               text,
+  look              text[] not null default '{}',
+  kit_angles        jsonb not null default '{}',   -- { wide, normal, tele, macro } angle notes
+  getting           text,
+  source            text,
+  published         boolean not null default false
+);
+
+create index if not exists events_city_idx on public.events (city_id);
+
+alter table public.cities enable row level security;
+alter table public.spots  enable row level security;
+alter table public.events enable row level security;
+
 -- Public read of published rows only (drafts stay hidden until flipped published).
 create policy "Anyone can read published cities"
   on public.cities for select using (published);
 create policy "Anyone can read published spots"
   on public.spots for select using (published);
+create policy "Anyone can read published events"
+  on public.events for select using (published);

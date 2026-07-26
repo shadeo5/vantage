@@ -26,7 +26,8 @@ import { LockScreen } from "./components/LockScreen";
 import { BagScreen } from "./components/BagScreen";
 import { PlanScreen } from "./components/PlanScreen";
 import { ComingUp } from "./components/ComingUp";
-import { ATLANTA_EVENTS, upcomingEvents, liveEvents, eventToSpot } from "./lib/events";
+import { ATLANTA_EVENTS, upcomingEvents, liveEvents, eventToSpot, type Opportunity } from "./lib/events";
+import { fetchEvents } from "./lib/eventPack";
 import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre } from "./lib/gearProfile";
 import { loadLensIds, saveLensIds, loadCameraId, saveCameraId } from "./lib/gearStorage";
 import { loadSavedIds, saveSavedIds } from "./lib/savedStorage";
@@ -57,6 +58,8 @@ export default function App() {
   // choice hydrates (GPS-based default is P2). `cities` feeds the header switcher.
   const [cityId, setCityId] = useState<string>(CITY_ID);
   const [cities, setCities] = useState<City[]>([]);
+  const [events, setEvents] = useState<Opportunity[]>(ATLANTA_EVENTS); // bundle for instant paint; DB load below
+
   const [cloud, setCloud] = useState<Forecast | null>(null);
   const [tab, setTab] = useState<Tab>("today");
   const [detailOpen, setDetailOpen] = useState(false);
@@ -104,6 +107,12 @@ export default function App() {
   // 3). Runs on mount for the default, then again when the saved/chosen city lands.
   useEffect(() => {
     fetchCityPack(cityId).then(setSpots);
+  }, [cityId]);
+
+  // Live events for the current city, read from the DB (bundled fallback). Editing an
+  // event in the Supabase dashboard shows up here on the next load — no app release.
+  useEffect(() => {
+    fetchEvents(cityId).then(setEvents);
   }, [cityId]);
 
   // Load the list of published cities once, for the header switcher.
@@ -162,10 +171,9 @@ export default function App() {
   // the functional-update `prev`, so it only writes once/day and never loops with the pick.
   useEffect(() => {
     if (!hydrated || spots.length === 0) return;
-    const evs = cityId === "atlanta" ? ATLANTA_EVENTS : [];
-    const heroId = tonightNudge(spots, new Date(), cameraId, lenses, { journal, cloud, shownLog, events: evs }).spot.id;
+    const heroId = tonightNudge(spots, new Date(), cameraId, lenses, { journal, cloud, shownLog, events }).spot.id;
     setShownLog((prev) => recordShown(prev, heroId, new Date()));
-  }, [hydrated, spots, cameraId, lenses, cloud, journal]);
+  }, [hydrated, spots, cameraId, lenses, cloud, journal, events]);
 
   if (!fontsLoaded) return <View style={[styles.root, styles.center]}><ActivityIndicator color={colors.golden} /></View>;
 
@@ -175,8 +183,9 @@ export default function App() {
   const greeting = now.getHours() < 12 ? "good morning" : now.getHours() < 17 ? "good afternoon" : "good evening";
   // The nudge brain (N1) decides tonight's pick + whether it's worth going out.
   // The journal feeds variety: a spot you just shot steps aside so Today stays fresh.
-  // Events are bundled + Atlanta-only for now — don't surface Atlanta events in Nashville.
-  const cityEvents = cityId === "atlanta" ? ATLANTA_EVENTS : [];
+  // Events come from the DB (bundled fallback), scoped to the current city — so Nashville
+  // never shows Atlanta events (fetchEvents returns [] for a city with no rows).
+  const cityEvents = events;
   const verdict = tonightNudge(spots, now, cameraId, lenses, { journal, cloud, shownLog, events: cityEvents });
   const hero = verdict.spot;
   // "Best near you" = a short, quality-gated set (max 4) — not the whole pack. On a

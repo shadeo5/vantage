@@ -10,7 +10,8 @@
     "images": "node --env-file-if-exists=.env build-images.mjs",
     "seed": "node build-seed.mjs",
     "seed:events": "node build-events-seed.mjs",
-    "image-urls": "node build-image-urls.mjs"
+    "image-urls": "node build-image-urls.mjs",
+    "gear": "node build-gear.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",

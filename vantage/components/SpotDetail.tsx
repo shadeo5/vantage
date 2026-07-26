@@ -6,19 +6,20 @@ import { Spot, spotImageSource } from "../lib/spots";
 import { lightStripModel } from "../lib/light";
 import { shootBrief } from "../lib/shootBrief";
 import { type Forecast } from "../lib/weather";
+import type { LensSpec } from "../lib/gear";
 import { LightStrip } from "./LightStrip";
 import { ShootBriefCard } from "./ShootBriefCard";
 
 export function SpotDetail({
-  spot, isGoing, isSaved, cloud, cameraId, lensIds, onBack, onToggleGoing, onToggleSaved,
+  spot, isGoing, isSaved, cloud, cameraId, lenses, onBack, onToggleGoing, onToggleSaved,
 }: {
-  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; cameraId: string; lensIds: string[]; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
+  spot: Spot; isGoing: boolean; isSaved: boolean; cloud?: Forecast | null; cameraId: string; lenses: LensSpec[]; onBack: () => void; onToggleGoing: () => void; onToggleSaved: () => void;
 }) {
   const now = new Date();
   // The detail page is now-first (E9 · PH3/PH4): what the light's doing at THIS moment,
   // what to shoot in it, and the kit's readiness — not a golden-hour countdown.
   const strip = lightStripModel(now, spot.lat, spot.lon, cloud);
-  const brief = shootBrief(now, spot, cameraId, lensIds, cloud);
+  const brief = shootBrief(now, spot, cameraId, lenses, cloud);
   const nowLabel = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }).toLowerCase().replace(/\s/g, "");
 
   // Cross-fade the detail in over the current screen (it's an overlay above the pager,

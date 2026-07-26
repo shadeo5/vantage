@@ -1,49 +1,78 @@
-import { LENS_CHIPS, DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS, kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, fitGapLabel, cameraLabel, cameraMeta } from "../lib/gearProfile";
-import { getLens, getCamera } from "../lib/gear";
+import {
+  DEFAULT_CAMERA_ID, DEFAULT_LENSES, LENS_PRESETS,
+  kitGenres, primaryLensLabel, bestLensForGenre, fitLabel, fitGapLabel,
+  lensLabel, cameraLabel, cameraMeta,
+} from "../lib/gearProfile";
+import { getCamera, type LensSpec } from "../lib/gear";
+
+const L = (minFocal: number, maxAperture: number, extra: Partial<LensSpec> = {}): LensSpec =>
+  ({ minFocal, maxFocal: minFocal, maxAperture, ...extra });
+const ILC = "sony-a7-iv"; // full-frame interchangeable
+const l35 = L(35, 1.8), l50 = L(50, 1.8);
+const tele: LensSpec = { minFocal: 70, maxFocal: 200, maxAperture: 2.8 };
+const macro = L(90, 2.8, { macro: true });
 
 describe("gear profile", () => {
-  test("every lens chip maps to a real catalog lens", () => {
-    // getLens falls back to LENSES[0] on an unknown id, so a typo would fail this.
-    for (const chip of LENS_CHIPS) {
-      expect(getLens(chip.id).id).toBe(chip.id);
-    }
-  });
-
   test("the default camera is a real catalog camera", () => {
     expect(getCamera(DEFAULT_CAMERA_ID).id).toBe(DEFAULT_CAMERA_ID);
   });
 
-  test("the default kit covers Street", () => {
-    expect(kitGenres(DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS)).toContain("Street");
+  test("presets are all valid generic descriptors", () => {
+    for (const p of LENS_PRESETS) {
+      expect(p.spec.maxFocal).toBeGreaterThanOrEqual(p.spec.minFocal);
+      expect(p.spec.maxAperture).toBeGreaterThan(0);
+    }
   });
 
-  test("adding a long telephoto adds Sports", () => {
-    const g = kitGenres(DEFAULT_CAMERA_ID, [...DEFAULT_LENS_IDS, "sony-fe-70-200-28gm2"]);
-    expect(g).toContain("Sports");
+  test("the default (fixed-lens X100VI) kit covers Street from its built-in lens", () => {
+    expect(kitGenres(DEFAULT_CAMERA_ID, DEFAULT_LENSES)).toContain("Street");
   });
 
-  test("adding more gear never shrinks coverage, and a macro adds Details", () => {
-    const base = kitGenres(DEFAULT_CAMERA_ID, DEFAULT_LENS_IDS);
-    const more = kitGenres(DEFAULT_CAMERA_ID, [...DEFAULT_LENS_IDS, "sony-fe90-macro"]);
+  test("adding a long telephoto to an ILC adds Sports", () => {
+    expect(kitGenres(ILC, [l35, tele])).toContain("Sports");
+  });
+
+  test("adding a macro adds Details and never shrinks coverage", () => {
+    const base = kitGenres(ILC, [l35]);
+    const more = kitGenres(ILC, [l35, macro]);
     expect(more.length).toBeGreaterThanOrEqual(base.length);
     expect(more).toContain("Details");
   });
 
-  test("primaryLensLabel reflects the selection, with a sane fallback", () => {
-    expect(primaryLensLabel(["sony-fe-70-200-28gm2"])).toBe("70–200mm");
-    expect(primaryLensLabel([])).toBe("35mm");
+  describe("lensLabel", () => {
+    test("prime → focal; zoom → range; macro flagged", () => {
+      expect(lensLabel(l50)).toBe("50mm");
+      expect(lensLabel(tele)).toBe("70–200mm");
+      expect(lensLabel(macro)).toBe("90mm macro");
+    });
+  });
+
+  describe("primaryLensLabel — honest, no fake default", () => {
+    test("a fixed-lens body reports its built-in focal", () => {
+      expect(primaryLensLabel("leica-q3", [])).toBe("28mm");
+      expect(primaryLensLabel(DEFAULT_CAMERA_ID, [])).toBe("35mm"); // X100VI = 35mm equiv
+    });
+    test("an ILC reports its first lens, or an honest fallback when empty", () => {
+      expect(primaryLensLabel(ILC, [tele])).toBe("70–200mm");
+      expect(primaryLensLabel(ILC, [])).toBe("lens");
+    });
   });
 
   describe("bestLensForGenre — never names a lens that doesn't fit", () => {
-    test("a selected 35mm is the street pick", () => {
-      expect(bestLensForGenre(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBe("35mm");
-    });
-    test("a telephoto-only kit falls back to the (street-capable) camera for Street", () => {
-      // The 70–200 doesn't cover Street, so it must NOT be named — the X100VI body does.
-      expect(bestLensForGenre(DEFAULT_CAMERA_ID, ["sony-fe-70-200-28gm2"], "Street")).toBe("X100VI");
+    test("a selected 35mm is the street pick on an ILC", () => {
+      expect(bestLensForGenre(ILC, [l35], "Street")).toBe("35mm");
     });
     test("the telephoto IS the pick for Sports", () => {
-      expect(bestLensForGenre(DEFAULT_CAMERA_ID, ["sony-fe-70-200-28gm2"], "Sports")).toBe("70–200mm");
+      expect(bestLensForGenre(ILC, [tele], "Sports")).toBe("70–200mm");
+    });
+    test("a telephoto-only ILC has no Street lens → null (honest gap)", () => {
+      expect(bestLensForGenre(ILC, [tele], "Street")).toBeNull();
+    });
+    test("a fixed-lens Q3 names its own 28mm for Street (never the model name)", () => {
+      expect(bestLensForGenre("leica-q3", [], "Street")).toBe("28mm");
+    });
+    test("a fixed-lens Q3 (28mm) has no Wildlife reach → null", () => {
+      expect(bestLensForGenre("leica-q3", [], "Wildlife")).toBeNull();
     });
   });
 
@@ -52,38 +81,31 @@ describe("gear profile", () => {
       expect(cameraLabel(getCamera("fuji-x100vi"))).toBe("Fujifilm X100VI");
     });
     test("cameraMeta shows the fixed-lens equivalent for a compact", () => {
-      // X100VI: 23mm × 1.5 crop ≈ 35mm equivalent, f/2.
-      expect(cameraMeta(getCamera("fuji-x100vi"))).toBe("Fixed 35mm-equiv · f/2");
+      expect(cameraMeta(getCamera("fuji-x100vi"))).toBe("Fixed 35mm · f/2");
     });
     test("cameraMeta shows sensor + interchangeable for an ILC", () => {
       expect(cameraMeta(getCamera("sony-a7-iv"))).toBe("Full-frame · interchangeable");
     });
     test("changing the body changes the kit's genres", () => {
-      // A 50mm reads ~75mm (Portraits) on APS-C but stays 50mm (Street) on full-frame.
-      const apsc = kitGenres("fuji-xt5", ["sony-fe50-18"]);
-      const ff = kitGenres("sony-a7-iv", ["sony-fe50-18"]);
+      const apsc = kitGenres("fuji-xt5", [l50]); // 50mm → ~75mm on APS-C (Portraits, not Street)
+      const ff = kitGenres("sony-a7-iv", [l50]); // stays 50mm (Street)
       expect(ff).toContain("Street");
       expect(apsc).not.toContain("Street");
     });
   });
 
-  describe("fitLabel", () => {
-    test("names the fitting lens for a covered genre", () => {
-      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBe("fits your 35mm");
+  describe("fitLabel / fitGapLabel", () => {
+    test("fitLabel names the fitting lens for a covered genre", () => {
+      expect(fitLabel(ILC, [l35], "Street")).toBe("fits your 35mm");
     });
-    test("offers a positive optional-upgrade note for a genre the kit isn't ideal for", () => {
-      // The X100VI body + only a macro lens covers neither Sports nor Wildlife —
-      // framed as an upgrade opportunity, never as "you can't shoot this".
-      expect(fitLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a longer lens would shine here");
+    test("fitLabel offers a positive note for a genre the kit isn't ideal for", () => {
+      expect(fitLabel(ILC, [macro], "Wildlife")).toBe("a longer lens would shine here");
     });
-  });
-
-  describe("fitGapLabel", () => {
-    test("is null when the kit already suits the genre (no wallpaper label)", () => {
-      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe35-18"], "Street")).toBeNull();
+    test("fitGapLabel is null when the kit already suits the genre", () => {
+      expect(fitGapLabel(ILC, [l35], "Street")).toBeNull();
     });
-    test("surfaces the upbeat upgrade note only when a different lens would elevate it", () => {
-      expect(fitGapLabel(DEFAULT_CAMERA_ID, ["sony-fe90-macro"], "Wildlife")).toBe("a longer lens would shine here");
+    test("fitGapLabel surfaces the note only on a real gap", () => {
+      expect(fitGapLabel(ILC, [macro], "Wildlife")).toBe("a longer lens would shine here");
     });
   });
 });

@@ -16,9 +16,9 @@
 import { Spot } from "./spots";
 import { getLightWindows, fmtTime, lightPhaseAt, LightWindows } from "./light";
 import { fastestAperture } from "./shootBrief";
-import { bestLensForGenre, fitLabel, LENS_CHIPS } from "./gearProfile";
+import { bestLensForGenre, fitLabel } from "./gearProfile";
 import { cloudFactor, skyLabel, type Forecast } from "./weather";
-import type { Genre } from "./gear";
+import type { Genre, LensSpec } from "./gear";
 import type { JournalEntry } from "./journal";
 import { type Opportunity, isLive, eventWindow, eventToSpot } from "./events";
 
@@ -81,16 +81,16 @@ export function lightTiming(now: Date, start: Date, end: Date): number {
   return 0.2; // window already passed today
 }
 
-// 0..1 gear fit: a dedicated lens for the genre beats the body, which beats a stretch.
-export function gearFitScore(cameraId: string, lensIds: string[], genre: Genre): number {
-  const best = bestLensForGenre(cameraId, lensIds, genre);
-  if (best === null) return 0.35;
-  return LENS_CHIPS.some((c) => c.short === best) ? 1.0 : 0.7;
+// Gear fit: a lens in the kit that covers the genre (a selected lens OR a fixed-lens
+// body's built-in) → full fit; nothing that covers it → a stretch. (Generic descriptors
+// make this binary — bestLensForGenre already returns a covering lens's label or null.)
+export function gearFitScore(cameraId: string, lenses: LensSpec[], genre: Genre): number {
+  return bestLensForGenre(cameraId, lenses, genre) === null ? 0.35 : 1.0;
 }
 
 type ScoredSpot = { spot: Spot; score: number; signals: NudgeSignal[]; win: { start: Date; end: Date } };
 
-function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], cloud?: Forecast | null): ScoredSpot {
+function scoreSpot(spot: Spot, now: Date, cameraId: string, lenses: LensSpec[], cloud?: Forecast | null): ScoredSpot {
   const w = getLightWindows(now, spot.lat, spot.lon);
   const win = windowFor(spot, w);
   const timing = lightTiming(now, win.start, win.end);
@@ -102,7 +102,7 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], c
   // the way a flat-light landscape spot is. weather (current sky) and phaseScore (the
   // genre's inherent light-dependence) are orthogonal — no double-count.
   const light = phaseScore(spot.genre, spot.windowType) * timing * weather;
-  const gear = gearFitScore(cameraId, lensIds, spot.genre);
+  const gear = gearFitScore(cameraId, lenses, spot.genre);
   const score = LIGHT_W * light + GEAR_W * gear; // activity weight 0 for now
 
   const windowLabel = `${spot.windowType === "blue" ? "Blue" : spot.windowType === "golden" ? "Golden" : "Day"} light ${fmtTime(win.start)}–${fmtTime(win.end)}`;
@@ -113,7 +113,7 @@ function scoreSpot(spot: Spot, now: Date, cameraId: string, lensIds: string[], c
     // Activity (live events) is not built yet — omit the row rather than show a
     // "coming soon" IOU on the app's most persuasive moment (#T3). Re-add an
     // { key: "activity", … } entry here once events land (weight is still 0 above).
-    { key: "gear", label: "Your kit", score: gear, detail: `${fitLabel(cameraId, lensIds, spot.genre)}.` },
+    { key: "gear", label: "Your kit", score: gear, detail: `${fitLabel(cameraId, lenses, spot.genre)}.` },
   ];
   return { spot, score, signals, win };
 }
@@ -144,9 +144,9 @@ export type NudgeOpts = { journal?: JournalEntry[]; cloud?: Forecast | null; sho
 // fit can still lose to a strong spot. Only fires while now is inside the event window.
 const EVENT_MAGNITUDE_W: Record<Opportunity["magnitude"], number> = { high: 0.45, medium: 0.28, low: 0.15 };
 
-function scoreEvent(ev: Opportunity, pack: Spot[], now: Date, cameraId: string, lensIds: string[], cloud?: Forecast | null) {
+function scoreEvent(ev: Opportunity, pack: Spot[], now: Date, cameraId: string, lenses: LensSpec[], cloud?: Forecast | null) {
   const adapted = eventToSpot(ev, pack);
-  const ss = scoreSpot(adapted, now, cameraId, lensIds, cloud);
+  const ss = scoreSpot(adapted, now, cameraId, lenses, cloud);
   const score = Math.min(1, ss.score + EVENT_MAGNITUDE_W[ev.magnitude]); // scarcity boost, capped
   return { adapted, ev, ss, score };
 }
@@ -226,10 +226,10 @@ export const MAX_NEAR_YOU = 4;
 // own (a QUALITY GATE — so every spot shown is genuinely worth it, and a quiet night
 // honestly shows fewer or none rather than padding to a fixed count), excluding the
 // hero, capped at MAX_NEAR_YOU.
-export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lensIds: string[], exclude: string | string[], opts?: NudgeOpts): Spot[] {
+export function bestNearYou(spots: Spot[], now: Date, cameraId: string, lenses: LensSpec[], exclude: string | string[], opts?: NudgeOpts): Spot[] {
   const excluded = new Set(Array.isArray(exclude) ? exclude : [exclude]); // hero + any eclipsed venue
   return spots
-    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lenses, opts?.cloud); return { spot: s, base: ss.score, rank: varietyRank(ss.score, s, now, opts) }; })
     .filter((s) => !excluded.has(s.spot.id) && s.base >= GO_THRESHOLD) // gate on real quality
     .sort((a, b) => b.rank - a.rank)                                  // order by the variety-aware rank
     .slice(0, MAX_NEAR_YOU)
@@ -257,13 +257,13 @@ const NIGHT_BAR = 0.7; // a spot must clear this night-fit to make the shelf
 
 // Evergreen after-dark spots, gated by kit + ordered by night-fit. Empty unless it's
 // actually dark at the pack's location (so it never shows in daylight).
-export function goodInTheDark(spots: Spot[], now: Date, cameraId: string, lensIds: string[], excludeId: string, opts?: NudgeOpts): Spot[] {
+export function goodInTheDark(spots: Spot[], now: Date, cameraId: string, lenses: LensSpec[], excludeId: string, opts?: NudgeOpts): Spot[] {
   const anchor = spots[0];
   if (!anchor) return [];
   const phase = lightPhaseAt(now, anchor.lat, anchor.lon);
   if (phase !== "night" && phase !== "blue") return []; // only "in the dark"
   // Faster glass → the kit handles the dark better, so it surfaces the best-matched first.
-  const fastest = fastestAperture(cameraId, lensIds);
+  const fastest = fastestAperture(cameraId, lenses);
   const kitFactor = fastest <= 2.8 ? 1 : fastest <= 4 ? 0.92 : 0.85;
   return spots
     .filter((s) => s.id !== excludeId)
@@ -279,9 +279,9 @@ export function goodInTheDark(spots: Spot[], now: Date, cameraId: string, lensId
 }
 
 // Decide tonight: rank every spot, pick the best, and say whether to nudge.
-export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds: string[], opts?: NudgeOpts): NudgeVerdict {
+export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lenses: LensSpec[], opts?: NudgeOpts): NudgeVerdict {
   const scored = spots
-    .map((s) => { const ss = scoreSpot(s, now, cameraId, lensIds, opts?.cloud); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
+    .map((s) => { const ss = scoreSpot(s, now, cameraId, lenses, opts?.cloud); return { ss, rank: varietyRank(ss.score, s, now, opts) }; })
     .sort((a, b) => b.rank - a.rank);
   // Anti-repeat: take the top spot we did NOT headline in the last couple days — but only
   // among spots that genuinely clear the go bar. If every worth-it spot is on cooldown (or
@@ -294,7 +294,7 @@ export function tonightNudge(spots: Spot[], now: Date, cameraId: string, lensIds
   const live = (opts?.events ?? []).filter((e) => isLive(e, now));
   let best: ReturnType<typeof scoreEvent> | null = null;
   for (const ev of live) {
-    const c = scoreEvent(ev, spots, now, cameraId, lensIds, opts?.cloud);
+    const c = scoreEvent(ev, spots, now, cameraId, lenses, opts?.cloud);
     if (!best || c.score > best.score) best = c;
   }
   if (best && best.score > top.score) {

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, ImageBackground, Pressable } from "
 import { colors, fonts, screen } from "../theme";
 import { findSpot, spotImageSource, windowMeta, type Spot } from "../lib/spots";
 import { fitGapLabel } from "../lib/gearProfile";
+import type { LensSpec } from "../lib/gear";
 
 // When a card falls: `offset` = N days from today; `dow` = the next occurrence of a
 // weekday (0=Sun). Event-anchored spots use `dow` so "the Sunday market" really lands
@@ -19,8 +20,8 @@ const PLAN: PlanMeta[] = [
 ];
 const tagColor = (t: string) => (t === "Happening" ? colors.crowdHigh : t === "The crowd" ? colors.flat : colors.golden);
 
-export function PlanScreen({ spots, going, cameraId, lensIds, windowTimeFor, onOpen, onToggleGoing }: {
-  spots: Spot[]; going: string[]; cameraId: string; lensIds: string[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
+export function PlanScreen({ spots, going, cameraId, lenses, windowTimeFor, onOpen, onToggleGoing }: {
+  spots: Spot[]; going: string[]; cameraId: string; lenses: LensSpec[]; windowTimeFor: (t: string) => string; onOpen: (id: string) => void; onToggleGoing: (id: string) => void;
 }) {
   const now = new Date();
   const today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -47,7 +48,7 @@ export function PlanScreen({ spots, going, cameraId, lensIds, windowTimeFor, onO
           const spot = findSpot(spots, m.id);
           const wm = windowMeta(spot.windowType);
           const on = going.includes(m.id);
-          const fitGap = fitGapLabel(cameraId, lensIds, spot.genre); // only shows when the kit falls short (#P3)
+          const fitGap = fitGapLabel(cameraId, lenses, spot.genre); // only shows when the kit falls short (#P3)
           return (
             <View key={m.id}>
               <View style={styles.dayRow}>

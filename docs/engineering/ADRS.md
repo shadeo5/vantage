@@ -12,7 +12,7 @@ area** — most of these encode a non-obvious trade-off that's easy to undo by a
 |---|---|---|
 | [TECH_DECISIONS.html](TECH_DECISIONS.html) | living | Running record of technical choices (stack, structure, the small calls). |
 | [PUSH_ARCHITECTURE.html](PUSH_ARCHITECTURE.html) | ✅ shipped | How the in-app nudge becomes a real push: Supabase `pg_cron` → the ported Deno "brain" → Expo Push. **Explains why the scoring brain lives in two places** — see the parity guard below. |
-| [GEAR_MATCHING.html](GEAR_MATCHING.html) | ✅ shipped (E2) | How a photographer's kit maps to shootable genres (the matching engine). Open question noted: filter vs. re-rank vs. annotate. |
+| [GEAR_MATCHING.html](GEAR_MATCHING.html) | ✅ shipped · overhauled Phase 1 (Jul 25) | How a photographer's kit maps to shootable genres. Phase 1: generic lens descriptors + a curated Fuji/Sony/Leica camera catalog (single source + parity guard) + fixed-lens-aware Bag. Open: filter/re-rank/annotate; Phase 2 = multiple kits. |
 | [LIGHT_QUALITY_GENRE.html](LIGHT_QUALITY_GENRE.html) | ✅ shipped (CB7) | Light quality is **genre-dependent** — golden hour is a landscape bias, street is light-flexible. Replaced a global "golden > flat" weight with per-genre light sensitivity. Grounded in [LIGHT_GENRE_RESEARCH.md](LIGHT_GENRE_RESEARCH.md) (22-source pass). |
 | [PHASE_HONEST_LIGHT.html](PHASE_HONEST_LIGHT.html) | ✅ shipped (E9) | Every surface reads the light you have **now** — never "golden hour hits 8:05" at 9:30pm. |
 | [HERO_ANTI_REPEAT.md](HERO_ANTI_REPEAT.md) | ✅ shipped | Why Today stopped headlining the same spot daily — an anti-repeat rule (not a weight), plus the deeper flat-spot scoring issue it defers. |

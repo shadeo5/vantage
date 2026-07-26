@@ -1,20 +1,21 @@
 import {
   CAMERAS,
-  LENSES,
   getCamera,
-  getLens,
-  equivalentFocal,
+  equivFocal,
   categoryForFocal,
-  genresForLens,
+  genresForSpec,
   genresForCamera,
   genresForKit,
-  type Camera,
-  type Lens,
+  type LensSpec,
 } from "../lib/gear";
 
-describe("catalog data", () => {
+// A generic prime descriptor (the shape the UI now produces).
+const lens = (minFocal: number, maxAperture: number, extra: Partial<LensSpec> = {}): LensSpec =>
+  ({ minFocal, maxFocal: minFocal, maxAperture, ...extra });
+
+describe("camera catalog", () => {
   test("cameras carry the fields the matcher needs", () => {
-    expect(CAMERAS.length).toBeGreaterThanOrEqual(15);
+    expect(CAMERAS.length).toBeGreaterThanOrEqual(50);
     for (const c of CAMERAS) {
       expect(c.id).toBeTruthy();
       expect(c.brand).toBeTruthy();
@@ -28,51 +29,23 @@ describe("catalog data", () => {
     }
   });
 
-  test("lenses carry sane focal + aperture specs", () => {
-    expect(LENSES.length).toBeGreaterThanOrEqual(15);
-    for (const l of LENSES) {
-      expect(l.maxFocal).toBeGreaterThanOrEqual(l.minFocal);
-      if (l.type === "prime") expect(l.maxFocal).toBe(l.minFocal);
-      expect(l.maxAperture).toBeGreaterThan(0);
-    }
-  });
-
-  test("every lens category is represented in the catalog", () => {
-    const cats = new Set(LENSES.map((l) => l.category));
-    for (const cat of ["ultra-wide", "wide", "normal", "short-tele", "tele", "super-tele", "macro"] as const) {
-      expect(cats.has(cat)).toBe(true);
-    }
-  });
-
-  test("ids are unique across cameras and lenses", () => {
-    const camIds = CAMERAS.map((c) => c.id);
-    const lensIds = LENSES.map((l) => l.id);
-    expect(new Set(camIds).size).toBe(camIds.length);
-    expect(new Set(lensIds).size).toBe(lensIds.length);
+  test("scoped to Fujifilm / Sony / Leica, with unique ids", () => {
+    expect([...new Set(CAMERAS.map((c) => c.brand))].sort()).toEqual(["Fujifilm", "Leica", "Sony"]);
+    const ids = CAMERAS.map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 
-describe("lookups", () => {
-  test("getCamera / getLens return the match", () => {
+describe("getCamera", () => {
+  test("returns the match; falls back to the first entry for an unknown id", () => {
     expect(getCamera("fuji-x100vi").model).toBe("X100VI");
-    expect(getLens("sony-fe-70-200-28gm2").minFocal).toBe(70);
-  });
-  test("fall back to the first entry for an unknown id", () => {
     expect(getCamera("nope").id).toBe(CAMERAS[0].id);
-    expect(getLens("nope").id).toBe(LENSES[0].id);
   });
 });
 
-describe("equivalentFocal", () => {
-  const apsc = getCamera("fuji-xt5"); // 1.5x crop
-  test("a 33mm lens on an APS-C 1.5x body ≈ 50mm equiv", () => {
-    const lens = getLens("fuji-xf33-14");
-    expect(equivalentFocal(lens, apsc)).toBe(50); // 33 * 1.5 = 49.5 → 50
-  });
-  test("a 50mm on full-frame stays 50mm", () => {
-    const ff = getCamera("sony-a7-iv");
-    expect(equivalentFocal(getLens("sony-fe50-18"), ff)).toBe(50);
-  });
+describe("equivFocal", () => {
+  test("33mm on APS-C 1.5x ≈ 50mm equiv", () => expect(equivFocal(33, 1.5)).toBe(50));
+  test("full-frame keeps the physical focal", () => expect(equivFocal(50, 1.0)).toBe(50));
 });
 
 describe("categoryForFocal", () => {
@@ -86,34 +59,32 @@ describe("categoryForFocal", () => {
   });
 });
 
-describe("genresForLens", () => {
-  test("a fast 35mm prime is a Street lens", () => {
-    expect(genresForLens(getLens("sigma-35-14-art"))).toContain("Street");
-  });
-  test("a 70-200mm zoom covers Sports", () => {
-    expect(genresForLens(getLens("sony-fe-70-200-28gm2"))).toContain("Sports");
-  });
-  test("a macro lens is for Details", () => {
-    expect(genresForLens(getLens("sony-fe90-macro"))).toContain("Details");
-  });
+describe("genresForSpec (generic lenses)", () => {
+  test("a fast 35mm prime is a Street lens", () => expect(genresForSpec(lens(35, 1.4))).toContain("Street"));
+  test("a 70-200mm zoom covers Sports", () => expect(genresForSpec({ minFocal: 70, maxFocal: 200, maxAperture: 2.8 })).toContain("Sports"));
+  test("a macro lens is for Details", () => expect(genresForSpec(lens(90, 2.8, { macro: true }))).toContain("Details"));
   test("an ultra-wide covers Landscape and Architecture", () => {
-    const g = genresForLens(getLens("sigma-14-18-art"));
+    const g = genresForSpec(lens(14, 1.8));
     expect(g).toContain("Landscape");
     expect(g).toContain("Architecture");
   });
-  test("an 85mm f/1.8 is a Portraits lens", () => {
-    expect(genresForLens(getLens("sony-fe85-18"))).toContain("Portraits");
-  });
-  test("crop factor shifts a normal prime toward Portraits on APS-C", () => {
-    // 50mm on a 1.5x body = 75mm equiv → portrait territory
-    const g = genresForLens(getLens("sony-fe50-18"), getCamera("sony-a6700"));
-    expect(g).toContain("Portraits");
+  test("an 85mm f/1.8 is a Portraits lens", () => expect(genresForSpec(lens(85, 1.8))).toContain("Portraits"));
+  test("crop factor shifts a 50mm toward Portraits on APS-C (→75mm equiv)", () => {
+    expect(genresForSpec(lens(50, 1.8), getCamera("sony-a6700"))).toContain("Portraits");
   });
 });
 
-describe("genresForCamera", () => {
+describe("genresForCamera (fixed-lens bodies)", () => {
   test("the X100VI (23mm f/2, 1.5x → 35mm equiv) shoots Street", () => {
     expect(genresForCamera(getCamera("fuji-x100vi"))).toContain("Street");
+  });
+  test("the Leica Q3 (28mm f/1.7) shoots Street", () => {
+    expect(genresForCamera(getCamera("leica-q3"))).toContain("Street");
+  });
+  test("a fixed ZOOM compact (RX100 VII, ~24–194mm equiv) covers wide AND reach", () => {
+    const g = genresForCamera(getCamera("sony-rx100-vii"));
+    expect(g).toContain("Street");
+    expect(g).toContain("Sports");
   });
   test("an interchangeable-lens body contributes no built-in genres", () => {
     expect(genresForCamera(getCamera("sony-a7-iv"))).toEqual([]);
@@ -122,14 +93,12 @@ describe("genresForCamera", () => {
 
 describe("genresForKit", () => {
   test("a street + reach kit unions to cover Street and Sports", () => {
-    const cams: Camera[] = [getCamera("sony-a7-iv")];
-    const kit: Lens[] = [getLens("sigma-35-14-art"), getLens("sony-fe-70-200-28gm2")];
-    const g = genresForKit(cams, kit);
+    const g = genresForKit([getCamera("sony-a7-iv")], [lens(35, 1.4), { minFocal: 70, maxFocal: 200, maxAperture: 2.8 }]);
     expect(g).toContain("Street");
     expect(g).toContain("Sports");
   });
   test("result is deduped", () => {
-    const g = genresForKit([getCamera("sony-a7-iv")], [getLens("sony-fe50-18"), getLens("sony-fe50-18")]);
+    const g = genresForKit([getCamera("sony-a7-iv")], [lens(50, 1.8), lens(50, 1.8)]);
     expect(new Set(g).size).toBe(g.length);
   });
 });

@@ -3,7 +3,7 @@ import { tonightNudge } from "../lib/nudge";
 import { FALLBACK_SPOTS as SPOTS } from "../lib/spots";
 
 const CAM = "fuji-x100vi";
-const KIT = ["sony-fe35-18"];
+const KIT = [{ minFocal: 35, maxFocal: 35, maxAperture: 1.8 }];
 
 function copyOn(day: number) {
   const now = new Date(2026, 6, day, 19, 0, 0);

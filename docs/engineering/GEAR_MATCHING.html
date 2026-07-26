@@ -102,10 +102,15 @@
     <p class="lede">How a photographer's <b>kit</b> — their cameras and lenses — becomes a signal the app can act on: telling them which shoots their gear can actually nail, powering the <b>"why this pick — perfect for your fast 35"</b> line, and, later, shaping the nudge.</p>
     <div class="meta">
       <span class="tag">Doc <b>ADR — gear layer</b></span>
-      <span class="tag">Status <b>Built &amp; wired · annotate live</b></span>
-      <span class="tag">Updated <b>Jul 12, 2026</b></span>
+      <span class="tag">Status <b>Overhauled (Phase 1) · Jul 25, 2026</b></span>
+      <span class="tag">Updated <b>Jul 25, 2026</b></span>
     </div>
   </header>
+
+  <div class="call blue">
+    <div class="k">Phase 1 overhaul — Jul 25, 2026</div>
+    <p><b>Decision B (where gear data comes from) resolved:</b> <b>generic lenses</b> + a <b>curated camera catalog</b>. A kit lens is now a <code>LensSpec {minFocal,maxFocal,maxAperture,macro?}</code> descriptor (quick-picks + a custom "add a lens" entry) — focal + aperture is all the matcher needs, so any lens is expressible with <b>no lens catalog</b> (this also removed the lens duplication in the push). Cameras are one authored source of truth — <code>lib/cameras.catalog.json</code> (curated Fujifilm/Sony/Leica, 2010→today); the push reads a <b>generated</b> copy guarded by <code>parity.test.ts</code>. <b>Fixed-lens bodies</b> (X100, Q, RX1) now hide the lens picker and show their built-in lens as the kit — fixing the old bug where you could attach a 70–200mm to a Q3. <b>Known simplifications from §04 addressed:</b> fixed-lens is first-class; the crop-factor math is unchanged. <b>Deferred to Phase 2:</b> multiple named kits + a kit switcher. Full log: <code>docs/BACKLOG.md</code> (Gear model overhaul · Phase 1).</p>
+  </div>
 
   <!-- 01 -->
   <section>

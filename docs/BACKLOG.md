@@ -16,7 +16,19 @@
 - **Verified in-browser:** Q3 → no lens picker + built-in panel + Street/Arch/Landscape; a7 IV → presets toggle live (85mm → Portraits), custom 200mm f/2.8 → Sports/Wildlife/Nature. `npm run check` green (typecheck + lint + **186 tests**, +38). Fixed a copy bug found in verify ("bring your *your lens*" → "lens").
 - **⚠️ DEPLOY (manual, not done):** run `schema.sql` in Supabase (adds `lenses`, drops `lens_ids`) **then** `supabase functions deploy nudge` — in that order, so the push doesn't read a missing column. Until then the app writes `lenses` best-effort (old push keeps working on the old column).
 - **Post-ship fixes (on-device testing):** (1) the camera picker was a short bottom sheet → the soft keyboard covered the results; made it a full-height sheet (search pinned top) + dismiss-on-drag. (2) **fixed-lens phantom lenses** — lenses lingering from a prior ILC selection still polluted `kitGenres`/`fastestAperture` (a Q3 read "portraits/sports/wildlife" from a leftover 70–200); both now ignore separate lenses on a fixed-lens body (non-destructive). 188 tests. **⚠️ needs a new APK build to reach the phone** (JS is embedded in the preview build).
-- **🎯 Phase 2 (fast-follow, NOT built):** **multiple named kits** + a kit switcher (reuse the CitySwitcher pattern) + active-kit→push sync. **Later:** camera imagery ("see it"); brands beyond Fuji/Sony/Leica.
+- **Later:** camera imagery ("see it"); brands beyond Fuji/Sony/Leica.
+
+### Phase 2 · Multiple named kits + switcher  🎯 (NOT built)
+**Why:** a photographer carries different kits for different days (a light street kit vs. the full bag); one active profile can't express that.
+
+**Acceptance criteria** (each line = a test to write first):
+- [ ] A user can save more than one named kit (e.g. "Street", "Full bag"); names persist on-device across a restart.
+- [ ] Exactly one kit is active at a time; switching the active kit changes which lens the nudge/Today/Lock name.
+- [ ] The active kit (not all kits) is what syncs to Supabase and what the push scores against.
+- [ ] Deleting the active kit falls back to another kit, never to an empty profile.
+- [ ] Migration: an existing single-profile user becomes one kit named "My kit" with no data loss.
+
+**Out of scope:** kit sharing, per-city kits, camera imagery (all later). Reuse the CitySwitcher pattern for the switcher UI.
 
 ---
 

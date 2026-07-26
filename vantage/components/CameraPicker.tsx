@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Modal, TextInput, SectionList } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, fonts, radius, screen } from "../theme";
+import { safeTop } from "../lib/safeArea";
 import { CAMERAS, type Camera } from "../lib/gear";
 import { cameraLabel, cameraMeta } from "../lib/gearProfile";
 
@@ -15,6 +17,7 @@ export function CameraPicker({
   visible: boolean; currentId: string; onPick: (id: string) => void; onClose: () => void;
 }) {
   const [query, setQuery] = useState("");
+  const insets = useSafeAreaInsets();
 
   const sections = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -29,7 +32,7 @@ export function CameraPicker({
 
   return (
     <Modal visible={visible} animationType="slide" transparent statusBarTranslucent onRequestClose={onClose}>
-      <View style={styles.backdrop}>
+      <View style={[styles.backdrop, { paddingTop: safeTop(insets, 12, 48) }]}>
         <View style={styles.sheet}>
           <View style={styles.header}>
             <Text style={styles.title}>Your camera</Text>
@@ -52,7 +55,7 @@ export function CameraPicker({
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
             stickySectionHeadersEnabled={false}
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}
             ListEmptyComponent={<Text style={styles.empty}>No match — try a model name.</Text>}
             renderSectionHeader={({ section }) => <Text style={styles.sectionHead}>{section.brand.toUpperCase()}</Text>}
             renderItem={({ item }) => {
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
   // top so the soft keyboard never covers it, and the results list fills the whole screen
   // above the keyboard (dismiss-on-drag reveals the rest). Avoids the bottom-sheet + keyboard
   // clash where the keyboard ate the list.
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)", paddingTop: 48 },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)" },
   sheet: { flex: 1, backgroundColor: colors.canvas, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: screen.padSide, paddingTop: 18 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 24 },

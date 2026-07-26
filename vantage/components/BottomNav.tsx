@@ -1,16 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Line, Rect, Path } from "react-native-svg";
 import { colors, fonts } from "../theme";
+import { safeBottom } from "../lib/safeArea";
 
 type Tab = "today" | "plan" | "bag";
 const ACTIVE = colors.golden;
 const INACTIVE = "#9a97a1"; // brighter than before so inactive icons don't get lost
 
 export function BottomNav({ active, onNavigate }: { active: Tab; onNavigate: (t: Tab) => void }) {
+  const insets = useSafeAreaInsets();
   return (
-    <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={styles.bar}>
+    <LinearGradient colors={["rgba(15,15,17,0)", colors.canvas]} style={[styles.bar, { paddingBottom: safeBottom(insets, 12, 30) }]}>
       <Item label="Today" active={active === "today"} onPress={() => onNavigate("today")} icon={TodayIcon} />
       <Item label="Plan" active={active === "plan"} onPress={() => onNavigate("plan")} icon={PlanIcon} />
       <Item label="Bag" active={active === "bag"} onPress={() => onNavigate("bag")} icon={BagIcon} />
@@ -53,7 +56,7 @@ const BagIcon = (c: string) => (
 
 const styles = StyleSheet.create({
   bar: { position: "absolute", left: 0, right: 0, bottom: 0, flexDirection: "row", justifyContent: "space-between",
-    paddingHorizontal: 24, paddingTop: 12, paddingBottom: 30 },
+    paddingHorizontal: 24, paddingTop: 12 },
   item: { flex: 1, alignItems: "center", gap: 5 },
   pressed: { opacity: 0.6 },
   iconWrap: { width: 52, height: 30, borderRadius: 16, alignItems: "center", justifyContent: "center" },

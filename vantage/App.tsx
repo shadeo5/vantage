@@ -8,7 +8,9 @@ import {
   HankenGrotesk_600SemiBold, HankenGrotesk_700Bold,
 } from "@expo-google-fonts/hanken-grotesk";
 
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, fonts, screen as scr } from "./theme";
+import { safeTop } from "./lib/safeArea";
 import { FALLBACK_SPOTS, findSpot, spotImageSource, HERO_ID, type Spot } from "./lib/spots";
 import { fetchCityPack, fetchCities, CITY_ID, type City } from "./lib/cityPack";
 import { fetchForecast, type Forecast } from "./lib/weather";
@@ -84,6 +86,7 @@ export default function App() {
   // bottom bar both drive it and stay in sync. Detail rides above as an overlay so the
   // pager keeps its scroll position underneath.
   const { width: winWidth, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   // Cap the content to a phone-scale column on wide screens (web) so the UI doesn't
   // stretch edge-to-edge; on a real phone winWidth is already below the cap. The pager's
   // paging math uses this same capped width, so swipe + scrollTo stay consistent.
@@ -279,7 +282,7 @@ export default function App() {
         style={styles.pager}
       >
         {/* Today */}
-        <ScrollView style={{ width, height }} contentContainerStyle={styles.content} alwaysBounceVertical overScrollMode="always">
+        <ScrollView style={{ width, height }} contentContainerStyle={[styles.content, { paddingTop: safeTop(insets, 20, scr.padTop), paddingBottom: 118 + insets.bottom }]} alwaysBounceVertical overScrollMode="always">
           {dueSpot && <CheckInCard spotName={dueSpot.name} onWent={() => checkIn(dueSpot.id, true)} onSkipped={() => checkIn(dueSpot.id, false)} />}
           {gearBanner && !cam.fixedLens && lenses.length === 0 && <GearBanner onAdd={() => goToTab("bag")} onDismiss={() => setGearBanner(false)} />}
           <View style={styles.header}>
@@ -393,7 +396,7 @@ const styles = StyleSheet.create({
   column: { flex: 1 }, // phone-scale column, width capped + centered on wide (web) screens
   pager: { flex: 1 },
   center: { justifyContent: "center", alignItems: "center" },
-  content: { paddingTop: scr.padTop, paddingHorizontal: scr.padSide, paddingBottom: 118 },
+  content: { paddingHorizontal: scr.padSide },
   header: { flexDirection: "row", alignItems: "flex-start", marginBottom: 22 },
   eyebrow: { color: colors.muted, fontFamily: fonts.sansSemi, fontSize: 12, letterSpacing: 1.5 },
   title: { color: colors.ink, fontFamily: fonts.serif, fontSize: 30, lineHeight: 32, marginTop: 6 },

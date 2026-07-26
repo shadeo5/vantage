@@ -62,7 +62,6 @@ export function InspirationHero({
 
         <View style={styles.chips}>
           <Text style={[styles.chip, styles.chipGold]}>{light.icon} {light.chipLabel}</Text>
-          {spot.distance ? <Text style={styles.chip}>{spot.distance} away</Text> : null}
           {spot.type ? <Text style={styles.chip}>{spot.type}</Text> : null}
         </View>
 

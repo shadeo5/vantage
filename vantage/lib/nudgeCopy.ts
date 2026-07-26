@@ -55,9 +55,9 @@ export function nudgeCopy(verdict: NudgeVerdict, gearLens: string, now: Date): N
     `Keep the ${gearLens} close — ${spot.name} is worth a look tonight.`,
   ];
   const bodies = [
-    `${win} hits ${at} and ${spot.name} comes alive. Grab your ${gearLens} — ${spot.distance} away.`,
-    `${gearLens} weather at ${spot.name}. ${win} at ${at}, ${spot.distance} out.`,
-    `${win} at ${at} — ${spot.name}'s ${spot.distance} away and made for your ${gearLens}.`,
+    `${win} hits ${at} and ${spot.name} comes alive — grab your ${gearLens}.`,
+    `${gearLens} weather at ${spot.name}. ${win} at ${at}.`,
+    `${win} at ${at} — ${spot.name} is made for your ${gearLens}.`,
   ];
 
   const titles = confidence === "high" ? highTitles : medTitles;
